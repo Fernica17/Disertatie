@@ -65,23 +65,41 @@ export async function postFrame(url, blob, filename = 'frame.jpg') {
 /**
  * Draws a detection box over the video.
  *
- * Boxes come back in the detection frame's coordinate space, so they are
- * rescaled to whatever size the video is actually displayed at.
+ * Three coordinate spaces have to line up:
+ *  1. the box comes back in the downscaled frame that was sent for detection;
+ *  2. the video's own pixels are larger than that frame;
+ *  3. `object-fit: cover` then scales the video to fill its element and crops
+ *     the overflow, which shifts everything when the element is not the same
+ *     aspect ratio as the camera. A square stage over a 4:3 camera crops the
+ *     sides, so ignoring that offset draws the box left of the face.
  */
 export function drawDetectionBox(canvas, video, face, sourceWidth) {
-    canvas.width = video.clientWidth;
-    canvas.height = video.clientHeight;
+    const boxWidth = video.clientWidth;
+    const boxHeight = video.clientHeight;
+
+    canvas.width = boxWidth;
+    canvas.height = boxHeight;
 
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, boxWidth, boxHeight);
 
-    if (!face) {
+    if (!face || !video.videoWidth || !video.videoHeight) {
         return;
     }
 
-    const scale = video.clientWidth / sourceWidth;
+    const cover = Math.max(boxWidth / video.videoWidth, boxHeight / video.videoHeight);
+    const offsetX = (boxWidth - video.videoWidth * cover) / 2;
+    const offsetY = (boxHeight - video.videoHeight * cover) / 2;
+
+    // detection frame -> video pixels -> displayed pixels
+    const scale = (video.videoWidth / sourceWidth) * cover;
 
     ctx.strokeStyle = '#2ec4b6';
     ctx.lineWidth = 3;
-    ctx.strokeRect(face.x * scale, face.y * scale, face.width * scale, face.height * scale);
+    ctx.strokeRect(
+        offsetX + face.x * scale,
+        offsetY + face.y * scale,
+        face.width * scale,
+        face.height * scale,
+    );
 }
