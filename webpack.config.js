@@ -10,6 +10,7 @@ Encore
     .addEntry('app', './assets/js/app.js')
     .addEntry('admin', './assets/js/admin.js')
     .addEntry('login', './assets/js/login.js')
+    .addEntry('face-login', './assets/js/face-login.js')
     .addEntry('profile-edit', './assets/js/profile-edit.js')
     .addEntry('profile', './assets/js/profile.js')
     .enableStimulusBridge('./assets/controllers.json')

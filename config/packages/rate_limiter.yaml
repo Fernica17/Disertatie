@@ -7,3 +7,16 @@ framework:
             policy: 'sliding_window'
             limit: 20
             interval: '1 minute'
+
+        # The face login endpoints are reachable without a session. Detection is
+        # a polling loop so it needs headroom; matching is the expensive call and
+        # the one an attacker would hammer, so it stays tight.
+        face_login_detect:
+            policy: 'sliding_window'
+            limit: 150
+            interval: '1 minute'
+
+        face_login_identify:
+            policy: 'sliding_window'
+            limit: 10
+            interval: '1 minute'

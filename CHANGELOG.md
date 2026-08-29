@@ -2,6 +2,21 @@
 
 Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
+## [0.7.0] - 2026-08-29
+
+### Adăugat
+
+- **Autentificare cu fața** — rută publică `/login/face`, cu buton pe pagina de
+  autentificare. Camera identifică **ce cont** ești, apoi parola confirmă.
+  Recunoașterea facială singură nu este un factor de autentificare: o fotografie
+  printată trece, iar liveness nu există încă. Păstrând pasul cu parola, pagina
+  adaugă comoditate fără să slăbească nimic și refolosește autentificatorul
+  existent, în loc să deschidă o a doua cale de intrare.
+- Endpoint-urile publice sunt limitate pe adresă: 150 detecții/minut (buclă de
+  verificare) și 10 potriviri/minut.
+- Butonul de captură cere **două cadre consecutive** cu față detectată, nu unul
+  singur, ca să nu se activeze accidental în timpul mișcării.
+
 ## [0.6.0] - 2026-08-29
 
 ### Adăugat

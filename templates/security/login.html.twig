@@ -92,4 +92,11 @@
             <span>{{ 'security.login.submit'|trans({}, 'security') }}</span>
         </button>
     </form>
+
+    <div class="login-separator"><span>{{ 'security.login.or'|trans({}, 'security') }}</span></div>
+
+    <a href="{{ path('app_login_face') }}" class="login-btn login-btn-secondary">
+        <i class="fa-solid fa-camera"></i>
+        <span>{{ 'security.login.with_face'|trans({}, 'security') }}</span>
+    </a>
 {% endblock %}

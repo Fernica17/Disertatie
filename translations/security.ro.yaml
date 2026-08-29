@@ -27,6 +27,8 @@ security:
         error_invalid_token: "Link-ul de resetare este invalid sau a expirat."
         password_change_success: "Parola ta a fost schimbată cu succes. Te poți autentifica acum."
     login:
+        or: 'sau'
+        with_face: 'Autentificare cu fața'
         forgot_password: "Ai uitat parola?"
         email_label: 'Email sau utilizator'
         heading: Autentificare
@@ -65,3 +67,13 @@ security:
         submit: 'Trimite link de resetare'
         success_message: 'Dacă adresa de email există în sistem, un link de resetare a fost trimis.'
         invalid_csrf: 'Cerere invalidă. Te rugăm să încerci din nou.'
+    face_login:
+        title: 'Autentificare cu fața'
+        subtitle: 'Privește spre cameră pentru a-ți identifica contul, apoi confirmă cu parola.'
+        start: 'Pornește camera'
+        capture: 'Identifică-mă'
+        retry: 'Încearcă din nou'
+        back: 'Înapoi la autentificarea clasică'
+        greeting: 'Bună,'
+        no_match: 'Nu am putut identifica nicio persoană înregistrată. Încearcă din nou sau folosește emailul și parola.'
+        unavailable: 'Serviciul de recunoaștere facială nu este disponibil momentan. Folosește emailul și parola.'

@@ -1,0 +1,102 @@
+{% extends 'security/_base.html.twig' %}
+
+{% block title %}{{ 'security.face_login.title'|trans({}, 'security') }} | {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block content %}
+    <div class="login-header">
+        <h1>{{ 'security.face_login.title'|trans({}, 'security') }}</h1>
+        <p data-face-login-target="subtitle">{{ 'security.face_login.subtitle'|trans({}, 'security') }}</p>
+    </div>
+
+    {% if not serviceAvailable %}
+        <div class="login-alert login-alert-error">
+            {{ 'security.face_login.unavailable'|trans({}, 'security') }}
+        </div>
+    {% endif %}
+
+    <div data-controller="face-login"
+         data-face-login-detect-url-value="{{ path('app_login_face_detect') }}"
+         data-face-login-identify-url-value="{{ path('app_login_face_identify') }}"
+         data-face-login-text-idle="{{ 'users.face.detect.idle'|trans({}, 'users') }}"
+         data-face-login-text-starting="{{ 'users.face.detect.starting'|trans({}, 'users') }}"
+         data-face-login-text-matching="{{ 'users.face.detect.matching'|trans({}, 'users') }}"
+         data-face-login-text-camera-error="{{ 'users.face.error.camera'|trans({}, 'users') }}"
+         data-face-login-text-generic-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
+         data-face-login-text-greeting="{{ 'security.face_login.greeting'|trans({}, 'security') }}">
+
+        {# Step 1: camera #}
+        <div data-face-login-target="cameraStep">
+            <div class="fl-stage">
+                <video data-face-login-target="video" playsinline muted></video>
+                <canvas class="fl-overlay" data-face-login-target="overlay"></canvas>
+                <div class="fl-placeholder" data-face-login-target="placeholder">
+                    <i class="fa-solid fa-user-large"></i>
+                </div>
+            </div>
+
+            <p class="fl-status" data-face-login-target="status">
+                {{ 'users.face.detect.idle'|trans({}, 'users') }}
+            </p>
+
+            <button type="button" class="login-btn login-btn-secondary"
+                    data-face-login-target="startButton"
+                    data-action="face-login#start">
+                <i class="fa-solid fa-video"></i>
+                <span>{{ 'security.face_login.start'|trans({}, 'security') }}</span>
+            </button>
+
+            <button type="button" class="login-btn" disabled hidden
+                    data-face-login-target="captureButton"
+                    data-action="face-login#capture">
+                <i class="fa-solid fa-camera"></i>
+                <span>{{ 'security.face_login.capture'|trans({}, 'security') }}</span>
+            </button>
+        </div>
+
+        {# Step 2: the identified account confirms with its password.
+           Posts to the normal login route, so authentication itself is unchanged. #}
+        <form method="post" action="{{ path('app_login') }}" hidden data-face-login-target="passwordStep">
+            <div class="fl-identified">
+                <div class="fl-identified-name" data-face-login-target="identifiedName"></div>
+                <div class="fl-identified-email" data-face-login-target="identifiedEmail"></div>
+            </div>
+
+            <input type="hidden" name="_username" data-face-login-target="usernameInput">
+
+            <div class="login-input-group">
+                <label for="facePassword">{{ 'security.login.password_label'|trans({}, 'security') }}</label>
+                <i class="fa-solid fa-lock input-icon"></i>
+                <input type="password"
+                       id="facePassword"
+                       name="_password"
+                       required
+                       autocomplete="current-password"
+                       data-face-login-target="passwordInput">
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit" class="login-btn">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>{{ 'security.login.submit'|trans({}, 'security') }}</span>
+            </button>
+
+            <button type="button" class="login-btn login-btn-secondary"
+                    data-action="face-login#restart">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>{{ 'security.face_login.retry'|trans({}, 'security') }}</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="login-options login-options-centered">
+        <a href="{{ path('app_login') }}" class="login-forgot">
+            <i class="fa-solid fa-arrow-left"></i> {{ 'security.face_login.back'|trans({}, 'security') }}
+        </a>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('face-login') }}
+{% endblock %}
