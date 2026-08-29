@@ -3,14 +3,17 @@
 namespace App\Controller;
 
 use App\Repository\UsersRepository;
+use App\Security\UserChecker;
 use App\Service\FaceRecognitionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -36,6 +39,17 @@ class FaceLoginController extends AbstractController
         private readonly TranslatorInterface $translator,
         private readonly RateLimiterFactoryInterface $faceLoginDetectLimiter,
         private readonly RateLimiterFactoryInterface $faceLoginIdentifyLimiter,
+        private readonly Security $security,
+        private readonly UserChecker $userChecker,
+        /**
+         * When false, a face match signs the user straight in.
+         *
+         * That makes the face the only factor, which a printed photo defeats:
+         * keep it true anywhere real until liveness detection exists. It is a
+         * setting rather than a code change so a demo can drop the password
+         * step without anyone editing the login flow.
+         */
+        private readonly bool $faceLoginRequirePassword,
     ) {
     }
 
@@ -49,6 +63,7 @@ class FaceLoginController extends AbstractController
 
         return $this->render('security/face_login.html.twig', [
             'serviceAvailable' => $this->faceRecognition->isAvailable(),
+            'requirePassword' => $this->faceLoginRequirePassword,
         ]);
     }
 
@@ -118,7 +133,21 @@ class FaceLoginController extends AbstractController
             ]);
         }
 
-        return $this->json([
+        // Same account rules as a password login: disabled account, unverified
+        // email, inactive company. Skipping them here would make the camera a
+        // way around checks the password form enforces.
+        try {
+            $this->userChecker->checkPreAuth($user);
+            $this->userChecker->checkPostAuth($user);
+        } catch (AccountStatusException $e) {
+            return $this->json([
+                'ok' => true,
+                'matched' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        $payload = [
             'ok' => true,
             'matched' => true,
             // The score stays server-side: it is a tuning detail, and publishing
@@ -127,7 +156,17 @@ class FaceLoginController extends AbstractController
                 'name' => $user->getFirstName(),
                 'email' => $user->getEmail(),
             ],
-        ]);
+        ];
+
+        if (!$this->faceLoginRequirePassword) {
+            // login() dispatches the usual security events, so the audit log
+            // records this exactly like any other sign in.
+            $this->security->login($user, 'form_login');
+
+            $payload['redirect'] = $this->generateUrl('admin');
+        }
+
+        return $this->json($payload);
     }
 
     private function frameOrNull(Request $request): ?UploadedFile

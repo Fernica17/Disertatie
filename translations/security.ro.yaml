@@ -70,6 +70,7 @@ security:
     face_login:
         title: 'Autentificare cu fața'
         subtitle: 'Privește spre cameră pentru a-ți identifica contul, apoi confirmă cu parola.'
+        subtitle_direct: 'Privește spre cameră pentru a te autentifica.'
         start: 'Pornește camera'
         capture: 'Identifică-mă'
         retry: 'Încearcă din nou'

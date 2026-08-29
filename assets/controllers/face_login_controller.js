@@ -101,6 +101,15 @@ export default class extends Controller {
             const blob = await grabFrame(this.videoTarget, 640, 0.85);
             const data = await postFrame(this.identifyUrlValue, blob, 'capture.jpg');
 
+            if (data.matched && data.redirect) {
+                // The server already signed the user in.
+                this.teardown();
+                this.setStatus(`${this.t('greeting')} ${data.user.name}`, 'ok');
+                window.location.href = data.redirect;
+
+                return;
+            }
+
             if (data.matched && data.user) {
                 this.showPasswordStep(data.user);
 

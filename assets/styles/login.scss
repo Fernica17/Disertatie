@@ -374,6 +374,10 @@ body.login-page {
     transform: scaleX(-1);
 }
 
+.fl-placeholder[hidden] {
+    display: none;
+}
+
 .fl-placeholder {
     position: absolute;
     inset: 0;

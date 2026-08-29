@@ -5,7 +5,9 @@
 {% block content %}
     <div class="login-header">
         <h1>{{ 'security.face_login.title'|trans({}, 'security') }}</h1>
-        <p data-face-login-target="subtitle">{{ 'security.face_login.subtitle'|trans({}, 'security') }}</p>
+        <p data-face-login-target="subtitle">
+            {{ (requirePassword ? 'security.face_login.subtitle' : 'security.face_login.subtitle_direct')|trans({}, 'security') }}
+        </p>
     </div>
 
     {% if not serviceAvailable %}

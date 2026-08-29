@@ -6,8 +6,15 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
 ### Adăugat
 
+- `FACE_LOGIN_REQUIRE_PASSWORD` — când este `false`, potrivirea facială
+  autentifică direct, fără parolă. Setat pe `false` pentru demo. Pentru orice
+  mediu real trebuie `true`, cât timp nu există detecție de viu: o fotografie
+  printată trece. Autentificarea directă trece prin aceleași verificări de cont
+  și aceleași evenimente de securitate ca autentificarea cu parolă, deci apare
+  normal în jurnalul de audit.
+
 - **Autentificare cu fața** — rută publică `/login/face`, cu buton pe pagina de
-  autentificare. Camera identifică **ce cont** ești, apoi parola confirmă.
+  autentificare.
   Recunoașterea facială singură nu este un factor de autentificare: o fotografie
   printată trece, iar liveness nu există încă. Păstrând pasul cu parola, pagina
   adaugă comoditate fără să slăbească nimic și refolosește autentificatorul
