@@ -10,7 +10,7 @@ import { Controller } from '@hotwired/stimulus';
  * leaves the photo untouched.
  */
 export default class extends Controller {
-    static targets = ['frame', 'image', 'removeButton', 'undoButton', 'pending'];
+    static targets = ['frame', 'image', 'initials', 'removeButton', 'undoButton', 'pending'];
 
     connect() {
         this.form = this.element.closest('form');
@@ -53,6 +53,7 @@ export default class extends Controller {
         this.previewUrl = URL.createObjectURL(file);
         this.imageTarget.setAttribute('src', this.previewUrl);
         this.frameTarget.hidden = false;
+        this.toggleInitials(false);
 
         // Let the user drop the newly picked file and go back to what was stored.
         this.toggleButton(this.undoButton, true);
@@ -71,6 +72,7 @@ export default class extends Controller {
         this.revokePreview();
 
         this.frameTarget.hidden = true;
+        this.toggleInitials(true);
         this.pendingTarget.hidden = false;
         this.toggleButton(this.removeButton, false);
         this.toggleButton(this.undoButton, true);
@@ -91,9 +93,11 @@ export default class extends Controller {
         if (this.hadPhoto) {
             this.imageTarget.setAttribute('src', this.originalSrc);
             this.frameTarget.hidden = false;
+            this.toggleInitials(false);
         } else {
             this.imageTarget.removeAttribute('src');
             this.frameTarget.hidden = true;
+            this.toggleInitials(true);
         }
 
         this.toggleButton(this.removeButton, this.hadPhoto);
@@ -133,6 +137,13 @@ export default class extends Controller {
     toggleButton(button, visible) {
         if (button) {
             button.hidden = !visible;
+        }
+    }
+
+    /** The initials placeholder only exists when the user has no stored photo. */
+    toggleInitials(visible) {
+        if (this.hasInitialsTarget) {
+            this.initialsTarget.hidden = !visible;
         }
     }
 

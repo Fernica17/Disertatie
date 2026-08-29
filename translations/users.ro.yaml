@@ -1,9 +1,13 @@
 users:
     action:
+        back_to_list: 'Înapoi la listă'
+        choose_photo: 'Alege o fotografie'
+        save: 'Salvează'
         remove_photo: 'Șterge fotografia'
         undo_remove_photo: 'Anulează'
         change_password: 'Schimbă parola'
         new: 'Adaugă utilizator'
+        form_subtitle: 'Completează datele utilizatorului și, opțional, o fotografie pentru recunoaștere facială.'
         edit: 'Editează'
         detail: 'Detalii'
         delete: 'Șterge'
@@ -44,7 +48,13 @@ users:
     filter:
         is_active: 'Status activ'
         role: Rol
+    fieldset:
+        identification: 'Identificare'
+        photo: 'Fotografie'
+        access: 'Acces și rol'
+        password: 'Parolă'
     help:
+        password_optional: 'Lasă câmpurile goale dacă nu vrei să schimbi parola.'
         photo: 'O fotografie clară, cu o singură față privind spre cameră. Este folosită ca avatar și pentru recunoașterea facială la autentificare.'
         photo_pending_removal: 'Fotografia și datele de recunoaștere facială vor fi șterse la salvare.'
     face:
@@ -71,6 +81,7 @@ users:
         edit: 'Editare utilizator: {name}'
         index: 'Gestionare utilizatori'
         new: 'Adaugă utilizator'
+        form_subtitle: 'Completează datele utilizatorului și, opțional, o fotografie pentru recunoaștere facială.'
 enum:
     user_role:
         admin: Administrator

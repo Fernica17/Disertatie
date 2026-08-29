@@ -4,6 +4,14 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
 ## [0.5.0] - 2026-08-29
 
+### Modificat
+
+- **Formularul de utilizator** folosește acum tema Magnum, ca pagina de profil,
+  în locul temei implicite EasyAdmin: secțiuni cu iconițe (identificare,
+  fotografie, acces, parolă), grilă pe două coloane și acțiuni în subsol.
+  Implementat cu `UserFormType` + `admin/users/user_form.html.twig`, același
+  tipar folosit deja pentru companii.
+
 ### Adăugat
 
 - **Previzualizarea fotografiei** în formularul de utilizator, actualizată în

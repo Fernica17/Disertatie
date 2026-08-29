@@ -8,6 +8,7 @@ use App\Entity\Files;
 use App\Entity\Users;
 use App\Enum\UserRole;
 use App\Filter\JsonContainsFilter;
+use App\Form\Type\UserFormType;
 use App\Security\Voter\UsersVoter;
 use App\Service\FilesUploadService;
 use App\Service\UsersService;
@@ -19,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -29,15 +31,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted(UsersVoter::USERS_VIEW)]
@@ -52,6 +49,7 @@ class UsersCrudController extends AbstractCrudController
         private readonly UsersService $usersService,
         private readonly TranslatorInterface $translator,
         private readonly FilesUploadService $filesUploadService,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
     ) {
     }
 
@@ -116,9 +114,9 @@ class UsersCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return match ($pageName) {
-            Crud::PAGE_INDEX => $this->configureIndexFields(),
             Crud::PAGE_DETAIL => $this->configureDetailFields(),
-            default => $this->configureFormFields($pageName),
+            // NEW and EDIT render admin/users/user_form.html.twig instead
+            default => $this->configureIndexFields(),
         };
     }
 
@@ -185,90 +183,6 @@ class UsersCrudController extends AbstractCrudController
             ->setFormat('dd/MM/yyyy HH:mm');
     }
 
-    private function configureFormFields(string $pageName): iterable
-    {
-        yield TextField::new('email', $this->translator->trans('users.field.email', [], 'users'))
-            ->setRequired(true);
-        yield TextField::new('firstName', $this->translator->trans('users.field.first_name', [], 'users'))
-            ->setRequired(true);
-        yield TextField::new('lastName', $this->translator->trans('users.field.last_name', [], 'users'))
-            ->setRequired(true);
-        yield TextField::new('phone', $this->translator->trans('users.field.phone', [], 'users'))
-            ->setRequired(false);
-        $isNew = $pageName === Crud::PAGE_NEW;
-        $passwordConstraints = [
-            new Length(min: 6, minMessage: 'validation.user.password.min_length'),
-            new Regex(pattern: '/[A-Z]/', message: 'validation.user.password.uppercase'),
-            new Regex(pattern: '/[a-z]/', message: 'validation.user.password.lowercase'),
-            new Regex(pattern: '/[0-9]/', message: 'validation.user.password.digit'),
-            new Regex(pattern: '/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\\\\/~]/', message: 'validation.user.password.special'),
-        ];
-        if ($isNew) {
-            array_unshift($passwordConstraints, new NotBlank(message: 'validation.user.password.required'));
-        }
-
-        yield TextField::new('plainPassword', $this->translator->trans('users.field.password', [], 'users'))
-            ->setFormType(RepeatedType::class)
-            ->setFormTypeOptions([
-                'type' => PasswordType::class,
-                'invalid_message' => 'validation.user.passwords_mismatch',
-                'constraints' => $passwordConstraints,
-                'first_options' => [
-                    'label' => $this->translator->trans('users.field.password', [], 'users'),
-                    'attr' => [
-                        'class' => 'form-control password-field',
-                        'autocomplete' => 'new-password',
-                    ],
-                ],
-                'second_options' => [
-                    'label' => $this->translator->trans('users.field.confirm_password', [], 'users'),
-                    'attr' => [
-                        'class' => 'form-control',
-                        'autocomplete' => 'new-password',
-                    ],
-                ],
-                'required' => $isNew,
-            ])
-            ->setRequired($isNew);
-        yield AssociationField::new('company', $this->translator->trans('users.field.company', [], 'users'))
-            ->setRequired(false)
-            ->setPermission('ROLE_ADMIN');
-        yield ChoiceField::new('primaryRole')
-            ->setLabel($this->translator->trans('users.field.role', [], 'users'))
-            ->setChoices($this->getRoleChoices())
-            ->setRequired(false)
-            ->setPermission('ROLE_ADMIN');
-        yield BooleanField::new('isActive', $this->translator->trans('users.field.is_active', [], 'users'))
-            ->renderAsSwitch(true);
-        $currentPhoto = $isNew ? null : $this->currentPhotoOf($this->getContext()?->getEntity()?->getInstance());
-
-        yield Field::new('photoUpload', $this->translator->trans('users.field.photo', [], 'users'))
-            ->setFormType(FileType::class)
-            ->setFormTypeOptions([
-                'required' => false,
-                'mapped' => true,
-                'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
-                'constraints' => [
-                    new Assert\File(
-                        maxSize: '8M',
-                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                        mimeTypesMessage: 'validation.user.photo.mime',
-                    ),
-                ],
-            ])
-            ->setHelp($this->renderView('admin/users/_photo_preview.html.twig', ['photo' => $currentPhoto]))
-            ->setFormTypeOption('help_html', true)
-            ->onlyOnForms();
-
-        // Backs the red remove button in the preview widget. Hidden by the
-        // Stimulus controller so the intent is expressed once, by the button.
-        if ($currentPhoto !== null) {
-            yield BooleanField::new('removePhoto', $this->translator->trans('users.field.remove_photo', [], 'users'))
-                ->renderAsSwitch(false)
-                ->onlyOnForms();
-        }
-    }
-
     private function getRoleChoices(): array
     {
         $choices = [];
@@ -325,59 +239,102 @@ class UsersCrudController extends AbstractCrudController
             ->add(JsonContainsFilter::new('roles', $this->translator->trans('users.filter.role', [], 'users'))->setChoices($roleChoices));
     }
 
-    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    /**
+     * The form is a custom Symfony form rendered through the Magnum layout,
+     * matching the profile page, instead of EasyAdmin's default form theme.
+     */
+    public function new(AdminContext $context): Response
     {
         $this->denyAccessUnlessGranted(UsersVoter::USERS_CREATE);
 
-        $dto = new CreateUserDto();
-        $dto->email = $entityInstance->getEmail();
-        $dto->firstName = $entityInstance->getFirstName();
-        $dto->lastName = $entityInstance->getLastName();
-        $dto->phone = $entityInstance->getPhone();
-        $dto->plainPassword = $entityInstance->getPlainPassword() ?? '';
-        $dto->role = $entityInstance->getPrimaryRole();
-        $dto->isActive = $entityInstance->isActive();
-        $dto->company = $entityInstance->getCompany();
+        $user = new Users();
+        $form = $this->createForm(UserFormType::class, $user, ['is_new' => true]);
+        $form->handleRequest($context->getRequest());
 
-        $user = $this->usersService->create($dto);
-        $this->addFlash('success', $this->translator->trans('users.flash.created', [
-            '{name}' => $entityInstance->getFullName(),
-        ], 'users'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dto = new CreateUserDto();
+            $dto->email = $user->getEmail();
+            $dto->firstName = $user->getFirstName();
+            $dto->lastName = $user->getLastName();
+            $dto->phone = $user->getPhone();
+            $dto->plainPassword = $user->getPlainPassword() ?? '';
+            $dto->role = $user->getPrimaryRole();
+            $dto->isActive = $user->isActive();
+            $dto->company = $user->getCompany();
 
-        $this->handleReferencePhoto($user, $entityInstance->getPhotoUpload());
+            $created = $this->usersService->create($dto);
+
+            $this->addFlash('success', $this->translator->trans('users.flash.created', [
+                '{name}' => $created->getFullName(),
+            ], 'users'));
+
+            $this->handleReferencePhoto($created, $user->getPhotoUpload());
+
+            return $this->redirect($this->indexUrl());
+        }
+
+        return $this->render('admin/users/user_form.html.twig', [
+            'form' => $form,
+            'user' => null,
+            'photo' => null,
+        ]);
     }
 
-    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    public function edit(AdminContext $context): Response
     {
-        $this->denyAccessUnlessGranted(UsersVoter::USERS_EDIT, $entityInstance);
+        $user = $context->getEntity()->getInstance();
 
-        $dto = new UpdateUserDto();
-        $dto->email = $entityInstance->getEmail();
-        $dto->firstName = $entityInstance->getFirstName();
-        $dto->lastName = $entityInstance->getLastName();
-        $dto->phone = $entityInstance->getPhone();
-        $dto->plainPassword = $entityInstance->getPlainPassword() ?: null;
-        $dto->role = $entityInstance->getPrimaryRole();
-        $dto->isActive = $entityInstance->isActive();
-        $dto->company = $entityInstance->getCompany();
-
-        $this->usersService->update($entityInstance, $dto);
-
-        $this->addFlash('success', $this->translator->trans('users.flash.updated', [
-            '{name}' => $entityInstance->getFullName(),
-        ], 'users'));
-
-        $photo = $entityInstance->getPhotoUpload();
-
-        if ($photo !== null) {
-            // A new upload replaces the old one, so it also settles a removal request.
-            $this->handleReferencePhoto($entityInstance, $photo);
-        } elseif ($entityInstance->isRemovePhoto()) {
-            $this->usersService->removeReferencePhoto($entityInstance);
-            $this->addFlash('success', $this->translator->trans('users.flash.photo_removed', [
-                '{name}' => $entityInstance->getFullName(),
-            ], 'users'));
+        if (!$user instanceof Users) {
+            throw $this->createNotFoundException();
         }
+
+        $this->denyAccessUnlessGranted(UsersVoter::USERS_EDIT, $user);
+
+        $form = $this->createForm(UserFormType::class, $user);
+        $form->handleRequest($context->getRequest());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dto = new UpdateUserDto();
+            $dto->email = $user->getEmail();
+            $dto->firstName = $user->getFirstName();
+            $dto->lastName = $user->getLastName();
+            $dto->phone = $user->getPhone();
+            $dto->plainPassword = $user->getPlainPassword() ?: null;
+            $dto->role = $user->getPrimaryRole();
+            $dto->isActive = $user->isActive();
+            $dto->company = $user->getCompany();
+
+            $this->usersService->update($user, $dto);
+
+            $this->addFlash('success', $this->translator->trans('users.flash.updated', [
+                '{name}' => $user->getFullName(),
+            ], 'users'));
+
+            $photo = $user->getPhotoUpload();
+
+            if ($photo !== null) {
+                // A new upload replaces the old one, so it also settles a removal request.
+                $this->handleReferencePhoto($user, $photo);
+            } elseif ($user->isRemovePhoto()) {
+                $this->usersService->removeReferencePhoto($user);
+                $this->addFlash('success', $this->translator->trans('users.flash.photo_removed', [
+                    '{name}' => $user->getFullName(),
+                ], 'users'));
+            }
+
+            return $this->redirect($this->indexUrl());
+        }
+
+        return $this->render('admin/users/user_form.html.twig', [
+            'form' => $form,
+            'user' => $user,
+            'photo' => $this->currentPhotoOf($user),
+        ]);
+    }
+
+    private function indexUrl(): string
+    {
+        return $this->adminUrlGenerator->setController(self::class)->setAction(Action::INDEX)->generateUrl();
     }
 
     public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void

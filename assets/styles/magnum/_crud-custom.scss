@@ -387,3 +387,21 @@
 .mg-photo-field-hint {
     margin: 8px 0 0;
 }
+
+/* ---- Checkbox row, used where a plain switch would be overkill ---- */
+.mg-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--mg-text, #1f2937);
+
+    input[type='checkbox'] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: var(--mg-primary, #2563eb);
+        cursor: pointer;
+    }
+}

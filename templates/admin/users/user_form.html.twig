@@ -1,0 +1,198 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set isEdit = user is not null %}
+
+{% set usersIndexUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\UsersCrudController').setAction('index').generateUrl() %}
+
+{% block title %}{% if isEdit %}{{ 'users.page.edit'|trans({'{name}': user.fullName}, 'users') }}{% else %}{{ 'users.page.new'|trans({}, 'users') }}{% endif %} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li><a href="{{ usersIndexUrl }}">{{ 'admin.menu.users'|trans({}, 'admin') }}</a></li>
+    <li class="active">{% if isEdit %}{{ user.fullName }}{% else %}{{ 'users.page.new'|trans({}, 'users') }}{% endif %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">
+                {% if isEdit %}{{ 'users.page.edit'|trans({'{name}': user.fullName}, 'users') }}{% else %}{{ 'users.page.new'|trans({}, 'users') }}{% endif %}
+            </h1>
+            <p class="mg-page-subtitle">{{ 'users.page.form_subtitle'|trans({}, 'users') }}</p>
+        </div>
+    </div>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', novalidate: 'novalidate'}}) }}
+
+        {% if form.vars.errors|length > 0 %}
+            <div class="alert alert-danger">{{ form_errors(form) }}</div>
+        {% endif %}
+
+        <div class="mg-card">
+
+            {# Section 1: Identificare #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-id-card ct-icon-primary"></i> {{ 'users.fieldset.identification'|trans({}, 'users') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-2">
+                    <div>
+                        <label class="of-label" for="{{ form.firstName.vars.id }}">
+                            {{ 'users.field.first_name'|trans({}, 'users') }} <span class="ct-required">*</span>
+                        </label>
+                        {{ form_widget(form.firstName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.firstName) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.lastName.vars.id }}">
+                            {{ 'users.field.last_name'|trans({}, 'users') }} <span class="ct-required">*</span>
+                        </label>
+                        {{ form_widget(form.lastName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.lastName) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-grid-2 ct-form-row">
+                    <div>
+                        <label class="of-label" for="{{ form.email.vars.id }}">
+                            {{ 'users.field.email'|trans({}, 'users') }} <span class="ct-required">*</span>
+                        </label>
+                        {{ form_widget(form.email, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.email) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.phone.vars.id }}">{{ 'users.field.phone'|trans({}, 'users') }}</label>
+                        {{ form_widget(form.phone, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.phone) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 2: Fotografie #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-camera ct-icon-primary"></i> {{ 'users.fieldset.photo'|trans({}, 'users') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="avatar-upload-container" data-controller="photo-preview">
+                    <div class="avatar-preview-wrapper" data-photo-preview-target="frame"{% if photo is null %} hidden{% endif %}>
+                        <img src="{{ photo ? path('admin_file_view', {id: photo.id}) : '' }}"
+                             alt=""
+                             data-photo-preview-target="image">
+                    </div>
+
+                    {% if photo is null %}
+                        <div class="avatar-preview-wrapper" data-photo-preview-target="initials">
+                            {% set _initials = (form.vars.data.firstName|default('?')|first|upper) ~ (form.vars.data.lastName|default('')|first|upper) %}
+                            {% set _colors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                            <div class="avatar-initials" style="background-color: {{ _colors[(form.vars.data.fullName|default('')|length) % 9] }};">{{ _initials }}</div>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="mg-mt-4">
+                            {{ form_widget(form.photoUpload, {attr: {class: 'd-none'}}) }}
+                            <label for="{{ form.photoUpload.vars.id }}" class="custom-file-upload">
+                                <i class="fa-solid fa-camera"></i> {{ 'users.action.choose_photo'|trans({}, 'users') }}
+                            </label>
+
+                            <div class="mg-photo-field-actions">
+                                {% if photo %}
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            data-photo-preview-target="removeButton"
+                                            data-action="photo-preview#remove">
+                                        <i class="fa-solid fa-trash-can"></i> {{ 'users.action.remove_photo'|trans({}, 'users') }}
+                                    </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-sm btn-secondary" hidden
+                                        data-photo-preview-target="undoButton"
+                                        data-action="photo-preview#undo">
+                                    {{ 'users.action.undo_remove_photo'|trans({}, 'users') }}
+                                </button>
+                            </div>
+
+                            <p class="mg-photo-field-pending" hidden data-photo-preview-target="pending">
+                                {{ 'users.help.photo_pending_removal'|trans({}, 'users') }}
+                            </p>
+                            <p class="mg-form-help">{{ 'users.help.photo'|trans({}, 'users') }}</p>
+                        </div>
+                        <div class="mg-form-error">{{ form_errors(form.photoUpload) }}</div>
+                        <div class="d-none">{{ form_row(form.removePhoto) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 3: Acces #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-shield-halved ct-icon-primary"></i> {{ 'users.fieldset.access'|trans({}, 'users') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-2">
+                    <div>
+                        <label class="of-label" for="{{ form.primaryRole.vars.id }}">{{ 'users.field.role'|trans({}, 'users') }}</label>
+                        {{ form_widget(form.primaryRole, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.primaryRole) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.company.vars.id }}">{{ 'users.field.company'|trans({}, 'users') }}</label>
+                        {{ form_widget(form.company, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.company) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-row">
+                    <label class="mg-check">
+                        {{ form_widget(form.isActive) }}
+                        <span>{{ 'users.field.is_active'|trans({}, 'users') }}</span>
+                    </label>
+                    <div class="mg-form-error">{{ form_errors(form.isActive) }}</div>
+                </div>
+            </div>
+
+            {# Section 4: Parola #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-key ct-icon-primary"></i> {{ 'users.fieldset.password'|trans({}, 'users') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                {% if isEdit %}
+                    <p class="mg-form-help">{{ 'users.help.password_optional'|trans({}, 'users') }}</p>
+                {% endif %}
+                <div class="ct-form-grid-2 ct-form-row">
+                    <div>
+                        <label class="of-label" for="{{ form.plainPassword.first.vars.id }}">
+                            {{ 'users.field.password'|trans({}, 'users') }}{% if not isEdit %} <span class="ct-required">*</span>{% endif %}
+                        </label>
+                        {{ form_widget(form.plainPassword.first, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.plainPassword.first) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.plainPassword.second.vars.id }}">
+                            {{ 'users.field.confirm_password'|trans({}, 'users') }}{% if not isEdit %} <span class="ct-required">*</span>{% endif %}
+                        </label>
+                        {{ form_widget(form.plainPassword.second, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.plainPassword.second) }}</div>
+                    </div>
+                </div>
+                <div class="mg-form-error">{{ form_errors(form.plainPassword) }}</div>
+            </div>
+
+            {# Bottom actions #}
+            <div class="ct-form-actions">
+                <a href="{{ usersIndexUrl }}" class="mg-btn mg-btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> {{ 'users.action.back_to_list'|trans({}, 'users') }}
+                </a>
+                <div class="ct-form-actions-right">
+                    <button type="submit" class="mg-btn mg-btn-primary mg-btn-lg">
+                        <i class="fa-solid fa-floppy-disk"></i> {{ 'users.action.save'|trans({}, 'users') }}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    {{ form_end(form) }}
+{% endblock %}
