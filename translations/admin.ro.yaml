@@ -66,6 +66,7 @@ admin:
         welcome: 'Bun venit'
     menu:
         all_companies: Companii
+        face_recognition: 'Recunoaștere facială'
         dashboard: Dashboard
         logout: Deconectare
         contracts: Contracte

@@ -1,0 +1,100 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'users.face.page.title'|trans({}, 'users') }} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li class="active">{{ 'users.face.page.title'|trans({}, 'users') }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">{{ 'users.face.page.title'|trans({}, 'users') }}</h1>
+            <p class="mg-page-subtitle">{{ 'users.face.page.subtitle'|trans({}, 'users') }}</p>
+        </div>
+    </div>
+
+    {% if not serviceAvailable %}
+        <div class="alert alert-danger">{{ 'users.face.error.unavailable'|trans({}, 'users') }}</div>
+    {% elseif enrolledCount == 0 %}
+        <div class="alert alert-warning">{{ 'users.face.page.nobody_enrolled'|trans({}, 'users') }}</div>
+    {% endif %}
+
+    <div class="mg-card"
+         data-controller="face-capture"
+         data-face-capture-detect-url-value="{{ path('admin_face_recognition_detect') }}"
+         data-face-capture-identify-url-value="{{ path('admin_face_recognition_identify') }}"
+         data-face-capture-text-idle="{{ 'users.face.detect.idle'|trans({}, 'users') }}"
+         data-face-capture-text-starting="{{ 'users.face.detect.starting'|trans({}, 'users') }}"
+         data-face-capture-text-matching="{{ 'users.face.detect.matching'|trans({}, 'users') }}"
+         data-face-capture-text-camera-error="{{ 'users.face.error.camera'|trans({}, 'users') }}"
+         data-face-capture-text-detect-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
+         data-face-capture-text-score="{{ 'users.face.result.score'|trans({}, 'users') }}">
+
+        <div class="mg-card-header">
+            <h2 class="mg-card-title">
+                <i class="fa-solid fa-camera ct-icon-primary"></i> {{ 'users.face.page.camera'|trans({}, 'users') }}
+            </h2>
+        </div>
+
+        <div class="ct-form-section">
+            <div class="fc-layout">
+
+                {# Camera #}
+                <div>
+                    <div class="fc-stage">
+                        <video data-face-capture-target="video" playsinline muted></video>
+                        {# The box is drawn over the video, so it must not swallow clicks #}
+                        <canvas class="fc-overlay" data-face-capture-target="overlay"></canvas>
+
+                        <div class="fc-placeholder" data-face-capture-target="placeholder">
+                            <i class="fa-solid fa-video-slash"></i>
+                            <p>{{ 'users.face.page.camera_off'|trans({}, 'users') }}</p>
+                        </div>
+                    </div>
+
+                    <p class="fc-status" data-face-capture-target="status">
+                        {{ 'users.face.detect.idle'|trans({}, 'users') }}
+                    </p>
+
+                    <div class="fc-actions">
+                        <button type="button" class="mg-btn mg-btn-secondary"
+                                data-face-capture-target="startButton"
+                                data-action="face-capture#start">
+                            <i class="fa-solid fa-video"></i> {{ 'users.face.action.start'|trans({}, 'users') }}
+                        </button>
+
+                        <button type="button" class="mg-btn mg-btn-secondary" hidden
+                                data-face-capture-target="stopButton"
+                                data-action="face-capture#stop">
+                            <i class="fa-solid fa-video-slash"></i> {{ 'users.face.action.stop'|trans({}, 'users') }}
+                        </button>
+
+                        {# Stays disabled until the server confirms exactly one face #}
+                        <button type="button" class="mg-btn mg-btn-primary" disabled
+                                data-face-capture-target="captureButton"
+                                data-action="face-capture#capture">
+                            <i class="fa-solid fa-camera"></i> {{ 'users.face.action.capture'|trans({}, 'users') }}
+                        </button>
+                    </div>
+                </div>
+
+                {# Result #}
+                <div class="fc-result" data-face-capture-target="result">
+                    <div class="fc-result-empty" data-face-capture-target="resultEmpty">
+                        <i class="fa-solid fa-user-magnifying-glass"></i>
+                        <p>{{ 'users.face.page.result_empty'|trans({}, 'users') }}</p>
+                    </div>
+
+                    <div class="fc-result-card" hidden data-face-capture-target="resultCard">
+                        <div class="fc-result-avatar" data-face-capture-target="resultAvatar"></div>
+                        <div class="fc-result-name" data-face-capture-target="resultName"></div>
+                        <div class="fc-result-meta" data-face-capture-target="resultMeta"></div>
+                        <div class="fc-result-score" data-face-capture-target="resultScore"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

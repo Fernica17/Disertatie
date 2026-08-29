@@ -16,6 +16,16 @@ class FaceBox(BaseModel):
     score: float
 
 
+class DetectResponse(BaseModel):
+    """Detection only - no embedding, so it is cheap enough to poll."""
+
+    faces: int
+    usable: bool = Field(
+        description="True when exactly one face was found, i.e. the frame is worth submitting"
+    )
+    face: FaceBox | None = None
+
+
 class EnrollResponse(BaseModel):
     user_id: int
     embedding_id: int

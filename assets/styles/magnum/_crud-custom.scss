@@ -400,3 +400,158 @@
         cursor: pointer;
     }
 }
+
+/* ---- Face recognition: camera stage and result ---- */
+.fc-layout {
+    display: grid;
+    /* The camera keeps a 4:3 stage, so cap it or it grows to the card width */
+    grid-template-columns: minmax(0, 520px) 320px;
+    gap: 24px;
+    align-items: start;
+
+    @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.fc-stage {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #0f172a;
+    border-radius: var(--mg-radius, 8px);
+    overflow: hidden;
+
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+}
+
+/* Sits over the video, so it must not intercept clicks */
+.fc-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.fc-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #94a3b8;
+
+    i {
+        font-size: 32px;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+    }
+}
+
+.fc-status {
+    margin: 12px 0 0;
+    font-size: 14px;
+    color: var(--mg-text-muted, #6b7280);
+
+    &[data-tone='ok'] {
+        color: var(--mg-success, #16a34a);
+    }
+
+    &[data-tone='error'] {
+        color: var(--mg-danger, #dc2626);
+    }
+}
+
+.fc-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.fc-result {
+    border: 1px solid var(--mg-border);
+    border-radius: var(--mg-radius, 8px);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+}
+
+.fc-result-empty {
+    text-align: center;
+    color: var(--mg-text-muted, #6b7280);
+
+    i {
+        font-size: 28px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+    }
+}
+
+.fc-result-card {
+    text-align: center;
+}
+
+.fc-result-avatar {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--mg-primary, #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 600;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.fc-result-name {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--mg-text, #1f2937);
+}
+
+.fc-result-meta {
+    font-size: 13px;
+    color: var(--mg-text-muted, #6b7280);
+    margin-top: 4px;
+}
+
+.fc-result-score {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mg-success, #16a34a);
+}
+
+/* The theme had no disabled state for mg-btn: an inert button still looked
+   clickable, which matters where the button is gated on a detection. */
+.mg-btn:disabled,
+.mg-btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}

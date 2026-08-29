@@ -1,0 +1,9 @@
+framework:
+    rate_limiter:
+        # Face matching is the expensive call and, once wired into login, the one
+        # worth brute-forcing. Generous enough for a person retrying a capture,
+        # tight enough that a script gains nothing.
+        face_identify:
+            policy: 'sliding_window'
+            limit: 20
+            interval: '1 minute'

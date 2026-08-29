@@ -2,6 +2,20 @@
 
 Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
+## [0.6.0] - 2026-08-29
+
+### Adăugat
+
+- **Pagină de recunoaștere facială cu camera** (Administrare → Recunoaștere
+  facială). Camera pornește la cerere, iar butonul de captură devine activ doar
+  când serverul confirmă exact o față în cadru. La apăsare, cadrul este comparat
+  cu toate fotografiile înregistrate și se afișează persoana recunoscută și
+  scorul.
+- Endpoint `POST /faces/detect` în serviciul Python — doar detecție, fără
+  embedding: 11 ms și ~6 KB per cadru, față de 33 ms la recunoașterea completă.
+- Rate limiting pe potrivire (20 cereri/minut), fiindcă este operația scumpă și,
+  odată legată de autentificare, cea care merită atacată prin forță brută.
+
 ## [0.5.0] - 2026-08-29
 
 ### Modificat

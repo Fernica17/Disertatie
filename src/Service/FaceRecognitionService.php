@@ -47,6 +47,45 @@ class FaceRecognitionService
     }
 
     /**
+     * Is there exactly one usable face in the frame?
+     *
+     * Cheap enough to poll from a camera preview: detection only, no embedding.
+     *
+     * @return array{ok: bool, usable: bool, face: ?array, faces: int, reason: ?string}
+     */
+    public function detect(File $frame): array
+    {
+        $result = $this->request('POST', '/faces/detect', $frame);
+
+        return [
+            'ok' => $result['ok'],
+            'usable' => (bool) ($result['data']['usable'] ?? false),
+            'faces' => (int) ($result['data']['faces'] ?? 0),
+            'face' => $result['data']['face'] ?? null,
+            'reason' => $result['reason'],
+        ];
+    }
+
+    /**
+     * Who is in the frame? Searches every enrolled face (1:N).
+     *
+     * @return array{ok: bool, matched: bool, userId: ?int, score: ?float, reason: ?string}
+     */
+    public function identify(File $frame): array
+    {
+        $result = $this->request('POST', '/faces/identify', $frame);
+        $data = $result['data'];
+
+        return [
+            'ok' => $result['ok'],
+            'matched' => (bool) ($data['matched'] ?? false),
+            'userId' => isset($data['user_id']) ? (int) $data['user_id'] : null,
+            'score' => isset($data['score']) ? (float) $data['score'] : null,
+            'reason' => $result['reason'],
+        ];
+    }
+
+    /**
      * Checks a frame against one specific user (1:1).
      *
      * Preferred over identify() for login: the caller states who it expects, so
@@ -97,6 +136,29 @@ class FaceRecognitionService
             ]);
 
             return 0;
+        }
+    }
+
+    /**
+     * User ids that currently have a reference face.
+     *
+     * @return list<int>
+     */
+    public function enrolledUserIds(): array
+    {
+        try {
+            $response = $this->httpClient->request('GET', $this->url('/faces'), [
+                'headers' => ['X-API-Key' => $this->faceApiKey],
+                'timeout' => 5,
+            ]);
+
+            return array_map(intval(...), $response->toArray(false));
+        } catch (ExceptionInterface $e) {
+            $this->logger->warning('Face service unreachable while listing enrolments', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
         }
     }
 

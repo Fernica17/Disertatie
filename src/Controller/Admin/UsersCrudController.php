@@ -385,6 +385,8 @@ class UsersCrudController extends AbstractCrudController
             return;
         }
 
-        $this->addFlash('warning', $this->translator->trans($problem, [], 'users'));
+        $this->addFlash('warning', $this->translator->trans('users.face.enroll.failed', [
+            '{reason}' => $this->translator->trans($problem, [], 'users'),
+        ], 'users'));
     }
 }

@@ -22,6 +22,7 @@ from ..recognizer import (
 from ..schemas import (
     Candidate,
     DeleteResponse,
+    DetectResponse,
     EnrollmentStatus,
     EnrollResponse,
     FaceBox,
@@ -74,6 +75,40 @@ def _embed_or_400(request: Request, payload: bytes):
 def _to_box(face) -> FaceBox:
     x, y, w, h = face.box
     return FaceBox(x=x, y=y, width=w, height=h, score=round(face.score, 4))
+
+
+@router.post(
+    "/detect",
+    response_model=DetectResponse,
+    summary="Is there exactly one usable face in the frame?",
+)
+async def detect(
+    request: Request,
+    image: UploadFile = File(...),
+    settings: Settings = Depends(get_settings),
+) -> DetectResponse:
+    """Runs detection without computing an embedding.
+
+    Meant to be polled by a camera preview so the capture button only becomes
+    available once a single face is framed. Using the same detector as the
+    recognition endpoints means the preview never green-lights a frame that
+    enrolment or matching would then reject.
+    """
+    payload = await _read_upload(image, settings)
+    recognizer = request.app.state.recognizer
+
+    try:
+        frame = recognizer.decode(payload)
+    except FaceError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc))
+
+    faces = recognizer.detect(frame)
+
+    return DetectResponse(
+        faces=len(faces),
+        usable=len(faces) == 1,
+        face=_to_box(faces[0]) if len(faces) == 1 else None,
+    )
 
 
 @router.post(

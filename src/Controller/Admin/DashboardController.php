@@ -147,6 +147,7 @@ class DashboardController extends AbstractDashboardController
         if ($this->isGranted(UsersVoter::USERS_VIEW)) {
             yield MenuItem::section($this->translator->trans('admin.menu.section.administration', [], 'admin'));
             yield MenuItem::linkTo(UsersCrudController::class, $this->translator->trans('admin.menu.users', [], 'admin'), 'fa fa-users');
+            yield MenuItem::linkToRoute($this->translator->trans('admin.menu.face_recognition', [], 'admin'), 'fa fa-camera', 'admin_face_recognition');
         }
 
         if ($this->isGranted(AdministrationVoter::ADMINISTRATION_VIEW)) {
