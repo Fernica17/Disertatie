@@ -555,3 +555,66 @@
     cursor: not-allowed;
     pointer-events: none;
 }
+
+/* ---- Face search: mode switch, dropzone, person card ---- */
+.fc-modes {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.fc-mode.is-active {
+    background: var(--mg-primary, #2563eb);
+    border-color: var(--mg-primary, #2563eb);
+    color: #fff;
+}
+
+.fc-dropzone {
+    border: 2px dashed var(--mg-border);
+    border-radius: var(--mg-radius, 8px);
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--mg-text-muted, #6b7280);
+
+    i {
+        font-size: 32px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin: 0 0 14px;
+        font-size: 14px;
+    }
+}
+
+.fc-person {
+    text-align: center;
+    width: 100%;
+}
+
+.fc-person-fields {
+    text-align: left;
+    margin: 16px 0;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    font-size: 13px;
+
+    dt {
+        color: var(--mg-text-muted, #6b7280);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    dd {
+        margin: 0;
+        color: var(--mg-text, #1f2937);
+        word-break: break-word;
+    }
+}
+
+/* The result column can get tall once every field is filled in */
+.fc-result {
+    align-items: flex-start;
+}

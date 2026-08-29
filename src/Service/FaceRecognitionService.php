@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Persons;
 use App\Entity\Users;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -18,6 +19,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class FaceRecognitionService
 {
+    /** Login accounts. Only this collection may ever answer an authentication question. */
+    public const string COLLECTION_USERS = 'users';
+
+    /** The lookup registry, searched by face but never able to sign anyone in. */
+    public const string COLLECTION_PERSONS = 'persons';
+
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
@@ -43,7 +50,36 @@ class FaceRecognitionService
         // so a new upload is a correction of the previous one.
         $this->deleteEnrollment($user);
 
-        return $this->request('POST', sprintf('/faces/enroll/%d', $userId), $photo);
+        return $this->request('POST', sprintf('/faces/enroll/%d', $userId), $photo, self::COLLECTION_USERS);
+    }
+
+    /**
+     * Registers a photo as the reference face for a registry person.
+     *
+     * @return array{ok: bool, reason: ?string}
+     */
+    public function enrollPerson(Persons $person, File $photo): array
+    {
+        $personId = $person->getId();
+
+        if ($personId === null) {
+            return ['ok' => false, 'reason' => 'persons.face.error.unsaved'];
+        }
+
+        $this->deletePersonEnrollment($person);
+
+        return $this->request(
+            'POST',
+            sprintf('/faces/enroll/%d', $personId),
+            $photo,
+            self::COLLECTION_PERSONS,
+        );
+    }
+
+    /** Erases a registry person's biometric data. */
+    public function deletePersonEnrollment(Persons $person): bool
+    {
+        return $this->deleteEnrollmentFor($person->getId(), self::COLLECTION_PERSONS);
     }
 
     /**
@@ -71,9 +107,9 @@ class FaceRecognitionService
      *
      * @return array{ok: bool, matched: bool, userId: ?int, score: ?float, reason: ?string}
      */
-    public function identify(File $frame): array
+    public function identify(File $frame, string $collection = self::COLLECTION_USERS): array
     {
-        $result = $this->request('POST', '/faces/identify', $frame);
+        $result = $this->request('POST', '/faces/identify', $frame, $collection);
         $data = $result['data'];
 
         return [
@@ -101,7 +137,7 @@ class FaceRecognitionService
             return ['ok' => false, 'matched' => false, 'score' => null, 'reason' => 'users.face.error.unsaved_user'];
         }
 
-        $result = $this->request('POST', sprintf('/faces/verify/%d', $userId), $frame);
+        $result = $this->request('POST', sprintf('/faces/verify/%d', $userId), $frame, self::COLLECTION_USERS);
 
         return [
             'ok' => $result['ok'],
@@ -123,7 +159,7 @@ class FaceRecognitionService
         }
 
         try {
-            $response = $this->httpClient->request('GET', $this->url(sprintf('/faces/%d', $userId)), [
+            $response = $this->httpClient->request('GET', $this->url(sprintf('/faces/%d?collection=%s', $userId, self::COLLECTION_USERS)), [
                 'headers' => ['X-API-Key' => $this->faceApiKey],
                 'timeout' => 5,
             ]);
@@ -147,7 +183,7 @@ class FaceRecognitionService
     public function enrolledUserIds(): array
     {
         try {
-            $response = $this->httpClient->request('GET', $this->url('/faces'), [
+            $response = $this->httpClient->request('GET', $this->url('/faces?collection=' . self::COLLECTION_USERS), [
                 'headers' => ['X-API-Key' => $this->faceApiKey],
                 'timeout' => 5,
             ]);
@@ -170,14 +206,17 @@ class FaceRecognitionService
      */
     public function deleteEnrollment(Users $user): bool
     {
-        $userId = $user->getId();
+        return $this->deleteEnrollmentFor($user->getId(), self::COLLECTION_USERS);
+    }
 
-        if ($userId === null) {
+    private function deleteEnrollmentFor(?int $subjectId, string $collection): bool
+    {
+        if ($subjectId === null) {
             return false;
         }
 
         try {
-            $this->httpClient->request('DELETE', $this->url(sprintf('/faces/%d', $userId)), [
+            $this->httpClient->request('DELETE', $this->url(sprintf('/faces/%d?collection=%s', $subjectId, $collection)), [
                 'headers' => ['X-API-Key' => $this->faceApiKey],
                 'timeout' => 5,
             ])->getStatusCode();
@@ -185,7 +224,8 @@ class FaceRecognitionService
             return true;
         } catch (ExceptionInterface $e) {
             $this->logger->warning('Could not delete face enrolment', [
-                'user_id' => $userId,
+                'subject_id' => $subjectId,
+                'collection' => $collection,
                 'error' => $e->getMessage(),
             ]);
 
@@ -207,10 +247,16 @@ class FaceRecognitionService
     /**
      * @return array{ok: bool, reason: ?string, data: array}
      */
-    private function request(string $method, string $path, File $photo): array
+    private function request(string $method, string $path, File $photo, ?string $collection = null): array
     {
+        $url = $this->url($path);
+
+        if ($collection !== null) {
+            $url .= '?collection=' . urlencode($collection);
+        }
+
         try {
-            $response = $this->httpClient->request($method, $this->url($path), [
+            $response = $this->httpClient->request($method, $url, [
                 'headers' => ['X-API-Key' => $this->faceApiKey],
                 'body' => ['image' => fopen($photo->getPathname(), 'r')],
                 'timeout' => 20,

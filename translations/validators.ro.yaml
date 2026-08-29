@@ -283,3 +283,16 @@ validation:
     counties:
         country:
             required: 'Țara este obligatorie'
+
+    # Persons
+    person:
+        first_name:
+            required: 'Prenumele este obligatoriu'
+        last_name:
+            required: 'Numele este obligatoriu'
+        birth_date:
+            past: 'Data nașterii nu poate fi în viitor'
+        email:
+            invalid: 'Adresa de email nu este validă'
+        photo:
+            mime: 'Fotografia trebuie să fie JPEG, PNG sau WebP.'

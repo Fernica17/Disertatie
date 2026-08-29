@@ -1,96 +1,132 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block title %}{{ 'users.face.page.title'|trans({}, 'users') }} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+{% block title %}{{ 'persons.search.title'|trans({}, 'persons') }} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
 
 {% block mg_breadcrumb %}
-    <li class="active">{{ 'users.face.page.title'|trans({}, 'users') }}</li>
+    <li class="active">{{ 'persons.search.title'|trans({}, 'persons') }}</li>
 {% endblock %}
 
 {% block content %}
     <div class="mg-page-header">
         <div>
-            <h1 class="mg-page-title">{{ 'users.face.page.title'|trans({}, 'users') }}</h1>
-            <p class="mg-page-subtitle">{{ 'users.face.page.subtitle'|trans({}, 'users') }}</p>
+            <h1 class="mg-page-title">{{ 'persons.search.title'|trans({}, 'persons') }}</h1>
+            <p class="mg-page-subtitle">{{ 'persons.search.subtitle'|trans({}, 'persons') }}</p>
         </div>
     </div>
 
     {% if not serviceAvailable %}
         <div class="alert alert-danger">{{ 'users.face.error.unavailable'|trans({}, 'users') }}</div>
     {% elseif enrolledCount == 0 %}
-        <div class="alert alert-warning">{{ 'users.face.page.nobody_enrolled'|trans({}, 'users') }}</div>
+        <div class="alert alert-warning">{{ 'persons.search.nobody_enrolled'|trans({}, 'persons') }}</div>
     {% endif %}
 
     <div class="mg-card"
          data-controller="face-capture"
          data-face-capture-detect-url-value="{{ path('admin_face_recognition_detect') }}"
-         data-face-capture-identify-url-value="{{ path('admin_face_recognition_identify') }}"
+         data-face-capture-search-url-value="{{ path('admin_face_recognition_search') }}"
          data-face-capture-text-idle="{{ 'users.face.detect.idle'|trans({}, 'users') }}"
          data-face-capture-text-starting="{{ 'users.face.detect.starting'|trans({}, 'users') }}"
-         data-face-capture-text-matching="{{ 'users.face.detect.matching'|trans({}, 'users') }}"
+         data-face-capture-text-matching="{{ 'persons.search.matching'|trans({}, 'persons') }}"
          data-face-capture-text-camera-error="{{ 'users.face.error.camera'|trans({}, 'users') }}"
-         data-face-capture-text-detect-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
-         data-face-capture-text-score="{{ 'users.face.result.score'|trans({}, 'users') }}">
+         data-face-capture-text-generic-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
+         data-face-capture-text-file-hint="{{ 'persons.search.file_hint'|trans({}, 'persons') }}"
+         data-face-capture-text-score-label="{{ 'persons.search.score'|trans({}, 'persons') }}"
+         data-face-capture-label-national-id="{{ 'persons.field.national_id'|trans({}, 'persons') }}"
+         data-face-capture-label-id-document="{{ 'persons.field.id_document'|trans({}, 'persons') }}"
+         data-face-capture-label-birth-date="{{ 'persons.field.birth_date'|trans({}, 'persons') }}"
+         data-face-capture-label-phone="{{ 'persons.field.phone'|trans({}, 'persons') }}"
+         data-face-capture-label-email="{{ 'persons.field.email'|trans({}, 'persons') }}"
+         data-face-capture-label-address="{{ 'persons.field.address'|trans({}, 'persons') }}"
+         data-face-capture-label-notes="{{ 'persons.field.notes'|trans({}, 'persons') }}">
 
         <div class="mg-card-header">
             <h2 class="mg-card-title">
-                <i class="fa-solid fa-camera ct-icon-primary"></i> {{ 'users.face.page.camera'|trans({}, 'users') }}
+                <i class="fa-solid fa-magnifying-glass ct-icon-primary"></i> {{ 'persons.search.source'|trans({}, 'persons') }}
             </h2>
         </div>
 
         <div class="ct-form-section">
             <div class="fc-layout">
 
-                {# Camera #}
                 <div>
-                    <div class="fc-stage">
-                        <video data-face-capture-target="video" playsinline muted></video>
-                        {# The box is drawn over the video, so it must not swallow clicks #}
-                        <canvas class="fc-overlay" data-face-capture-target="overlay"></canvas>
+                    {# Two ways in: the person is here, or you only have a photo of them #}
+                    <div class="fc-modes">
+                        <button type="button" class="mg-btn mg-btn-secondary fc-mode is-active"
+                                data-face-capture-target="cameraMode"
+                                data-action="face-capture#showCamera">
+                            <i class="fa-solid fa-video"></i> {{ 'persons.search.mode_camera'|trans({}, 'persons') }}
+                        </button>
+                        <button type="button" class="mg-btn mg-btn-secondary fc-mode"
+                                data-face-capture-target="fileMode"
+                                data-action="face-capture#showFile">
+                            <i class="fa-solid fa-image"></i> {{ 'persons.search.mode_file'|trans({}, 'persons') }}
+                        </button>
+                    </div>
 
-                        <div class="fc-placeholder" data-face-capture-target="placeholder">
-                            <i class="fa-solid fa-video-slash"></i>
-                            <p>{{ 'users.face.page.camera_off'|trans({}, 'users') }}</p>
+                    <div data-face-capture-target="cameraPanel">
+                        <div class="fc-stage">
+                            <video data-face-capture-target="video" playsinline muted></video>
+                            <canvas class="fc-overlay" data-face-capture-target="overlay"></canvas>
+                            <div class="fc-placeholder" data-face-capture-target="placeholder">
+                                <i class="fa-solid fa-video-slash"></i>
+                                <p>{{ 'users.face.page.camera_off'|trans({}, 'users') }}</p>
+                            </div>
+                        </div>
+
+                        <p class="fc-status" data-face-capture-target="status">{{ 'users.face.detect.idle'|trans({}, 'users') }}</p>
+
+                        <div class="fc-actions">
+                            <button type="button" class="mg-btn mg-btn-secondary"
+                                    data-face-capture-target="startButton"
+                                    data-action="face-capture#start">
+                                <i class="fa-solid fa-video"></i> {{ 'users.face.action.start'|trans({}, 'users') }}
+                            </button>
+                            <button type="button" class="mg-btn mg-btn-secondary" hidden
+                                    data-face-capture-target="stopButton"
+                                    data-action="face-capture#stop">
+                                <i class="fa-solid fa-video-slash"></i> {{ 'users.face.action.stop'|trans({}, 'users') }}
+                            </button>
+                            <button type="button" class="mg-btn mg-btn-primary" disabled
+                                    data-face-capture-target="captureButton"
+                                    data-action="face-capture#capture">
+                                <i class="fa-solid fa-magnifying-glass"></i> {{ 'persons.search.action'|trans({}, 'persons') }}
+                            </button>
                         </div>
                     </div>
 
-                    <p class="fc-status" data-face-capture-target="status">
-                        {{ 'users.face.detect.idle'|trans({}, 'users') }}
-                    </p>
-
-                    <div class="fc-actions">
-                        <button type="button" class="mg-btn mg-btn-secondary"
-                                data-face-capture-target="startButton"
-                                data-action="face-capture#start">
-                            <i class="fa-solid fa-video"></i> {{ 'users.face.action.start'|trans({}, 'users') }}
-                        </button>
-
-                        <button type="button" class="mg-btn mg-btn-secondary" hidden
-                                data-face-capture-target="stopButton"
-                                data-action="face-capture#stop">
-                            <i class="fa-solid fa-video-slash"></i> {{ 'users.face.action.stop'|trans({}, 'users') }}
-                        </button>
-
-                        {# Stays disabled until the server confirms exactly one face #}
-                        <button type="button" class="mg-btn mg-btn-primary" disabled
-                                data-face-capture-target="captureButton"
-                                data-action="face-capture#capture">
-                            <i class="fa-solid fa-camera"></i> {{ 'users.face.action.capture'|trans({}, 'users') }}
-                        </button>
+                    <div hidden data-face-capture-target="filePanel">
+                        <div class="fc-dropzone">
+                            <i class="fa-solid fa-image"></i>
+                            <p>{{ 'persons.search.file_hint'|trans({}, 'persons') }}</p>
+                            <input type="file" accept="image/jpeg,image/png,image/webp" class="d-none"
+                                   id="faceSearchFile"
+                                   data-face-capture-target="fileInput"
+                                   data-action="face-capture#fileChosen">
+                            <label for="faceSearchFile" class="custom-file-upload">
+                                <i class="fa-solid fa-folder-open"></i> {{ 'persons.search.choose_file'|trans({}, 'persons') }}
+                            </label>
+                        </div>
+                        <p class="fc-status" data-face-capture-target="fileStatus"></p>
                     </div>
                 </div>
 
-                {# Result #}
+                {# The person's file #}
                 <div class="fc-result" data-face-capture-target="result">
                     <div class="fc-result-empty" data-face-capture-target="resultEmpty">
-                        <i class="fa-solid fa-user-magnifying-glass"></i>
-                        <p>{{ 'users.face.page.result_empty'|trans({}, 'users') }}</p>
+                        <i class="fa-solid fa-user-large"></i>
+                        <p>{{ 'persons.search.result_empty'|trans({}, 'persons') }}</p>
                     </div>
 
-                    <div class="fc-result-card" hidden data-face-capture-target="resultCard">
+                    <div class="fc-person" hidden data-face-capture-target="resultCard">
                         <div class="fc-result-avatar" data-face-capture-target="resultAvatar"></div>
                         <div class="fc-result-name" data-face-capture-target="resultName"></div>
-                        <div class="fc-result-meta" data-face-capture-target="resultMeta"></div>
                         <div class="fc-result-score" data-face-capture-target="resultScore"></div>
+
+                        <dl class="fc-person-fields" data-face-capture-target="resultFields"></dl>
+
+                        <a href="#" class="mg-btn mg-btn-secondary mg-btn-sm" data-face-capture-target="resultLink">
+                            <i class="fa-solid fa-up-right-from-square"></i> {{ 'persons.search.open_record'|trans({}, 'persons') }}
+                        </a>
                     </div>
                 </div>
 

@@ -24,9 +24,16 @@ from .config import Settings
 logger = logging.getLogger(__name__)
 
 
+# Embeddings are partitioned by collection. Searching across collections would
+# be actively wrong: a person in the lookup registry and a login account can
+# share a numeric id while being different people, so an unscoped search could
+# answer a login question with a registry hit.
+DEFAULT_COLLECTION = "users"
+
+
 @dataclass(frozen=True)
 class StoredFace:
-    user_id: int
+    subject_id: int
     embedding: np.ndarray
 
 
@@ -81,9 +88,19 @@ class FaceStore:
                     """
                 ).format(schema)
             )
+            # Added after the first release, so existing rows fall back to the
+            # collection they were created in.
+            # PostgreSQL cannot infer the type of a bound parameter in a
+            # DEFAULT clause, so the value is composed as a literal instead.
             conn.execute(
                 sql.SQL(
-                    "CREATE INDEX IF NOT EXISTS embeddings_user_id_idx ON {}.embeddings (user_id)"
+                    "ALTER TABLE {}.embeddings"
+                    " ADD COLUMN IF NOT EXISTS collection text NOT NULL DEFAULT {}"
+                ).format(schema, sql.Literal(DEFAULT_COLLECTION))
+            )
+            conn.execute(
+                sql.SQL(
+                    "CREATE INDEX IF NOT EXISTS embeddings_lookup_idx ON {}.embeddings (collection, user_id)"
                 ).format(schema)
             )
 
@@ -93,73 +110,77 @@ class FaceStore:
     # queries
     # ------------------------------------------------------------------ #
 
-    def add(self, user_id: int, embedding: np.ndarray, model: str) -> int:
+    def add(self, subject_id: int, embedding: np.ndarray, model: str, collection: str) -> int:
         with self._pool.connection() as conn:
             row = conn.execute(
                 sql.SQL(
-                    "INSERT INTO {}.embeddings (user_id, embedding, model) VALUES (%s, %s, %s) RETURNING id"
+                    "INSERT INTO {}.embeddings (user_id, embedding, model, collection)"
+                    " VALUES (%s, %s, %s, %s) RETURNING id"
                 ).format(sql.Identifier(self._schema)),
-                (user_id, embedding.tolist(), model),
+                (subject_id, embedding.tolist(), model, collection),
             ).fetchone()
 
         return int(row[0])
 
-    def all_faces(self) -> list[StoredFace]:
+    def all_faces(self, collection: str) -> list[StoredFace]:
         with self._pool.connection() as conn:
             rows = conn.execute(
-                sql.SQL("SELECT user_id, embedding FROM {}.embeddings").format(
-                    sql.Identifier(self._schema)
-                )
+                sql.SQL(
+                    "SELECT user_id, embedding FROM {}.embeddings WHERE collection = %s"
+                ).format(sql.Identifier(self._schema)),
+                (collection,),
             ).fetchall()
 
         return [
-            StoredFace(user_id=int(user_id), embedding=np.asarray(embedding, dtype=np.float32))
-            for user_id, embedding in rows
+            StoredFace(subject_id=int(sid), embedding=np.asarray(embedding, dtype=np.float32))
+            for sid, embedding in rows
         ]
 
-    def faces_for(self, user_id: int) -> list[StoredFace]:
+    def faces_for(self, subject_id: int, collection: str) -> list[StoredFace]:
         with self._pool.connection() as conn:
             rows = conn.execute(
-                sql.SQL("SELECT user_id, embedding FROM {}.embeddings WHERE user_id = %s").format(
-                    sql.Identifier(self._schema)
-                ),
-                (user_id,),
+                sql.SQL(
+                    "SELECT user_id, embedding FROM {}.embeddings"
+                    " WHERE user_id = %s AND collection = %s"
+                ).format(sql.Identifier(self._schema)),
+                (subject_id, collection),
             ).fetchall()
 
         return [
-            StoredFace(user_id=int(uid), embedding=np.asarray(embedding, dtype=np.float32))
-            for uid, embedding in rows
+            StoredFace(subject_id=int(sid), embedding=np.asarray(embedding, dtype=np.float32))
+            for sid, embedding in rows
         ]
 
-    def count_for(self, user_id: int) -> int:
+    def count_for(self, subject_id: int, collection: str) -> int:
         with self._pool.connection() as conn:
             row = conn.execute(
-                sql.SQL("SELECT count(*) FROM {}.embeddings WHERE user_id = %s").format(
-                    sql.Identifier(self._schema)
-                ),
-                (user_id,),
+                sql.SQL(
+                    "SELECT count(*) FROM {}.embeddings WHERE user_id = %s AND collection = %s"
+                ).format(sql.Identifier(self._schema)),
+                (subject_id, collection),
             ).fetchone()
 
         return int(row[0])
 
-    def enrolled_user_ids(self) -> list[int]:
+    def enrolled_ids(self, collection: str) -> list[int]:
         with self._pool.connection() as conn:
             rows = conn.execute(
-                sql.SQL("SELECT DISTINCT user_id FROM {}.embeddings ORDER BY user_id").format(
-                    sql.Identifier(self._schema)
-                )
+                sql.SQL(
+                    "SELECT DISTINCT user_id FROM {}.embeddings WHERE collection = %s ORDER BY user_id"
+                ).format(sql.Identifier(self._schema)),
+                (collection,),
             ).fetchall()
 
         return [int(row[0]) for row in rows]
 
-    def delete_for(self, user_id: int) -> int:
-        """Removes every enrolment for a user. Biometric data must be erasable."""
+    def delete_for(self, subject_id: int, collection: str) -> int:
+        """Removes every enrolment for a subject. Biometric data must be erasable."""
         with self._pool.connection() as conn:
             cursor = conn.execute(
-                sql.SQL("DELETE FROM {}.embeddings WHERE user_id = %s").format(
-                    sql.Identifier(self._schema)
-                ),
-                (user_id,),
+                sql.SQL(
+                    "DELETE FROM {}.embeddings WHERE user_id = %s AND collection = %s"
+                ).format(sql.Identifier(self._schema)),
+                (subject_id, collection),
             )
 
         return cursor.rowcount

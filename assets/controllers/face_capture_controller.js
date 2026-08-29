@@ -1,30 +1,30 @@
 import { Controller } from '@hotwired/stimulus';
+import { openCamera, closeCamera, grabFrame, postFrame, drawDetectionBox } from '../js/face-camera';
 
 /**
- * Camera preview that gates the capture button on a real detection.
+ * Face search over the person registry.
  *
- * Two different frames are sent, on purpose:
- *  - the polling loop posts a small, low quality frame to /detect, which only
- *    runs the detector (~11 ms, ~6 KB) and answers "is there exactly one face";
- *  - pressing capture posts a full quality frame to /identify, which computes
- *    the embedding and searches every enrolled face.
+ * Two ways in, because in practice you either have the person in front of you
+ * or only a photo of them:
+ *  - the camera, gated by a cheap detection loop so the search button only
+ *    lights up once a single face is framed;
+ *  - a file, sent straight to the search.
  *
- * Detection runs server side rather than in the browser so the preview and the
- * matching use the same model: a frame the button accepts is a frame matching
- * will also accept.
+ * Detection runs server side so the preview and the search agree: a frame the
+ * button accepts is a frame the search will accept too.
  */
 export default class extends Controller {
     static targets = [
         'video', 'overlay', 'placeholder', 'status',
         'startButton', 'stopButton', 'captureButton',
+        'cameraMode', 'fileMode', 'cameraPanel', 'filePanel', 'fileInput', 'fileStatus',
         'result', 'resultEmpty', 'resultCard',
-        'resultAvatar', 'resultName', 'resultMeta', 'resultScore',
+        'resultAvatar', 'resultName', 'resultScore', 'resultFields', 'resultLink',
     ];
 
     static values = {
         detectUrl: String,
-        identifyUrl: String,
-        // Slow enough to stay cheap, fast enough to feel responsive.
+        searchUrl: String,
         interval: { type: Number, default: 600 },
     };
 
@@ -39,6 +39,30 @@ export default class extends Controller {
         this.stop();
     }
 
+    // ---------------------------------------------------------------- //
+    // modes
+    // ---------------------------------------------------------------- //
+
+    showCamera() {
+        this.cameraPanelTarget.hidden = false;
+        this.filePanelTarget.hidden = true;
+        this.cameraModeTarget.classList.add('is-active');
+        this.fileModeTarget.classList.remove('is-active');
+    }
+
+    showFile() {
+        // Free the camera as soon as it is not on screen.
+        this.stop();
+        this.cameraPanelTarget.hidden = true;
+        this.filePanelTarget.hidden = false;
+        this.fileModeTarget.classList.add('is-active');
+        this.cameraModeTarget.classList.remove('is-active');
+    }
+
+    // ---------------------------------------------------------------- //
+    // camera
+    // ---------------------------------------------------------------- //
+
     async start() {
         if (this.stream) {
             return;
@@ -47,13 +71,9 @@ export default class extends Controller {
         this.setStatus(this.t('starting'));
 
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
-                audio: false,
-            });
+            this.stream = await openCamera();
         } catch (error) {
-            // Most often a denied permission, or a non-secure origin.
-            this.setStatus(this.t('camera_error'), 'error');
+            this.setStatus(this.t('cameraError'), 'error');
 
             return;
         }
@@ -65,7 +85,6 @@ export default class extends Controller {
         this.startButtonTarget.hidden = true;
         this.stopButtonTarget.hidden = false;
 
-        this.syncOverlaySize();
         this.timer = window.setInterval(() => this.poll(), this.intervalValue);
     }
 
@@ -73,25 +92,23 @@ export default class extends Controller {
         window.clearInterval(this.timer);
         this.timer = null;
 
-        this.stream?.getTracks().forEach((track) => track.stop());
+        closeCamera(this.stream);
         this.stream = null;
 
         if (this.hasVideoTarget) {
             this.videoTarget.srcObject = null;
+            drawDetectionBox(this.overlayTarget, this.videoTarget, null, 320);
         }
-
-        this.clearOverlay();
-        this.setCaptureEnabled(false);
 
         if (this.hasPlaceholderTarget) {
             this.placeholderTarget.hidden = false;
             this.startButtonTarget.hidden = false;
             this.stopButtonTarget.hidden = true;
+            this.captureButtonTarget.disabled = true;
             this.setStatus(this.t('idle'));
         }
     }
 
-    /** One detection round trip. Skipped while a previous one is still open. */
     async poll() {
         if (this.inFlight || this.busy || !this.stream) {
             return;
@@ -100,15 +117,15 @@ export default class extends Controller {
         this.inFlight = true;
 
         try {
-            const blob = await this.grabFrame(320, 0.5);
-            const data = await this.post(this.detectUrlValue, blob, 'gate.jpg');
+            const blob = await grabFrame(this.videoTarget, 320, 0.5);
+            const data = await postFrame(this.detectUrlValue, blob, 'gate.jpg');
 
-            this.setCaptureEnabled(Boolean(data.usable));
+            this.captureButtonTarget.disabled = !data.usable;
             this.setStatus(data.message, data.usable ? 'ok' : null);
-            this.drawBox(data.face);
+            drawDetectionBox(this.overlayTarget, this.videoTarget, data.face, 320);
         } catch (error) {
-            this.setCaptureEnabled(false);
-            this.setStatus(this.t('detect_error'), 'error');
+            this.captureButtonTarget.disabled = true;
+            this.setStatus(this.t('genericError'), 'error');
         } finally {
             this.inFlight = false;
         }
@@ -120,113 +137,106 @@ export default class extends Controller {
         }
 
         this.busy = true;
-        this.setCaptureEnabled(false);
+        this.captureButtonTarget.disabled = true;
         this.setStatus(this.t('matching'));
 
         try {
-            const blob = await this.grabFrame(640, 0.85);
-            const data = await this.post(this.identifyUrlValue, blob, 'capture.jpg');
-
-            this.renderResult(data);
-            this.setStatus(data.message ?? '', data.matched ? 'ok' : 'error');
-        } catch (error) {
-            this.setStatus(this.t('detect_error'), 'error');
+            const blob = await grabFrame(this.videoTarget, 640, 0.85);
+            await this.search(blob, 'capture.jpg', (text, tone) => this.setStatus(text, tone));
         } finally {
             this.busy = false;
         }
     }
 
     // ---------------------------------------------------------------- //
-    // frames
+    // file
     // ---------------------------------------------------------------- //
 
-    /** Draws the current video frame to an offscreen canvas and encodes it. */
-    grabFrame(width, quality) {
-        const video = this.videoTarget;
-        const ratio = video.videoHeight / video.videoWidth || 0.75;
+    async fileChosen() {
+        const file = this.fileInputTarget.files?.[0];
 
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = Math.round(width * ratio);
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        return new Promise((resolve, reject) => {
-            canvas.toBlob(
-                (blob) => (blob ? resolve(blob) : reject(new Error('canvas encoding failed'))),
-                'image/jpeg',
-                quality,
-            );
-        });
-    }
-
-    async post(url, blob, filename) {
-        const body = new FormData();
-        body.append('frame', blob, filename);
-
-        const response = await fetch(url, {
-            method: 'POST',
-            body,
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            credentials: 'same-origin',
-        });
-
-        return response.json();
-    }
-
-    // ---------------------------------------------------------------- //
-    // rendering
-    // ---------------------------------------------------------------- //
-
-    syncOverlaySize() {
-        const { clientWidth, clientHeight } = this.videoTarget;
-        this.overlayTarget.width = clientWidth;
-        this.overlayTarget.height = clientHeight;
-    }
-
-    /** Box coordinates come back in the detection frame's space, so rescale. */
-    drawBox(face) {
-        this.syncOverlaySize();
-        const ctx = this.clearOverlay();
-
-        if (!face) {
+        if (!file || this.busy) {
             return;
         }
 
-        const video = this.videoTarget;
-        const scale = video.clientWidth / 320;
+        this.busy = true;
+        this.setFileStatus(this.t('matching'));
 
-        ctx.strokeStyle = '#2ec4b6';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(face.x * scale, face.y * scale, face.width * scale, face.height * scale);
+        try {
+            await this.search(file, file.name, (text, tone) => this.setFileStatus(text, tone));
+        } finally {
+            this.busy = false;
+        }
     }
 
-    clearOverlay() {
-        const ctx = this.overlayTarget.getContext('2d');
-        ctx.clearRect(0, 0, this.overlayTarget.width, this.overlayTarget.height);
+    // ---------------------------------------------------------------- //
+    // search
+    // ---------------------------------------------------------------- //
 
-        return ctx;
+    async search(blob, filename, report) {
+        try {
+            const data = await postFrame(this.searchUrlValue, blob, filename);
+
+            this.renderResult(data);
+            report(data.message ?? '', data.matched ? 'ok' : 'error');
+        } catch (error) {
+            this.renderResult({ matched: false });
+            report(this.t('genericError'), 'error');
+        }
     }
 
     renderResult(data) {
-        if (!data.matched || !data.user) {
+        if (!data.matched || !data.person) {
             this.resultCardTarget.hidden = true;
             this.resultEmptyTarget.hidden = false;
 
             return;
         }
 
-        const user = data.user;
+        const person = data.person;
 
-        this.resultAvatarTarget.innerHTML = user.avatarUrl
-            ? `<img src="${user.avatarUrl}" alt="">`
-            : `<span>${this.initials(user.name)}</span>`;
+        this.resultAvatarTarget.innerHTML = person.photoUrl
+            ? `<img src="${person.photoUrl}" alt="">`
+            : `<span>${this.initials(person.name)}</span>`;
 
-        this.resultNameTarget.textContent = user.name;
-        this.resultMetaTarget.textContent = `${user.email} · ${user.role}`;
-        this.resultScoreTarget.textContent = `${this.t('score')}: ${Number(data.score).toFixed(3)}`;
+        this.resultNameTarget.textContent = person.name;
+        this.resultScoreTarget.textContent = `${this.t('scoreLabel')} ${Number(data.score).toFixed(3)}`;
+        this.resultLinkTarget.href = person.detailUrl;
+
+        this.resultFieldsTarget.innerHTML = '';
+        this.addField(this.label('nationalId'), person.nationalId);
+        this.addField(this.label('idDocument'), person.idDocument);
+        this.addField(this.label('birthDate'), this.withAge(person));
+        this.addField(this.label('phone'), person.phone);
+        this.addField(this.label('email'), person.email);
+        this.addField(this.label('address'), person.address);
+        this.addField(this.label('notes'), person.notes);
 
         this.resultEmptyTarget.hidden = true;
         this.resultCardTarget.hidden = false;
+    }
+
+    withAge(person) {
+        if (!person.birthDate) {
+            return null;
+        }
+
+        return person.age === null ? person.birthDate : `${person.birthDate} (${person.age})`;
+    }
+
+    /** Empty fields are omitted rather than shown as dashes. */
+    addField(label, value) {
+        if (!value) {
+            return;
+        }
+
+        const dt = document.createElement('dt');
+        dt.textContent = label;
+
+        const dd = document.createElement('dd');
+        dd.textContent = value;
+
+        this.resultFieldsTarget.append(dt, dd);
     }
 
     initials(name) {
@@ -238,17 +248,21 @@ export default class extends Controller {
             .join('');
     }
 
-    setCaptureEnabled(enabled) {
-        this.captureButtonTarget.disabled = !enabled;
-    }
-
     setStatus(text, tone = null) {
         this.statusTarget.textContent = text;
         this.statusTarget.dataset.tone = tone ?? '';
     }
 
-    /** Strings the controller needs without a round trip, read off the element. */
+    setFileStatus(text, tone = null) {
+        this.fileStatusTarget.textContent = text;
+        this.fileStatusTarget.dataset.tone = tone ?? '';
+    }
+
+    label(key) {
+        return this.element.dataset[`faceCaptureLabel${key[0].toUpperCase()}${key.slice(1)}`] ?? key;
+    }
+
     t(key) {
-        return this.element.dataset[`faceCaptureText${key.replace(/(^|_)(\w)/g, (_, __, c) => c.toUpperCase())}`] ?? '';
+        return this.element.dataset[`faceCaptureText${key[0].toUpperCase()}${key.slice(1)}`] ?? '';
     }
 }

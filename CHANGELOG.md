@@ -2,6 +2,23 @@
 
 Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
+## [0.8.0] - 2026-08-29
+
+### Adăugat
+
+- **Registru de persoane căutabil după față** — înregistrări cu date de
+  identificare (nume, CNP, act, data nașterii, contact, adresă, observații) și
+  fotografie, separate de conturile de utilizator: nu au parolă, rol sau
+  posibilitatea de a se autentifica.
+- **Pagină de căutare după față** — cameră sau fotografie încărcată. Butonul de
+  căutare se activează doar când serverul confirmă o singură față în cadru.
+  Rezultatul afișează fișa completă a persoanei, cu scor și link.
+- **Colecții în serviciul de recunoaștere.** Embedding-urile erau salvate plat,
+  cu un singur id: o persoană din registru și un utilizator cu același id
+  numeric ar fi fost confundați, iar o față din registru ar fi putut declanșa
+  autentificarea. Căutarea este acum limitată la o colecție, iar `users` este
+  singura care poate răspunde unei întrebări de autentificare.
+
 ## [0.7.0] - 2026-08-29
 
 ### Adăugat

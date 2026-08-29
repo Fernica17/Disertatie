@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
-from fastapi import APIRouter, Depends, File, HTTPException, Path, Request, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Path, Query, Request, UploadFile, status
 
 from ..config import Settings, get_settings
 from ..recognizer import (
@@ -37,6 +37,14 @@ router = APIRouter(prefix="/faces", tags=["faces"], dependencies=[Depends(requir
 
 MODEL_NAME = "sface_2021dec"
 MAX_CANDIDATES = 5
+
+# Which set of faces a call operates on. Login accounts and the person registry
+# are stored separately so an id from one can never be answered for the other.
+CollectionParam = Query(
+    default="users",
+    pattern="^[a-z][a-z0-9_]{0,31}$",
+    description="Face collection to work within, e.g. users or persons",
+)
 
 
 async def _read_upload(image: UploadFile, settings: Settings) -> bytes:
@@ -121,6 +129,7 @@ async def enroll(
     request: Request,
     user_id: int = Path(ge=1),
     image: UploadFile = File(...),
+    collection: str = CollectionParam,
     settings: Settings = Depends(get_settings),
 ) -> EnrollResponse:
     """Adds one more reference face for a user.
@@ -133,14 +142,14 @@ async def enroll(
     embedding, face = _embed_or_400(request, payload)
 
     store = request.app.state.store
-    embedding_id = store.add(user_id, embedding, MODEL_NAME)
+    embedding_id = store.add(user_id, embedding, MODEL_NAME, collection)
 
-    logger.info("Enrolled a face for user %s (embedding %s)", user_id, embedding_id)
+    logger.info("Enrolled a face for %s/%s (embedding %s)", collection, user_id, embedding_id)
 
     return EnrollResponse(
         user_id=user_id,
         embedding_id=embedding_id,
-        samples=store.count_for(user_id),
+        samples=store.count_for(user_id, collection),
         face=_to_box(face),
     )
 
@@ -153,6 +162,7 @@ async def enroll(
 async def identify(
     request: Request,
     image: UploadFile = File(...),
+    collection: str = CollectionParam,
     settings: Settings = Depends(get_settings),
 ) -> IdentifyResponse:
     """Scores the frame against every enrolled face and returns the best match.
@@ -163,7 +173,7 @@ async def identify(
     embedding, face = _embed_or_400(request, payload)
 
     store = request.app.state.store
-    known = store.all_faces()
+    known = store.all_faces(collection)
 
     if not known:
         return IdentifyResponse(
@@ -177,8 +187,8 @@ async def identify(
     best_per_user: dict[int, float] = {}
     for stored in known:
         score = cosine_similarity(embedding, stored.embedding)
-        if score > best_per_user.get(stored.user_id, -1.0):
-            best_per_user[stored.user_id] = score
+        if score > best_per_user.get(stored.subject_id, -1.0):
+            best_per_user[stored.subject_id] = score
 
     ranked = sorted(best_per_user.items(), key=lambda item: item[1], reverse=True)
     top_user, top_score = ranked[0]
@@ -206,6 +216,7 @@ async def verify(
     request: Request,
     user_id: int = Path(ge=1),
     image: UploadFile = File(...),
+    collection: str = CollectionParam,
     settings: Settings = Depends(get_settings),
 ) -> VerifyResponse:
     """Safer than `identify` for login: the ERP says who it expects, so a
@@ -214,7 +225,7 @@ async def verify(
     embedding, face = _embed_or_400(request, payload)
 
     store = request.app.state.store
-    known = store.faces_for(user_id)
+    known = store.faces_for(user_id, collection)
 
     if not known:
         raise HTTPException(
@@ -238,15 +249,19 @@ async def verify(
     response_model=EnrollmentStatus,
     summary="Whether a user has an enrolled face",
 )
-async def enrollment_status(request: Request, user_id: int = Path(ge=1)) -> EnrollmentStatus:
-    samples = request.app.state.store.count_for(user_id)
+async def enrollment_status(
+    request: Request,
+    user_id: int = Path(ge=1),
+    collection: str = CollectionParam,
+) -> EnrollmentStatus:
+    samples = request.app.state.store.count_for(user_id, collection)
 
     return EnrollmentStatus(user_id=user_id, enrolled=samples > 0, samples=samples)
 
 
 @router.get("", response_model=list[int], summary="User ids that have an enrolled face")
-async def enrolled_users(request: Request) -> list[int]:
-    return request.app.state.store.enrolled_user_ids()
+async def enrolled_users(request: Request, collection: str = CollectionParam) -> list[int]:
+    return request.app.state.store.enrolled_ids(collection)
 
 
 @router.delete(
@@ -254,10 +269,14 @@ async def enrolled_users(request: Request) -> list[int]:
     response_model=DeleteResponse,
     summary="Erase every face enrolled for a user",
 )
-async def delete_faces(request: Request, user_id: int = Path(ge=1)) -> DeleteResponse:
+async def delete_faces(
+    request: Request,
+    user_id: int = Path(ge=1),
+    collection: str = CollectionParam,
+) -> DeleteResponse:
     """Biometric data is special-category personal data; erasure has to be a
     first-class operation, not a manual DELETE."""
-    deleted = request.app.state.store.delete_for(user_id)
-    logger.info("Deleted %s embedding(s) for user %s", deleted, user_id)
+    deleted = request.app.state.store.delete_for(user_id, collection)
+    logger.info("Deleted %s embedding(s) for %s/%s", deleted, collection, user_id)
 
     return DeleteResponse(user_id=user_id, deleted=deleted)

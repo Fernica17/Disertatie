@@ -4,11 +4,14 @@ namespace App\Controller\Admin;
 
 use App\Entity\Files;
 use App\Enum\UserRole;
+use App\Repository\PersonsRepository;
 use App\Repository\UsersRepository;
 use App\Security\Voter\UsersVoter;
 use App\Service\FaceRecognitionService;
 use App\Service\FilesUploadService;
+use App\Service\PersonsService;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -35,9 +38,12 @@ class FaceRecognitionController extends AbstractController
     public function __construct(
         private readonly FaceRecognitionService $faceRecognition,
         private readonly UsersRepository $usersRepository,
+        private readonly PersonsRepository $personsRepository,
+        private readonly PersonsService $personsService,
         private readonly FilesUploadService $filesUploadService,
         private readonly TranslatorInterface $translator,
         private readonly RateLimiterFactoryInterface $faceIdentifyLimiter,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
     ) {
     }
 
@@ -74,6 +80,92 @@ class FaceRecognitionController extends AbstractController
             'faces' => $result['faces'],
             'face' => $result['face'],
             'message' => $this->detectMessage($result),
+        ]);
+    }
+
+    /**
+     * Searches the person registry by face.
+     *
+     * A separate endpoint from identify() because it queries a different
+     * collection: registry hits must never be able to stand in for a login.
+     */
+    #[AdminRoute('/face-recognition/search', name: 'face_recognition_search', options: ['methods' => ['POST']])]
+    public function search(Request $request): JsonResponse
+    {
+        $this->denyAccessUnlessGranted(UsersVoter::USERS_VIEW);
+
+        if (!$this->faceIdentifyLimiter->create($request->getClientIp() ?? 'anonymous')->consume()->isAccepted()) {
+            return $this->json([
+                'ok' => false,
+                'matched' => false,
+                'message' => $this->trans('users.face.error.rate_limited'),
+            ], Response::HTTP_TOO_MANY_REQUESTS);
+        }
+
+        $frame = $this->frameOrNull($request);
+
+        if ($frame === null) {
+            return $this->json(['ok' => false, 'matched' => false, 'message' => $this->trans('users.face.error.bad_image')], Response::HTTP_BAD_REQUEST);
+        }
+
+        $result = $this->faceRecognition->identify($frame, FaceRecognitionService::COLLECTION_PERSONS);
+
+        if (!$result['ok']) {
+            return $this->json([
+                'ok' => false,
+                'matched' => false,
+                'message' => $this->translator->trans('users.face.result.failed', [
+                    '{reason}' => $this->trans($result['reason'] ?? 'users.face.error.unavailable'),
+                ], 'users'),
+            ]);
+        }
+
+        if (!$result['matched'] || $result['userId'] === null) {
+            return $this->json([
+                'ok' => true,
+                'matched' => false,
+                'score' => $result['score'],
+                'message' => $this->translator->trans('persons.search.no_match', [], 'persons'),
+            ]);
+        }
+
+        $person = $this->personsRepository->find($result['userId']);
+
+        if ($person === null) {
+            return $this->json([
+                'ok' => true,
+                'matched' => false,
+                'score' => $result['score'],
+                'message' => $this->translator->trans('persons.search.stale', [], 'persons'),
+            ]);
+        }
+
+        $photo = $this->personsService->photoOf($person);
+
+        return $this->json([
+            'ok' => true,
+            'matched' => true,
+            'score' => $result['score'],
+            'person' => [
+                'id' => $person->getId(),
+                'name' => $person->getFullName(),
+                'nationalId' => $person->getNationalId(),
+                'idDocument' => $person->getIdDocument(),
+                'birthDate' => $person->getBirthDate()?->format('d.m.Y'),
+                'age' => $person->getAge(),
+                'phone' => $person->getPhone(),
+                'email' => $person->getEmail(),
+                'address' => $person->getFullAddress() ?: null,
+                'notes' => $person->getNotes(),
+                'isActive' => $person->isActive(),
+                'photoUrl' => $photo ? $this->generateUrl('admin_file_view', ['id' => $photo->getId()]) : null,
+                'detailUrl' => $this->adminUrlGenerator
+                    ->unsetAll()
+                    ->setController(PersonsCrudController::class)
+                    ->setAction('detail')
+                    ->setEntityId($person->getId())
+                    ->generateUrl(),
+            ],
         ]);
     }
 

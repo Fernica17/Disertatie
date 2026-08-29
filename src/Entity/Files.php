@@ -20,6 +20,8 @@ class Files
     public const TYPE_DEFAULT = 'default';
     public const TYPE_COMPANIES_LOGO = 'companies_logo';
     public const TYPE_USER_AVATAR = 'user_avatar';
+
+    public const TYPE_PERSON_PHOTO = 'person_photo';
     public const TYPE_ORDER_ATTACHMENT = 'order_attachment';
     public const TYPE_OFFER_ATTACHMENT = 'offer_attachment';
     public const TYPE_OFFER_PDF = 'offer_pdf';

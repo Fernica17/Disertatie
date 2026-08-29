@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Companies;
 use App\Entity\Files;
 use App\Entity\Folders;
+use App\Entity\Persons;
 use App\Entity\Users;
 use App\Repository\FilesRepository;
 use App\Security\Voter\CompaniesVoter;
@@ -24,6 +25,8 @@ class FileServeController extends AbstractController
     private const array ENTITY_VOTER_MAP = [
         Companies::class => CompaniesVoter::COMPANIES_VIEW,
         Users::class => UsersVoter::USERS_VIEW_AVATAR,
+        // The registry is guarded by the same permission as the staff list
+        Persons::class => UsersVoter::USERS_VIEW,
         Folders::class => FoldersVoter::FOLDERS_DOWNLOAD,
     ];
 

@@ -1,0 +1,205 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set isEdit = person is not null %}
+
+{% set indexUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\PersonsCrudController').setAction('index').generateUrl() %}
+
+{% block title %}{% if isEdit %}{{ 'persons.page.edit'|trans({'{name}': person.fullName}, 'persons') }}{% else %}{{ 'persons.page.new'|trans({}, 'persons') }}{% endif %} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li><a href="{{ indexUrl }}">{{ 'persons.entity.plural'|trans({}, 'persons') }}</a></li>
+    <li class="active">{% if isEdit %}{{ person.fullName }}{% else %}{{ 'persons.page.new'|trans({}, 'persons') }}{% endif %}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">
+                {% if isEdit %}{{ 'persons.page.edit'|trans({'{name}': person.fullName}, 'persons') }}{% else %}{{ 'persons.page.new'|trans({}, 'persons') }}{% endif %}
+            </h1>
+            <p class="mg-page-subtitle">{{ 'persons.page.form_subtitle'|trans({}, 'persons') }}</p>
+        </div>
+    </div>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', novalidate: 'novalidate'}}) }}
+
+        {% if form.vars.errors|length > 0 %}
+            <div class="alert alert-danger">{{ form_errors(form) }}</div>
+        {% endif %}
+
+        <div class="mg-card">
+
+            {# Identitate #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-id-card ct-icon-primary"></i> {{ 'persons.fieldset.identity'|trans({}, 'persons') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-2">
+                    <div>
+                        <label class="of-label" for="{{ form.firstName.vars.id }}">
+                            {{ 'persons.field.first_name'|trans({}, 'persons') }} <span class="ct-required">*</span>
+                        </label>
+                        {{ form_widget(form.firstName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.firstName) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.lastName.vars.id }}">
+                            {{ 'persons.field.last_name'|trans({}, 'persons') }} <span class="ct-required">*</span>
+                        </label>
+                        {{ form_widget(form.lastName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.lastName) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-grid-3 ct-form-row">
+                    <div>
+                        <label class="of-label" for="{{ form.nationalId.vars.id }}">{{ 'persons.field.national_id'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.nationalId, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.nationalId) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.idDocument.vars.id }}">{{ 'persons.field.id_document'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.idDocument, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.idDocument) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.birthDate.vars.id }}">{{ 'persons.field.birth_date'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.birthDate, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.birthDate) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Fotografie #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-camera ct-icon-primary"></i> {{ 'persons.fieldset.photo'|trans({}, 'persons') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="avatar-upload-container" data-controller="photo-preview">
+                    <div class="avatar-preview-wrapper" data-photo-preview-target="frame"{% if photo is null %} hidden{% endif %}>
+                        <img src="{{ photo ? path('admin_file_view', {id: photo.id}) : '' }}" alt="" data-photo-preview-target="image">
+                    </div>
+
+                    {% if photo is null %}
+                        <div class="avatar-preview-wrapper" data-photo-preview-target="initials">
+                            <div class="avatar-initials" style="background-color: #64748b;">
+                                {{ (form.vars.data.firstName|default('?')|first|upper) ~ (form.vars.data.lastName|default('')|first|upper) }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div>
+                        <div class="mg-mt-4">
+                            {{ form_widget(form.photoUpload, {attr: {class: 'd-none'}}) }}
+                            <label for="{{ form.photoUpload.vars.id }}" class="custom-file-upload">
+                                <i class="fa-solid fa-camera"></i> {{ 'persons.action.choose_photo'|trans({}, 'persons') }}
+                            </label>
+
+                            <div class="mg-photo-field-actions">
+                                {% if photo %}
+                                    <button type="button" class="mg-btn mg-btn-danger mg-btn-sm"
+                                            data-photo-preview-target="removeButton"
+                                            data-action="photo-preview#remove">
+                                        <i class="fa-solid fa-trash-can"></i> {{ 'persons.action.remove_photo'|trans({}, 'persons') }}
+                                    </button>
+                                {% endif %}
+                                <button type="button" class="mg-btn mg-btn-secondary mg-btn-sm" hidden
+                                        data-photo-preview-target="undoButton"
+                                        data-action="photo-preview#undo">
+                                    {{ 'persons.action.undo'|trans({}, 'persons') }}
+                                </button>
+                            </div>
+
+                            <p class="mg-photo-field-pending" hidden data-photo-preview-target="pending">
+                                {{ 'persons.help.photo_pending_removal'|trans({}, 'persons') }}
+                            </p>
+                            <p class="mg-form-help">{{ 'persons.help.photo'|trans({}, 'persons') }}</p>
+                        </div>
+                        <div class="mg-form-error">{{ form_errors(form.photoUpload) }}</div>
+                        <div class="d-none">{{ form_row(form.removePhoto) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Contact #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-address-book ct-icon-primary"></i> {{ 'persons.fieldset.contact'|trans({}, 'persons') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-2">
+                    <div>
+                        <label class="of-label" for="{{ form.phone.vars.id }}">{{ 'persons.field.phone'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.phone, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.phone) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ form.email.vars.id }}">{{ 'persons.field.email'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.email, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.email) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-row">
+                    <label class="of-label" for="{{ form.address.vars.id }}">{{ 'persons.field.address'|trans({}, 'persons') }}</label>
+                    {{ form_widget(form.address, {attr: {class: 'of-input'}}) }}
+                </div>
+
+                <div class="ct-form-grid-3 ct-form-row"
+                     data-controller="location-picker"
+                     data-location-picker-city-id-value="{{ isEdit and person.city ? person.city.id : 0 }}">
+                    <div>
+                        <label class="of-label" for="{{ form.country.vars.id }}">{{ 'persons.field.country'|trans({}, 'persons') }}</label>
+                        {{ form_widget(form.country, {attr: {class: 'of-input', 'data-location-picker-target': 'country'}}) }}
+                    </div>
+                    <div>
+                        <label class="of-label">{{ 'persons.field.county'|trans({}, 'persons') }}</label>
+                        <select class="of-input" disabled data-location-picker-target="county">
+                            <option value="">—</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="of-label">{{ 'persons.field.city'|trans({}, 'persons') }}</label>
+                        {# AjaxEntityType renders a hidden input holding the id #}
+                        {{ form_widget(form.city, {attr: {style: 'display:none', 'data-location-picker-target': 'cityHidden'}}) }}
+                        <select class="of-input" disabled data-location-picker-target="city">
+                            <option value="">—</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {# Observatii #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title">
+                    <i class="fa-solid fa-note-sticky ct-icon-primary"></i> {{ 'persons.fieldset.notes'|trans({}, 'persons') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                {{ form_widget(form.notes, {attr: {class: 'of-input'}}) }}
+                <div class="ct-form-row">
+                    <label class="mg-check">
+                        {{ form_widget(form.isActive) }}
+                        <span>{{ 'persons.field.is_active'|trans({}, 'persons') }}</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="ct-form-actions">
+                <a href="{{ indexUrl }}" class="mg-btn mg-btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i> {{ 'persons.action.back'|trans({}, 'persons') }}
+                </a>
+                <div class="ct-form-actions-right">
+                    <button type="submit" class="mg-btn mg-btn-primary mg-btn-lg">
+                        <i class="fa-solid fa-floppy-disk"></i> {{ 'persons.action.save'|trans({}, 'persons') }}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    {{ form_end(form) }}
+{% endblock %}
