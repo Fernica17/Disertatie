@@ -14,6 +14,8 @@ parameters:
     profilesFilesDir: 'profiles'
     storageDir: '%kernel.project_dir%/storage'
     appUrl: '%env(APP_URL)%'
+    faceServiceUrl: '%env(FACE_SERVICE_URL)%'
+    faceApiKey: '%env(FACE_API_KEY)%'
     uploadMaxFileSize: 10485760       # 10 MB in bytes
     uploadMaxFileSizeMb: '10M'        # For Symfony Assert\File constraint
     uploadMaxFiles: 10                # Max files per upload
@@ -37,6 +39,11 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    App\Service\FaceRecognitionService:
+        arguments:
+            $faceServiceUrl: '%faceServiceUrl%'
+            $faceApiKey: '%faceApiKey%'
 
     App\Twig\ChangelogExtension:
         arguments:

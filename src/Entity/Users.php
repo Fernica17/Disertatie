@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -64,6 +65,13 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $isActive = true;
 
     private ?string $plainPassword = null;
+
+    /**
+     * Reference photo, uploaded through the form and not persisted on the user.
+     * The file itself is stored via Files (TYPE_USER_AVATAR) and the face
+     * embedding lives in the Python service.
+     */
+    private ?UploadedFile $photoUpload = null;
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isVerified = false;
@@ -187,6 +195,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getPhotoUpload(): ?UploadedFile
+    {
+        return $this->photoUpload;
+    }
+
+    public function setPhotoUpload(?UploadedFile $photoUpload): self
+    {
+        $this->photoUpload = $photoUpload;
 
         return $this;
     }

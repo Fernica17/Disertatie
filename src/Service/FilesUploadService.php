@@ -111,6 +111,26 @@ class FilesUploadService
     }
 
     /**
+     * Absolute path of a stored file on disk, or null when it is missing.
+     *
+     * Files::getFilename() holds the path relative to the storage root, so
+     * callers that need to read the bytes go through here instead of
+     * reassembling the path themselves.
+     */
+    public function absolutePath(Files $file): ?string
+    {
+        $filename = $file->getFilename();
+
+        if ($filename === null) {
+            return null;
+        }
+
+        $path = $this->storageDir . '/' . $filename;
+
+        return is_file($path) ? $path : null;
+    }
+
+    /**
      * Upload multiple files for an entity in a single transaction.
      *
      * @param UploadedFile[] $uploadedFiles

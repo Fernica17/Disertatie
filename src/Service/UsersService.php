@@ -11,6 +11,7 @@ use App\Security\EmailVerifier;
 use App\Service\Audit\AuditService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -24,7 +25,55 @@ class UsersService
         private readonly EmailVerifier $emailVerifier,
         private readonly FilesUploadService $filesUploadService,
         private readonly AuditService $auditService,
+        private readonly FaceRecognitionService $faceRecognition,
+        private readonly string $profilesFilesDir,
     ) {
+    }
+
+    /**
+     * Stores the reference photo and registers it with the face service.
+     *
+     * Runs after the user is committed, because enrolment needs the user id and
+     * must not be able to roll back a save. A photo the recogniser rejects still
+     * becomes the avatar; only face login is unavailable, and the caller gets a
+     * translation key back so it can say why.
+     *
+     * @return ?string translation key describing the problem, null on success
+     */
+    public function storeReferencePhoto(Users $user, UploadedFile $photo): ?string
+    {
+        foreach ($this->filesUploadService->getFilesForEntity($user, Files::TYPE_USER_AVATAR) as $old) {
+            $this->filesUploadService->remove($old);
+        }
+
+        // upload() moves the temporary file, so enrol from the stored copy
+        $stored = $this->filesUploadService->upload(
+            $photo,
+            $user,
+            $this->profilesFilesDir,
+            Files::TYPE_USER_AVATAR,
+        );
+
+        $this->entityManager->flush();
+
+        $path = $this->filesUploadService->absolutePath($stored);
+
+        if ($path === null || !is_file($path)) {
+            $this->logger->error('Stored photo is missing on disk', ['user_id' => $user->getId()]);
+
+            return 'users.face.error.bad_image';
+        }
+
+        $result = $this->faceRecognition->enroll($user, new File($path));
+
+        if (!$result['ok']) {
+            $this->logger->warning('Face enrolment failed', [
+                'user_id' => $user->getId(),
+                'reason' => $result['reason'],
+            ]);
+        }
+
+        return $result['ok'] ? null : $result['reason'];
     }
 
     /**
@@ -132,6 +181,10 @@ class UsersService
         try {
             $userId = $user->getId();
             $userEmail = $user->getEmail();
+
+            // Biometric data must go with the account (GDPR Art. 17). Done before
+            // the delete so the id is still available to address the face service.
+            $this->faceRecognition->deleteEnrollment($user);
 
             $this->entityManager->remove($user);
             $this->entityManager->flush();

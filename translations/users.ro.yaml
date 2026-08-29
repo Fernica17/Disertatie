@@ -25,6 +25,7 @@ users:
         singular: Utilizator
     field:
         avatar: Avatar
+        photo: 'Fotografie'
         company: Companie
         confirm_password: 'Confirmă parola'
         created_at: 'Creat la'
@@ -40,11 +41,24 @@ users:
     filter:
         is_active: 'Status activ'
         role: Rol
+    help:
+        photo: 'O fotografie clara, cu o singura fata privind spre camera. Este folosita ca avatar si pentru recunoasterea faciala la autentificare.'
+    face:
+        error:
+            no_face: 'Fotografia a fost salvata ca avatar, dar nu s-a detectat nicio fata in ea, asa ca autentificarea faciala nu este disponibila.'
+            multiple_faces: 'Fotografia a fost salvata ca avatar, dar contine mai multe fete. Pentru recunoastere este nevoie de o poza cu o singura persoana.'
+            bad_image: 'Fisierul nu a putut fi citit ca imagine.'
+            too_large: 'Fotografia depaseste dimensiunea maxima acceptata de serviciul de recunoastere.'
+            not_enrolled: 'Utilizatorul nu are o fotografie de referinta inregistrata.'
+            unauthorized: 'Serviciul de recunoastere faciala a respins cheia de acces. Verifica FACE_API_KEY.'
+            unavailable: 'Serviciul de recunoastere faciala nu este disponibil. Fotografia a fost salvata, dar asocierea se va face la o reincercare.'
+            unsaved_user: 'Utilizatorul trebuie salvat inainte de a inregistra o fotografie.'
     flash:
         csrf_invalid: 'Token CSRF invalid. Te rog reîncearcă.'
         password_changed: 'Parola utilizatorului {name} a fost schimbată cu succes.'
         password_error: 'A apărut o eroare la schimbarea parolei. Te rog reîncearcă.'
         created: 'Utilizatorul {name} a fost creat cu succes.'
+        face_enrolled: 'Fotografia lui {name} a fost asociata pentru recunoastere faciala.'
         updated: 'Utilizatorul {name} a fost actualizat cu succes.'
         deleted: 'Utilizatorul a fost șters cu succes.'
         delete_error_general: 'A apărut o eroare neprevăzută la încercarea de ștergere a utilizatorului.'

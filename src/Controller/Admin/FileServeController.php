@@ -10,6 +10,7 @@ use App\Repository\FilesRepository;
 use App\Security\Voter\CompaniesVoter;
 use App\Security\Voter\FoldersVoter;
 use App\Security\Voter\UsersVoter;
+use App\Service\FilesUploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -29,7 +30,7 @@ class FileServeController extends AbstractController
     public function __construct(
         private readonly FilesRepository $filesRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly string $storageDir,
+        private readonly FilesUploadService $filesUploadService,
     ) {
     }
 
@@ -87,8 +88,9 @@ class FileServeController extends AbstractController
 
     private function getPhysicalPath(Files $file): string
     {
-        $physicalPath = $this->storageDir . '/' . $file->getFilename();
-        if (!file_exists($physicalPath)) {
+        $physicalPath = $this->filesUploadService->absolutePath($file);
+
+        if ($physicalPath === null) {
             throw $this->createNotFoundException('Physical file not found.');
         }
 

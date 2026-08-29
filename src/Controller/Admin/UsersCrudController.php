@@ -29,9 +29,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\BooleanFilter;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -237,6 +240,22 @@ class UsersCrudController extends AbstractCrudController
             ->setPermission('ROLE_ADMIN');
         yield BooleanField::new('isActive', $this->translator->trans('users.field.is_active', [], 'users'))
             ->renderAsSwitch(true);
+        yield Field::new('photoUpload', $this->translator->trans('users.field.photo', [], 'users'))
+            ->setFormType(FileType::class)
+            ->setFormTypeOptions([
+                'required' => false,
+                'mapped' => true,
+                'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
+                'constraints' => [
+                    new Assert\File(
+                        maxSize: '8M',
+                        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                        mimeTypesMessage: 'validation.user.photo.mime',
+                    ),
+                ],
+            ])
+            ->setHelp($this->translator->trans('users.help.photo', [], 'users'))
+            ->onlyOnForms();
     }
 
     private function getRoleChoices(): array
@@ -309,10 +328,12 @@ class UsersCrudController extends AbstractCrudController
         $dto->isActive = $entityInstance->isActive();
         $dto->company = $entityInstance->getCompany();
 
-        $this->usersService->create($dto);
+        $user = $this->usersService->create($dto);
         $this->addFlash('success', $this->translator->trans('users.flash.created', [
             '{name}' => $entityInstance->getFullName(),
         ], 'users'));
+
+        $this->handleReferencePhoto($user, $entityInstance->getPhotoUpload());
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -334,6 +355,8 @@ class UsersCrudController extends AbstractCrudController
         $this->addFlash('success', $this->translator->trans('users.flash.updated', [
             '{name}' => $entityInstance->getFullName(),
         ], 'users'));
+
+        $this->handleReferencePhoto($entityInstance, $entityInstance->getPhotoUpload());
     }
 
     public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -351,5 +374,30 @@ class UsersCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn): Users
     {
         return new Users();
+    }
+
+    /**
+     * Stores the uploaded photo and reports whether face login became available.
+     *
+     * A photo the recogniser rejects is still kept as the avatar, so the admin
+     * gets a warning rather than a failed save.
+     */
+    private function handleReferencePhoto(Users $user, ?UploadedFile $photo): void
+    {
+        if ($photo === null) {
+            return;
+        }
+
+        $problem = $this->usersService->storeReferencePhoto($user, $photo);
+
+        if ($problem === null) {
+            $this->addFlash('success', $this->translator->trans('users.flash.face_enrolled', [
+                '{name}' => $user->getFullName(),
+            ], 'users'));
+
+            return;
+        }
+
+        $this->addFlash('warning', $this->translator->trans($problem, [], 'users'));
     }
 }

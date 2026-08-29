@@ -2,6 +2,19 @@
 
 Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
+## [0.5.0] - 2026-08-29
+
+### Adăugat
+
+- **Fotografie de referință pe utilizator** — câmp în formularul de administrare.
+  La salvare, poza devine avatarul utilizatorului și este trimisă serviciului de
+  recunoaștere facială pentru asociere. O poză fără față (sau cu mai multe) este
+  păstrată ca avatar, dar apare un avertisment că autentificarea facială nu e
+  disponibilă — salvarea utilizatorului nu eșuează niciodată din cauza asocierii.
+- `FaceRecognitionService` — client HTTP către serviciul Python (înrolare,
+  verificare 1:1, stare, ștergere).
+- Datele biometrice se șterg automat odată cu utilizatorul (GDPR Art. 17).
+
 ## [0.4.0] - 2026-08-29
 
 ### Adăugat

@@ -98,6 +98,11 @@ curl localhost:8092/health          # stare
 open http://localhost:8092/docs     # documentație interactivă
 ```
 
+Fiecare utilizator poate avea o **fotografie de referință**, încărcată din
+formularul de administrare (Administrare → Utilizatori → editare). Poza devine
+avatarul și este asociată automat pentru recunoaștere. Dacă nu conține exact o
+față, avatarul se salvează oricum, dar recunoașterea rămâne indisponibilă.
+
 Detalii, endpoint-uri, licențe și ce mai trebuie înainte de producție:
 [`face-service/README.md`](face-service/README.md).
 

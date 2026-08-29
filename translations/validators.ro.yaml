@@ -24,6 +24,8 @@ validation:
     # Users
     user:
         email_unique: 'Adresa de email există deja în sistem'
+        photo:
+            mime: 'Fotografia trebuie să fie JPEG, PNG sau WebP.'
         password:
             required: 'Parola este obligatorie'
             min_length: 'Parola trebuie să aibă cel puțin {{ limit }} caractere'
