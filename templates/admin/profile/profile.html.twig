@@ -1,0 +1,173 @@
+{# templates/admin/profile/profile.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+
+{% block content %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="mg-alert mg-alert-{{ label == 'danger' ? 'danger' : 'success' }}">
+                <i class="fa-solid {{ label == 'danger' ? 'fa-triangle-exclamation' : 'fa-check-circle' }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="mg-page-header">
+        <h1 class="mg-page-title">{{ 'profile.title'|trans({}, 'admin') }}</h1>
+    </div>
+
+    <div class="mg-profile-layout">
+
+        <aside class="mg-profile-sidebar">
+            <div class="mg-card mg-profile-card">
+                <div class="mg-profile-avatar">
+                    {% if avatar %}
+                        <img src="{{ path('admin_file_view', {id: avatar.id}) }}" alt="{{ user.fullName }}">
+                    {% else %}
+                        {% set initials = (user.firstName|default('?')|first|upper) ~ (user.lastName|default('')|first|upper) %}
+                        {% set fullName = user.firstName ~ ' ' ~ user.lastName %}
+                        {% set colors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                        {% set bgColor = colors[fullName|length % 9] %}
+                        <div class="mg-profile-initials" style="background-color: {{ bgColor }};">
+                            {{ initials }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h3 class="mg-profile-name">{{ user.firstName }} {{ user.lastName }}</h3>
+
+                {% set roleName = user.primaryRole|replace({'ROLE_': ''})|lower %}
+                <div class="mg-profile-role">
+                    <span class="mg-badge mg-badge-role-{{ roleName }}">
+                        {{ ('role.' ~ roleName)|trans({}, 'admin') }}
+                    </span>
+                </div>
+
+                <p class="mg-profile-email">{{ user.email }}</p>
+
+                <div class="mg-profile-actions">
+                    <a href="{{ path('admin_profile_update') }}" class="mg-btn mg-btn-primary mg-btn-lg mg-btn-block">
+                        <i class="fa-solid fa-pen"></i> {{ 'profile.edit_profile'|trans({}, 'admin') }}
+                    </a>
+                    <button class="mg-btn mg-btn-secondary mg-btn-lg mg-btn-block" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                        <i class="fa-solid fa-lock"></i> {{ 'profile.change_password'|trans({}, 'admin') }}
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <section class="mg-profile-content">
+
+            {# Card Date Personale #}
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-id-card text-primary"></i> {{ 'profile.personal_data'|trans({}, 'admin') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    <div class="mg-form-grid">
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'profile.first_name'|trans({}, 'admin') }}</div>
+                            <div class="mg-data-value">{{ user.firstName|default('-') }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'profile.last_name'|trans({}, 'admin') }}</div>
+                            <div class="mg-data-value">{{ user.lastName|default('-') }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'profile.phone'|trans({}, 'admin') }}</div>
+                            <div class="mg-data-value">{{ user.phone|default('-') }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'profile.email'|trans({}, 'admin') }}</div>
+                            <div class="mg-data-value">{{ user.email|default('-') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Card Companie #}
+            {% if user.company %}
+                <div class="mg-card">
+                    <div class="mg-card-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-building text-primary"></i> {{ 'profile.company_data'|trans({}, 'admin') }}
+                        </div>
+                    </div>
+                    <div class="mg-card-body">
+                        <div class="mg-form-grid">
+                            <div class="mg-data-item">
+                                <div class="mg-data-label">{{ 'profile.company_name'|trans({}, 'admin') }}</div>
+                                <div class="mg-data-value">{{ user.company.name|default('-') }}</div>
+                            </div>
+                            <div class="mg-data-item">
+                                <div class="mg-data-label">{{ 'profile.company_email'|trans({}, 'admin') }}</div>
+                                <div class="mg-data-value">{{ user.company.email|default('-') }}</div>
+                            </div>
+                            <div class="mg-data-item">
+                                <div class="mg-data-label">{{ 'profile.fiscal_code'|trans({}, 'admin') }}</div>
+                                <div class="mg-data-value">{{ user.company.fiscalCode|default('-') }}</div>
+                            </div>
+                            <div class="mg-data-item">
+                                <div class="mg-data-label">{{ 'profile.trade_register'|trans({}, 'admin') }}</div>
+                                <div class="mg-data-value">{{ user.company.tradeRegisterNumber|default('-') }}</div>
+                            </div>
+                            <div class="mg-data-item mg-col-full">
+                                <div class="mg-data-label">{{ 'profile.address'|trans({}, 'admin') }}</div>
+                                <div class="mg-data-value">{{ user.company.address|default('-') }} {{ user.company.city ? user.company.city.name : '' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </section>
+    </div>
+
+    {# Modal Schimbare Parolă #}
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content mg-card" style="border: none;">
+                <div class="modal-header mg-card-header">
+                    <h5 class="modal-title section-title" id="changePasswordModalLabel">
+                        <i class="fa-solid fa-lock text-primary"></i> {{ 'profile.change_password'|trans({}, 'admin') }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="password-form-errors" class="alert alert-danger d-none" role="alert"></div>
+
+                    {{ form_start(passwordForm, {'attr': {'id': 'change-password-form', 'action': path('admin_password_change'), novalidate: 'novalidate'}}) }}
+                    <div style="margin-bottom: 1rem;">
+                        <label class="of-label" for="{{ passwordForm.currentPassword.vars.id }}">{{ 'security.change_password.current_password_label'|trans({}, 'security') }}</label>
+                        {{ form_widget(passwordForm.currentPassword, {'attr': {'class': 'of-input'}}) }}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label class="of-label" for="{{ passwordForm.plainPassword.first.vars.id }}">{{ 'security.change_password.new_password_label'|trans({}, 'security') }}</label>
+                        {{ form_widget(passwordForm.plainPassword.first, {'attr': {'class': 'of-input'}}) }}
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label class="of-label" for="{{ passwordForm.plainPassword.second.vars.id }}">{{ 'security.change_password.confirm_password_label'|trans({}, 'security') }}</label>
+                        {{ form_widget(passwordForm.plainPassword.second, {'attr': {'class': 'of-input'}}) }}
+                    </div>
+                    {{ form_end(passwordForm) }}
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="mg-btn mg-btn-secondary" data-bs-dismiss="modal">
+                        {{ 'profile.cancel'|trans({}, 'admin') }}
+                    </button>
+                    <button type="submit" form="change-password-form" class="mg-btn mg-btn-primary" id="btn-save-password">
+                        <i class="fa-solid fa-floppy-disk"></i> {{ 'profile.save_password'|trans({}, 'admin') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('profile') }}
+{% endblock %}

@@ -1,0 +1,59 @@
+users:
+    action:
+        change_password: 'Schimbă parola'
+        new: 'Adaugă utilizator'
+        edit: 'Editează'
+        detail: 'Detalii'
+        delete: 'Șterge'
+    breadcrumb:
+        change_password: 'Utilizatori / Schimbă parola'
+    change_password:
+        back_to_edit: 'Înapoi la editare'
+        cancel: Anulează
+        confirm_password: 'Confirmă parola'
+        new_password: 'Parola nouă'
+        rule:
+            digit: 'Cel puțin o cifră'
+            lowercase: 'Cel puțin o literă mică'
+            min_length: 'Minim 10 caractere'
+            special: 'Cel puțin un caracter special'
+            uppercase: 'Cel puțin o literă mare'
+        submit: 'Schimbă parola'
+        title: 'Schimbă parola: {name}'
+    entity:
+        plural: Utilizatori
+        singular: Utilizator
+    field:
+        avatar: Avatar
+        company: Companie
+        confirm_password: 'Confirmă parola'
+        created_at: 'Creat la'
+        email: Email
+        first_name: Prenume
+        full_name: 'Nume complet'
+        is_active: Activ
+        last_name: Nume
+        password: Parolă
+        role: Rol
+        updated_at: 'Actualizat la'
+        phone: Telefon
+    filter:
+        is_active: 'Status activ'
+        role: Rol
+    flash:
+        csrf_invalid: 'Token CSRF invalid. Te rog reîncearcă.'
+        password_changed: 'Parola utilizatorului {name} a fost schimbată cu succes.'
+        password_error: 'A apărut o eroare la schimbarea parolei. Te rog reîncearcă.'
+        created: 'Utilizatorul {name} a fost creat cu succes.'
+        updated: 'Utilizatorul {name} a fost actualizat cu succes.'
+        deleted: 'Utilizatorul a fost șters cu succes.'
+        delete_error_general: 'A apărut o eroare neprevăzută la încercarea de ștergere a utilizatorului.'
+    page:
+        edit: 'Editare utilizator: {name}'
+        index: 'Gestionare utilizatori'
+        new: 'Adaugă utilizator'
+enum:
+    user_role:
+        admin: Administrator
+        manager: Manager
+        client: Client

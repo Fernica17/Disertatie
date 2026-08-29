@@ -1,0 +1,282 @@
+admin:
+    action:
+        edit: 'Editează'
+        detail: 'Detalii'
+        export: 'Export Excel'
+    brand:
+        subtitle: 'Internal Management System'
+    breadcrumb:
+        dashboard: Dashboard
+        detail: Detalii
+        edit: Editare
+        new: Adăugare
+        page: Pagină
+    dashboard:
+        alerts: Alerte
+        alert:
+            companies_count: '%count% companii'
+        month:
+            jan: Ian
+            feb: Feb
+            mar: Mar
+            apr: Apr
+            may: Mai
+            jun: Iun
+            jul: Iul
+            aug: Aug
+            sep: Sep
+            oct: Oct
+            nov: Nov
+            dec: Dec
+        chart:
+            companies: Companii
+            companies_by_status: 'Companii per status'
+            companies_per_month: 'Companii noi per lună'
+            users: Utilizatori
+            users_by_role: 'Utilizatori per rol'
+            users_per_month: 'Utilizatori noi per lună'
+        kpi:
+            companies_active: 'Companii active'
+            companies_prospect: 'Companii prospect'
+            companies_total: 'Total companii'
+            users_active: 'Utilizatori activi'
+            users_inactive: 'Utilizatori inactivi'
+        last_update: 'Ultima actualizare:'
+        no_data: 'Nu există date de afișat'
+        recent_notifications: 'Notificări recente'
+        recent_companies: 'Companii recente'
+        recent_users: 'Utilizatori recenți'
+        nomenclator: Nomenclator
+        active: Activ
+        inactive: Inactiv
+        table:
+            client: Client
+            deadline: Termen
+            responsible_person: 'Responsabil intern'
+            phase: Fază
+            progress: Progres
+            project: Proiect
+            received_at: 'Data primirii'
+            status: Status
+            test_number: 'Nr. test'
+            test_type: 'Tip test'
+        tests_pipeline: 'Teste — status curent'
+        title: Dashboard
+        top_clients: 'Top clienți'
+        welcome: 'Bun venit'
+    menu:
+        all_companies: Companii
+        dashboard: Dashboard
+        logout: Deconectare
+        contracts: Contracte
+        offers: Oferte
+        projects: Proiecte
+        settings: Setări
+        changelog: 'Istoric versiuni'
+        my_company: Compania mea
+        correspondences: Corespondență
+        section:
+            administration: Administrare
+            commercial: Comercial
+            companies: Companii
+            projects: Proiecte
+            nomenclator: Nomenclator
+            equipments: Echipamente
+            stock: Stocuri
+            tests: 'Testări'
+            documents: Documente
+        documents: 'Documente'
+        documents_system: 'Documente sistem'
+        documents_custom: 'Documente interne'
+        documents_clients: 'Documente clienți'
+        lists: Liste
+        elements: Elemente
+        users: Utilizatori
+        equipments: Echipamente
+        schedule: Planificare
+        schedule_overdue: Restante
+        schedule_upcoming: Viitoare
+        schedule_unplanned: Neplanificate
+        stock_items: 'Articole stoc'
+        stock_lots: 'Loturi stoc'
+        stock_movements: 'Mișcări stoc'
+        stock_reports: 'Rapoarte stoc'
+        stock_report_current: 'Stoc la zi'
+        stock_report_below_minimum: 'Sub nivel minim'
+        stock_report_near_expiry: 'Aproape de expirare'
+        stock_report_lot_traceability: 'Trasabilitate loturi'
+        tests: 'Testări / Determinări'
+        test_types: 'Tipuri de test'
+        tests_reports: 'Rapoarte testări'
+        tests_pending: 'În așteptare'
+        tests_in_progress: 'În lucru'
+        tests_completed: 'Finalizate'
+        tests_consumptions: 'Consumuri pe testări'
+        tests_recalled: 'Testări afectate de recall'
+        tests_consumptions_aggregated: 'Consumuri agregate'
+    nav:
+        all_companies: Companii
+        dashboard: Dashboard
+        logout: Deconectare
+        my_profile: 'Profilul meu'
+        product_categories: 'Categorii produse'
+        products: 'Produse / Servicii'
+        projects: Proiecte
+        countries: 'Țări'
+        counties: 'Județe'
+        cities: 'Orașe'
+        section:
+            administration: Administrare
+            main: Principal
+            nomenclature: Nomenclatoare
+            operational: Operațional
+            projects: Proiecte
+        users: Utilizatori
+    role:
+        admin: Administrator
+        manager: Manager
+        client: Client
+    notifications:
+        mark_all_read: 'Marchează toate ca citite'
+        no_new: 'Nu sunt notificări noi.'
+        title: Notificări
+        view_all: 'Vezi toate notificările'
+        none: "Nu există notificări necitite"
+    changelog:
+        title: 'Istoric versiuni'
+        subtitle: 'Modificările și noutățile platformei'
+        current_version: 'Versiunea curentă: %version%'
+        empty: 'Nu există încă nicio versiune publicată.'
+    sidebar:
+        version: 'v%version%'
+    settings:
+        title: 'Setări platformă'
+        subtitle: 'Configurează parametrii generali ai platformei'
+        save: 'Salvează setările'
+        saved: 'Setările au fost salvate cu succes.'
+        invalid_token: 'Token CSRF invalid. Te rog reîncearcă.'
+        group:
+            general: 'General'
+            financial: 'Financiar'
+            series: 'Serii documente'
+            notifications: 'Notificări'
+            files: 'Fișiere'
+            display: 'Afișare'
+        field:
+            company_name: 'Numele companiei'
+            company_cui: 'CUI'
+            company_reg_com: 'Nr. Reg. Comerțului'
+            company_address: 'Adresa'
+            company_phone: 'Telefon'
+            company_email: 'Email'
+            default_vat_percent: 'TVA implicit (%)'
+            default_currency: 'Moneda implicită'
+            offer_series_prefix: 'Prefix serie oferte'
+            contract_series_prefix: 'Prefix serie contracte'
+            app_title: 'Titlul aplicației'
+            contract_expiry_days: 'Zile notificare expirare contracte'
+            project_order_series_prefix: 'Prefix serie comenzi proiect'
+            equipment_maintenance_alert_days: 'Zile alertă mentenanță echipamente'
+            equipment_calibration_alert_days: 'Zile alertă etalonare echipamente'
+            stock_expiry_alert_days: 'Praguri alertă expirare stoc (zile, cu virgulă)'
+            test_series_prefix: 'Prefix serie testări'
+            correspondence_in_series_prefix: "Prefix corespondență intrări"
+            correspondence_out_series_prefix: "Prefix corespondență ieșiri"
+common:
+    choice:
+        'yes': Da
+        'no': 'Nu'
+countries:
+    flash:
+        created: 'Țara a fost creată cu succes.'
+        updated: 'Țara a fost actualizată cu succes.'
+    entity:
+        singular: 'Țară'
+        plural: 'Țări'
+    field:
+        name: 'Nume'
+        is_active: 'Activ'
+    page:
+        index: 'Țări'
+        new: 'Adaugă țară'
+        edit: 'Editează {name}'
+cities:
+    flash:
+        created: 'Orașul a fost creat cu succes.'
+        updated: 'Orașul a fost actualizat cu succes.'
+    entity:
+        singular: 'Oraș'
+        plural: 'Orașe'
+    field:
+        name: 'Nume'
+        county: 'Județ'
+        is_active: 'Activ'
+    page:
+        index: 'Orașe'
+        new: 'Adaugă oraș'
+        edit: 'Editează {name}'
+counties:
+    flash:
+        created: 'Județul a fost creat cu succes.'
+        updated: 'Județul a fost actualizat cu succes.'
+    entity:
+        singular: 'Județ'
+        plural: 'Județe'
+    field:
+        name: 'Nume'
+        code: 'Cod'
+        country: 'Țară'
+        is_active: 'Activ'
+    page:
+        index: 'Județe'
+        new: 'Adaugă județ'
+        edit: 'Editează {name}'
+
+profile:
+    title: "Profilul meu"
+    edit_profile: "Editează profilul"
+    change_password: "Schimbă parola"
+    personal_data: "Date personale"
+    first_name: "Prenume"
+    last_name: "Nume"
+    phone: "Telefon"
+    email: "Email"
+    company_data: "Date companie"
+    company_name: "Nume companie"
+    company_email: "Email companie"
+    fiscal_code: "CUI / CIF"
+    trade_register: "Nr. Reg. Comerțului"
+    address: "Adresă sediu"
+    cancel: "Anulează"
+    save_password: "Salvează parola"
+    edit:
+        title: "Editează profilul"
+        subtitle: "Actualizează informațiile de bază ale contului tău."
+        personal_data_avatar: "Date personale"
+        avatar_label: "Poza de profil"
+        avatar_preview: "Previzualizare"
+        choose_new_photo: "Alege o poză nouă"
+        avatar_help: "JPG, PNG sau WebP. Max 5MB."
+        back_to_profile: "Înapoi la profil"
+        save_changes: "Salvează modificările"
+        success: "Profil actualizat cu succes!"
+    password_changed: "Parola actualizată cu succes!"
+    form:
+        email: "Adresă de email"
+        first_name: "Prenume"
+        last_name: "Nume"
+        phone: "Telefon"
+        avatar_label: "Poza de profil"
+        avatar_invalid_type: "Te rugăm să încarci o imagine validă (JPG, PNG, WebP)"
+        avatar_too_large: "Imaginea este prea mare. Limita maximă este de 5MB."
+# Roluri
+role:
+    admin: Administrator
+    manager: Manager
+    consultant: Consultant
+    client: Client
+    company_manager: 'Manager Companie'
+
+error:
+    generic: 'A apărut o eroare. Încearcă din nou.'
+    foreign_key_violation: 'Înregistrarea nu poate fi ștearsă deoarece este utilizată în alte secțiuni ale platformei.'

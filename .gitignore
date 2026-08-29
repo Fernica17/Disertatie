@@ -1,0 +1,41 @@
+###> symfony/framework-bundle ###
+# .env is not tracked: copy .env.example to .env on a fresh checkout.
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> symfony/webpack-encore-bundle ###
+/node_modules/
+/public/build/
+npm-debug.log
+yarn-error.log
+###< symfony/webpack-encore-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.cache
+###< phpunit/phpunit ###
+
+/storage/
+/.php-cs-fixer.cache
+.idea/
+.DS_Store
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> face service ###
+# ONNX weights are fetched at image build time by scripts/download_models.py
+/face-service/models/*.onnx
+__pycache__/
+*.py[cod]
+.venv/
+###< face service ###

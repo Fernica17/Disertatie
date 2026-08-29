@@ -1,0 +1,188 @@
+enum:
+    offer_status:
+        draft: Ciornă
+        sent: Trimisă
+        renegotiation: Renegociere
+        accepted: Acceptată
+        rejected: Refuzată
+        expired: Expirată
+        cancelled: Anulată
+    offer_type:
+        testare: Testare
+        consultanta: Consultanță
+        mixt: Mixt
+
+offers:
+    entity:
+        singular: Ofertă
+        plural: Oferte
+    action:
+        new: 'Adaugă ofertă'
+        edit: Editează
+        delete: Șterge
+        duplicate: Duplică
+        detail: Detalii
+        mark_sent: 'Marchează trimisă'
+        mark_accepted: 'Marchează acceptată'
+        mark_rejected: 'Marchează refuzată'
+        mark_renegotiation: Renegociere
+        send_email: 'Trimite pe email'
+        create_contract: 'Creează contract'
+    field:
+        offer_number: 'Nr. ofertă'
+        client: Client
+        offer_date: 'Data ofertei'
+        valid_until: 'Valabilă până la'
+        status: Status
+        currency: Moneda
+        subtotal: Subtotal
+        total_without_vat: 'Total fără TVA'
+        vat_percent: 'TVA (%)'
+        vat_amount: 'Valoare TVA'
+        total_with_vat: 'Total cu TVA'
+        subject: Subiect
+        description: Descriere
+        notes: 'Note interne'
+        prepared_by: 'Întocmit de'
+        approved_by: 'Aprobat de'
+        sent_at: 'Data trimiterii'
+        responded_at: 'Data răspunsului'
+        rejection_reason: 'Motiv refuz'
+        type: 'Tip ofertă'
+    page:
+        index: 'Gestionare oferte'
+        new: 'Ofertă nouă'
+        edit: 'Editare ofertă'
+        detail: 'Detalii ofertă'
+    filter:
+        status: Status
+        type: 'Tip ofertă'
+        client: Client
+        date: 'Data ofertei'
+        prepared_by: 'Întocmit de'
+    tab:
+        general: 'Date generale'
+        lines: 'Linii ofertă'
+        documents: Documente
+    detail:
+        expired: Expirată
+        line_singular: linie
+        line_plural: linii
+        no_documents: 'Niciun document atașat.'
+        pdf_title: 'PDF ofertă'
+        pdf_not_generated: 'PDF-ul nu a fost generat încă. Editează și salvează oferta pentru a genera PDF-ul.'
+    fieldset:
+        identification: Identificare
+        values: Valori
+        details: Detalii
+        people: Persoane
+        system_info: 'Info sistem'
+    form:
+        cancel: Anulează
+        save: 'Salvează oferta'
+        save_changes: 'Salvează modificările'
+        auto_generated: 'Se generează automat'
+        subtitle_new: 'Completează datele ofertei comerciale'
+        subtitle_edit: 'Modifică datele ofertei'
+        search_client: 'Caută client după nume sau CUI...'
+        search_product: 'Caută produs după nume sau cod...'
+        quick_client: 'Client nou'
+        quick_client_title: 'Creare rapidă client'
+        company_name: 'Nume companie'
+        company_name_placeholder: 'SC Exemplu SRL'
+        phone: Telefon
+        create_client: 'Creează client'
+        custom_product: 'Produs personalizat (nu este în nomenclator)'
+        custom_product_placeholder: 'Introdu denumirea produsului/serviciului...'
+        subject_placeholder: 'Subiectul ofertei comerciale...'
+        description_placeholder: 'Descrierea detaliată a ofertei...'
+        notes_placeholder: 'Note interne (nu apar pe ofertă)...'
+        line_description_placeholder: 'Descriere detaliată a serviciului/produsului...'
+        line_notes_placeholder: 'Observații suplimentare...'
+        no_lines: 'Niciun serviciu/produs adăugat. Click pe Adaugă linie pentru a începe.'
+        actions: Acțiuni
+        existing_attachments: 'Atașamente existente'
+        remove: Elimină
+        upload_hint: 'Trage fișiere aici sau alege fișiere'
+        upload_file_types: 'PDF, JPG, PNG, DOC, XLS — max. 10 MB'
+        email_label: Email
+        edit_line: 'Editare linie'
+        save_line: Salvează
+        no_products_found: 'Niciun produs găsit'
+        no_clients_found: 'Niciun client găsit'
+        custom_badge: Custom
+        fiscal_code: CUI
+    error:
+        not_found: 'Oferta nu a fost găsită.'
+        client_name_required: 'Numele companiei este obligatoriu.'
+        client_create_failed: 'Eroare la crearea clientului.'
+        network: 'Eroare de rețea.'
+        invalid_token: 'Token de securitate invalid. Reîncarcă pagina și încearcă din nou.'
+        client_required: 'Clientul este obligatoriu.'
+        currency_required: 'Moneda este obligatorie.'
+        invalid_date: 'Data ofertei este invalidă.'
+        invalid_valid_until: 'Data de valabilitate este invalidă.'
+        invalid_vat: 'Procentul TVA trebuie să fie un număr între 0 și 100.'
+        invalid_type: 'Tipul ofertei este invalid.'
+        line_invalid_quantity: 'Linia {line}: cantitatea trebuie să fie un număr pozitiv.'
+        line_invalid_price: 'Linia {line}: prețul unitar trebuie să fie un număr pozitiv sau zero.'
+        line_invalid_discount: 'Linia {line}: discountul trebuie să fie între 0 și 100.'
+    confirm:
+        duplicate: 'Ești sigur că vrei să duplici această ofertă?'
+        mark_sent: 'Ești sigur că vrei să marchezi oferta ca trimisă?'
+        mark_accepted: 'Ești sigur că vrei să marchezi oferta ca acceptată?'
+        mark_rejected: 'Ești sigur că vrei să marchezi oferta ca refuzată?'
+        mark_renegotiation: 'Ești sigur că vrei să treci oferta în renegociere?'
+        delete: 'Ești sigur că vrei să ștergi această ofertă? Acțiunea este ireversibilă.'
+    flash:
+        created: 'Oferta {offerNumber} a fost creată cu succes.'
+        updated: 'Oferta {offerNumber} a fost actualizată.'
+        duplicated: 'Oferta {source} a fost duplicată ca {new}.'
+        deleted: 'Oferta a fost ștearsă.'
+        email_required: 'Adresa de email este obligatorie.'
+        email_sent: 'Oferta {offerNumber} a fost trimisă pe email la {email}.'
+        email_failed: 'Trimiterea emailului a eșuat.'
+        marked_sent: 'Oferta {offerNumber} a fost marcată ca trimisă.'
+        marked_accepted: 'Oferta {offerNumber} a fost marcată ca acceptată.'
+        marked_rejected: 'Oferta {offerNumber} a fost marcată ca refuzată.'
+        marked_renegotiation: 'Oferta {offerNumber} a fost trecută în renegociere.'
+    email:
+        modal_title: 'Trimite oferta pe email'
+        to: 'Către (email)'
+        subject: Subiect
+        body: 'Mesaj'
+        default_subject: 'Ofertă {offerNumber} — {companyName}'
+        default_body: "Bună ziua,\n\nÎți transmitem atașat oferta comercială {offerNumber}.\n\nPentru orice întrebări, nu ezita să ne contactezi.\n\nCu stimă,\n{companyName}"
+        send: 'Trimite email'
+        pdf_note: 'Oferta în format PDF va fi atașată automat la email.'
+        header_subtitle: 'Ofertă comercială'
+        offer_number: 'Nr. ofertă'
+        offer_date: 'Data ofertei'
+        valid_until: 'Valabilă până la'
+        total_with_vat: 'Total (cu TVA)'
+        pdf_attached: 'Oferta detaliată este atașată acestui email în format PDF.'
+    pdf:
+        title: 'OFERTĂ COMERCIALĂ'
+        date: Data
+        client: Client
+        services_products: 'Servicii / Produse'
+        valid_until: 'Oferta este valabilă până la data de'
+
+offer_lines:
+    entity:
+        singular: 'Linie ofertă'
+        plural: 'Linii ofertă'
+    field:
+        position: '#'
+        product: 'Produs/Serviciu'
+        custom_product_name: Denumire
+        description: Descriere
+        quantity: Cantitate
+        unit: Unitate de măsură
+        unit_price: 'Preț unitar'
+        discount_percent: 'Discount (%)'
+        total_value: 'Valoare totală'
+        notes: Observații
+    action:
+        add: 'Adaugă linie'
+        remove: 'Șterge linie'

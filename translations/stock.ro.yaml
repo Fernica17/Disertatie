@@ -1,0 +1,217 @@
+enum:
+    stock_lot_status:
+        active: Activ
+        inactive: Inactiv
+        expired: Expirat
+        recalled: Retras
+    stock_item_type:
+        reagent: Reactiv
+        consumable: Consumabil
+        auxiliary_material: 'Material auxiliar'
+        other: Altul
+    stock_movement_type:
+        entry_purchase: 'Intrare - Achiziție'
+        entry_transfer: 'Intrare - Transfer'
+        exit_consumption: 'Ieșire - Consum'
+        exit_reject: 'Ieșire - Rebut'
+        adjustment_inventory: 'Ajustare - Inventar'
+        adjustment_loss: 'Ajustare - Pierdere'
+
+stock:
+    item:
+        entity:
+            singular: 'Articol stoc'
+            plural: 'Articole stoc'
+        action:
+            new: 'Adaugă articol'
+            edit: Editează
+            detail: Detalii
+            delete: Șterge
+        field:
+            name: Denumire
+            code: Cod
+            indicativ: Indicativ
+            item_type: Tip
+            unit: 'Unitate de măsură'
+            manufacturer: Producător
+            distributor: Distribuitor
+            technical_specs: 'Specificații tehnice'
+            storage_type: 'Tip stocare'
+            minimum_stock: 'Stoc minim'
+            is_active: Activ
+            total_stock: 'Stoc total'
+        page:
+            index: 'Articole stoc'
+            new: 'Articol stoc nou'
+            edit: 'Editare articol'
+        filter:
+            item_type: Tip
+            distributor: Distribuitor
+            storage_type: 'Tip stocare'
+        form:
+            subtitle_new: 'Adaugă un articol de stoc nou'
+            subtitle_edit: 'Modifică informațiile articolului'
+            section_identification: Identificare
+            section_technical: 'Detalii tehnice'
+            section_status: Status
+        detail:
+            info: 'Informații articol'
+            total_stock: 'Stoc total'
+            minimum_stock: 'Stoc minim'
+            below_minimum: 'Sub stocul minim!'
+            active_lots: 'Loturi active'
+            of_total: 'din {total} total'
+            tab_lots: Loturi
+            tab_consumptions: Consumuri
+            total_consumed: 'Total consumat'
+            consumptions_count: consumuri
+            no_lots: 'Nu există loturi pentru acest articol.'
+            no_consumptions: 'Nu există consumuri înregistrate pentru acest articol.'
+            consumptions:
+                test_number: 'Nr. test'
+                client: Client
+                test_type: 'Tip test'
+                lot: Lot
+                quantity: 'Cantitate consumată'
+                status: Status
+                date: Data
+                view_test: 'Vezi testarea'
+                total: Total
+        flash:
+            created: 'Articolul {name} a fost creat cu succes.'
+            updated: 'Articolul {name} a fost actualizat.'
+            deleted: 'Articolul a fost șters.'
+    lot:
+        entity:
+            singular: 'Lot stoc'
+            plural: 'Loturi stoc'
+        action:
+            new: 'Adaugă lot'
+            edit: Editează
+            detail: Detalii
+            delete: Șterge
+            add_movement: 'Adaugă mișcare'
+        field:
+            stock_item: Articol
+            lot_number: 'Nr. lot'
+            quantity: Cantitate
+            unit: UM
+            received_date: 'Data recepție'
+            expiry_date: 'Data expirare'
+            notes: Observații
+            status: Status
+            certificate: 'Certificat calitate'
+        page:
+            index: 'Loturi stoc'
+            new: 'Lot nou'
+            edit: 'Editare lot'
+        filter:
+            stock_item: Articol
+            lot_number: 'Nr. lot'
+            received_date: 'Data recepție'
+            expiry_date: 'Data expirare'
+        form:
+            subtitle_new: 'Adaugă un lot nou de stoc'
+            subtitle_edit: 'Modifică informațiile lotului'
+            section_info: 'Informații lot'
+            existing_certificates: 'Certificate existente'
+            upload_hint: 'Trageți fișierele aici sau click pentru a selecta'
+            remove: Șterge
+        flash:
+            created: 'Lotul {lotNumber} a fost creat cu succes.'
+            updated: 'Lotul {lotNumber} a fost actualizat.'
+            deleted: 'Lotul a fost șters.'
+        status:
+            active: Activ
+            inactive: Inactiv
+            expired: Expirat
+            near_expiry: 'Aproape de expirare'
+    movement:
+        entity:
+            singular: 'Mișcare stoc'
+            plural: 'Mișcări stoc'
+        field:
+            stock_item: Articol
+            lot: Lot
+            movement_type: 'Tip mișcare'
+            quantity: Cantitate
+            movement_date: Data
+            reference: 'Referință document'
+            notes: Observații
+            performed_by: 'Efectuat de'
+            created_at: 'Creat la'
+        page:
+            index: 'Mișcări stoc'
+            new: 'Mișcare nouă'
+        for_lot: 'Mișcare pentru {item} — Lot: {lot}'
+        help:
+            reference: 'Nr. factură, bon, PV inventar...'
+        action:
+            delete: Șterge
+        filter:
+            movement_type: 'Tip mișcare'
+            stock_item: Articol
+            lot: Lot
+            performed_by: 'Efectuat de'
+        detail:
+            info: 'Detalii mișcare'
+        flash:
+            created: 'Mișcarea a fost înregistrată cu succes.'
+            deleted: 'Mișcarea a fost ștearsă și cantitatea lotului a fost ajustată.'
+            validation_error: 'Completează toate câmpurile obligatorii.'
+            generic_error: 'A apărut o eroare. Te rog să încerci din nou.'
+    detail:
+        info: 'Informații lot'
+        tab:
+            movements: Mișcări
+            certificates: Certificate
+            tests: 'Testări'
+        days_remaining: 'zile rămase'
+        total_movements: 'Total mișcări'
+        no_movements: 'Nu există mișcări înregistrate.'
+        no_certificates: 'Nu există certificate atașate.'
+        no_tests: 'Nu există testări care au consumat din acest lot.'
+        tests:
+            test_number: 'Nr. test'
+            client: 'Client'
+            test_type: 'Tip test'
+            quantity: 'Cantitate consumată'
+            status: 'Status consum'
+            date: 'Data'
+            view_test: 'Vezi testarea'
+    flash:
+        invalid_csrf: 'Token de securitate invalid. Te rog să reîncarci pagina și să încerci din nou.'
+    form:
+        cancel: Anulează
+        save: Salvează
+    report:
+        action:
+            view_item: 'Vezi articol'
+            view_lot: 'Vezi lot'
+        field:
+            days_until_expiry: 'Zile până la expirare'
+        days: zile
+        lot_traceability:
+            title: 'Trasabilitate loturi'
+            tests_count: 'Nr. consumuri'
+            total_consumed: 'Total consumat'
+    notifications:
+        email:
+            footer: 'Acest email a fost generat automat. Nu răspunde la acest mesaj.'
+        digest:
+            subject: 'Sumar stocuri - alerte expirare loturi'
+            title: 'Alerte stocuri'
+            summary: '{near_expiry_count} loturi aproape de expirare, {expired_count} loturi expirate'
+            greeting: 'Bună, {firstName}'
+            message: 'Acesta este un sumar al loturilor de stoc care necesită atenție:'
+            section_near_expiry: 'Loturi aproape de expirare'
+            section_expired: 'Loturi expirate'
+            col_item: Articol
+            col_lot: 'Nr. lot'
+            col_expiry_date: 'Data expirare'
+            col_days_left: 'Zile rămase'
+            col_status: Status
+            status_expired: Expirat
+            days: zile
+            view: Detalii
+            action: 'Verifică loturile de mai sus și ia măsurile necesare.'

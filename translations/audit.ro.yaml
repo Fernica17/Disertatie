@@ -1,0 +1,64 @@
+audit:
+    menu:
+        section: "Audit & securitate"
+        authentication_logs: "Log autentificare"
+        access_logs: "Log acces"
+        entity_change_logs: "Istoric modificări"
+    authentication_logs:
+        label_singular: "Eveniment autentificare"
+        label_plural: "Log autentificare"
+        field:
+            userId: "ID utilizator"
+            username: "Utilizator"
+            eventType: "Tip eveniment"
+            ipAddress: "Adresă IP"
+            userAgent: "User agent"
+            success: "Reușit"
+            failureReason: "Motiv eșec"
+            sessionId: "Sesiune"
+            createdAt: "Data/ora"
+    access_logs:
+        label_singular: "Acces"
+        label_plural: "Log acces"
+        field:
+            userId: "ID utilizator"
+            username: "Utilizator"
+            routeName: "Rută"
+            url: "URL"
+            method: "Metodă"
+            controller: "Controller"
+            action: "Acțiune"
+            requestParams: "Parametri request"
+            responseCode: "Cod răspuns"
+            ipAddress: "Adresă IP"
+            userAgent: "User agent"
+            executionTime: "Timp execuție (ms)"
+            memoryUsage: "Memorie (bytes)"
+            createdAt: "Data/ora"
+    entity_change_logs:
+        label_singular: "Modificare entitate"
+        label_plural: "Istoric modificări"
+        field:
+            entityClass: "Entitate"
+            entityId: "ID entitate"
+            entityLabel: "Denumire"
+            action: "Acțiune"
+            changes: "Modificări"
+            userId: "ID utilizator"
+            username: "Utilizator"
+            createdAt: "Data/ora"
+            ipAddress: 'Adresǎ IP'
+    enum:
+        event_type:
+            login_success: "Login reușit"
+            login_failed: "Login eșuat"
+            logout: "Deconectare"
+            password_change: "Schimbare parolă"
+        action:
+            create: "Creare"
+            update: "Modificare"
+            delete: "Ștergere"
+    cleanup:
+        success: "Curățare completă"
+        deleted_auth: "Șterse {count} înregistrări autentificare"
+        deleted_access: "Șterse {count} înregistrări acces"

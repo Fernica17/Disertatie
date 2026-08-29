@@ -1,0 +1,20 @@
+// Admin panel - imports the Magnum design system
+// All visual overrides are in magnum.scss
+@use 'magnum';
+
+th.check-col,
+td.check-col {
+    display: none !important;
+}
+
+.content-top .batch-actions {
+    display: none !important;
+}
+
+// Export button styling
+.global-actions a.btn-success,
+.global-actions button.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: #fff !important;
+}

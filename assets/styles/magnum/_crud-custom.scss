@@ -1,0 +1,347 @@
+/* ============================================================
+   CRUD CUSTOM - Shared styles for custom form & detail templates
+   Used by: Contracts, Offers, and future modules
+   Prefix: ct- (crud-template)
+   ============================================================ */
+
+/* --- Required asterisk --- */
+.ct-required {
+    color: var(--mg-danger, #dc2626);
+}
+
+/* --- Input modifiers (shared with offer form) --- */
+.of-input--right {
+    text-align: right;
+}
+
+.of-input--resize-v {
+    resize: vertical;
+}
+
+/* --- Hidden file input inside upload area --- */
+.ct-file-input {
+    display: none;
+}
+
+/* --- Form sections --- */
+.ct-form-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--mg-border, #e5e7eb);
+}
+
+.ct-form-section--last {
+    padding: 20px 24px;
+    border-bottom: none;
+}
+
+.ct-form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+}
+
+.ct-form-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px 24px;
+}
+
+.ct-form-grid-4 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px 24px;
+}
+
+.ct-form-row {
+    margin-top: 16px;
+}
+
+/* --- Readonly input (contract number, etc.) --- */
+.ct-input-readonly {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--mg-border, #e5e7eb);
+    border-radius: var(--mg-radius, 8px);
+    font-size: 14px;
+    font-family: inherit;
+    background: var(--mg-bg, #f9fafb);
+    color: var(--mg-text-muted, #6b7280);
+}
+
+/* --- Computed totals summary --- */
+.ct-totals-box {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--mg-bg, #f9fafb);
+    border-radius: var(--mg-radius, 8px);
+    border: 1px solid var(--mg-border, #e5e7eb);
+}
+
+.ct-totals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    text-align: center;
+}
+
+.ct-totals-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--mg-text-muted, #6b7280);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.ct-totals-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mg-text, #1f2937);
+    margin-top: 4px;
+}
+
+.ct-totals-value--primary {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mg-primary, #2563eb);
+    margin-top: 4px;
+}
+
+/* --- Form bottom actions bar --- */
+.ct-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-top: 1px solid var(--mg-border, #e5e7eb);
+    background: var(--mg-bg, #f9fafb);
+}
+
+.ct-form-actions-right {
+    display: flex;
+    gap: 12px;
+}
+
+/* --- Documents upload columns --- */
+.ct-docs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: end;
+}
+
+.ct-docs-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mg-text, #1f2937);
+    margin-bottom: 12px;
+}
+
+.ct-existing-label {
+    font-size: 12px;
+    color: var(--mg-text-muted, #6b7280);
+    margin-bottom: 8px;
+}
+
+.ct-existing-files {
+    margin-bottom: 12px;
+}
+
+/* --- File marked for removal --- */
+.ct-file-marked-remove {
+    opacity: 0.4;
+    text-decoration: line-through;
+}
+
+/* --- Selected file preview --- */
+.ct-selected-file {
+    font-size: 12px;
+    color: var(--mg-text-muted, #6b7280);
+    padding: 4px 0;
+
+    i {
+        margin-right: 6px;
+    }
+}
+
+.ct-selected-file-size {
+    color: var(--mg-text-light, #9ca3af);
+}
+
+.ct-file-list {
+    margin-top: 8px;
+}
+
+/* --- Upload area hint text --- */
+.ct-upload-icon {
+    font-size: 28px;
+    color: var(--mg-text-light, #9ca3af);
+    margin-bottom: 6px;
+}
+
+.ct-upload-text {
+    font-size: 13px;
+    color: var(--mg-text-muted, #6b7280);
+}
+
+.ct-upload-hint {
+    font-size: 11px;
+    color: var(--mg-text-light, #9ca3af);
+    margin-top: 4px;
+}
+
+/* --- Detail page --- */
+.ct-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.ct-summary-card {
+    padding: 20px;
+    text-align: center;
+}
+
+.ct-summary-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--mg-text-muted, #6b7280);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.ct-summary-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--mg-text, #1f2937);
+    margin-top: 6px;
+}
+
+.ct-summary-value--primary {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--mg-primary, #2563eb);
+    margin-top: 6px;
+}
+
+.ct-summary-value--danger {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--mg-danger, #dc2626);
+    margin-top: 6px;
+}
+
+.ct-summary-sub {
+    font-size: 12px;
+    color: var(--mg-text-light, #9ca3af);
+}
+
+.ct-summary-sub--danger {
+    font-size: 12px;
+    color: var(--mg-danger, #dc2626);
+}
+
+/* --- Detail 2-col grid --- */
+.ct-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+/* --- Detail card content --- */
+.ct-detail-card {
+    padding: 20px 24px;
+}
+
+.ct-detail-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mg-text, #1f2937);
+    margin-bottom: 12px;
+
+    i {
+        color: var(--mg-primary, #2563eb);
+        margin-right: 8px;
+    }
+}
+
+.ct-detail-field {
+    margin-bottom: 12px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.ct-detail-field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.ct-detail-field-value {
+    margin-top: 4px;
+}
+
+.ct-detail-empty {
+    color: var(--mg-text-light, #9ca3af);
+    font-size: 13px;
+}
+
+.ct-detail-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* --- Badge (status/type in header) --- */
+.ct-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* --- Detail page actions bar --- */
+.ct-detail-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--mg-border, #e5e7eb);
+    justify-content: flex-end;
+}
+
+/* --- Detail header meta (ID, timestamps) --- */
+.ct-detail-meta-right {
+    color: var(--mg-text-light, #9ca3af);
+    font-size: 12px;
+    margin-left: auto;
+}
+
+/* --- Detail avatar --- */
+.ct-detail-avatar {
+    background: #2563eb;
+}
+
+/* --- Section icon coloring --- */
+.ct-icon-primary {
+    color: var(--mg-primary, #2563eb);
+    margin-right: 8px;
+}
+
+/* --- Detail file item link --- */
+.ct-file-link {
+    color: var(--mg-primary, #2563eb);
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.ct-file-icon {
+    color: var(--mg-primary, #2563eb);
+}

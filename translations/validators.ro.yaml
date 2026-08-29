@@ -1,0 +1,283 @@
+validation:
+    # Common
+    phone:
+        invalid: 'Formatul de telefon invalid'
+    email:
+        required: 'Adresa de email este obligatorie'
+        invalid: 'Format de email invalid'
+        invalid_contact: 'Format de email invalid pentru persoana de contact'
+    first_name:
+        required: 'Prenumele este obligatoriu'
+        max_length: 'Prenumele nu poate depăși {{ limit }} caractere'
+    last_name:
+        required: 'Numele este obligatoriu'
+        max_length: 'Numele nu poate depăși {{ limit }} caractere'
+    name:
+        required: 'Denumirea este obligatorie'
+        min_length: 'Numele trebuie să aibă minim {{ limit }} caractere'
+        max_length: 'Numele nu poate depăși {{ limit }} caractere'
+    client:
+        required: 'Clientul este obligatoriu'
+    url:
+        invalid: 'Format de URL invalid'
+
+    # Users
+    user:
+        email_unique: 'Adresa de email există deja în sistem'
+        password:
+            required: 'Parola este obligatorie'
+            min_length: 'Parola trebuie să aibă cel puțin {{ limit }} caractere'
+            uppercase: 'Parola trebuie să conțină cel puțin o literă mare'
+            lowercase: 'Parola trebuie să conțină cel puțin o literă mică'
+            digit: 'Parola trebuie să conțină cel puțin o cifră'
+            special: 'Parola trebuie să conțină cel puțin un caracter special'
+        password_confirm:
+            required: 'Confirmarea parolei este obligatorie'
+        passwords_mismatch: 'Parolele nu coincid'
+        company_required: 'Compania este obligatorie pentru acest rol.'
+        company_not_allowed: 'Acest rol nu poate avea o companie asociată.'
+        cannot_deactivate_self: "Nu îți poți dezactiva propriul cont."
+
+    # Companies
+    company:
+        name:
+            required: 'Denumirea companiei este obligatorie'
+            min_length: 'Denumirea trebuie să aibă minim {{ limit }} caractere'
+            max_length: 'Denumirea nu poate depăși {{ limit }} caractere'
+        fiscal_code:
+            max_length: 'Codul fiscal nu poate depăși {{ limit }} caractere'
+        trade_register:
+            max_length: 'Nr. Reg. Comerț nu poate depăși {{ limit }} caractere'
+        type:
+            required: 'Selectează cel puțin un tip de companie'
+        iban:
+            max_length: 'IBAN-ul nu poate depăși {{ limit }} caractere'
+        credit_limit:
+            positive: 'Plafonul de credit trebuie să fie pozitiv'
+        payment_term:
+            positive: 'Termenul de plată trebuie să fie pozitiv'
+        fiscal_code_unique: 'Codul fiscal există deja în sistem'
+
+    # Contracts
+    contract:
+        number:
+            required: 'Numărul contractului este obligatoriu'
+        number_unique: 'Numărul de contract există deja în sistem'
+        title:
+            required: 'Titlul contractului este obligatoriu'
+        total_value:
+            positive: 'Valoarea totală nu poate fi negativă'
+            max: 'Valoarea totală nu poate depăși {{ compared_value }}'
+            required: 'Valoarea totală este obligatorie'
+        start_date:
+            required: 'Data de început este obligatorie'
+        end_date:
+            required: 'Data de sfârșit este obligatorie'
+        type:
+            required: 'Tipul contractului este obligatoriu'
+        end_before_start: 'Data de sfârșit nu poate fi înainte de data de început.'
+        signed_after_start: 'Data semnării nu poate fi după data de început.'
+        vat_range: 'Procentul TVA trebuie să fie între {{ min }} și {{ max }}'
+        payment_term_days:
+            range: 'Termenul de plată trebuie să fie între {{ min }} și {{ max }} zile'
+        notice_period_days:
+            range: 'Perioada de preaviz trebuie să fie între {{ min }} și {{ max }} zile'
+        responsible_person:
+            required: 'Persoana responsabilă este obligatorie'
+        vat_percent_required: 'Procentul TVA este obligatoriu'
+
+    # Offers
+    offer:
+        number:
+            required: 'Numărul ofertei este obligatoriu'
+        number_unique: 'Numărul de ofertă există deja în sistem'
+        date:
+            required: 'Data ofertei este obligatorie'
+        subtotal:
+            positive: 'Subtotalul nu poate fi negativ'
+            max: 'Subtotalul depășește valoarea maximă admisă'
+        total:
+            positive: 'Totalul fără TVA nu poate fi negativ'
+            max: 'Totalul depășește valoarea maximă admisă'
+        vat_range: 'Procentul TVA trebuie să fie între 0 și 100'
+        vat_percent_required: 'Procentul TVA este obligatoriu'
+        valid_before_date: 'Data de valabilitate nu poate fi înainte de data ofertei.'
+        valid_until_required: 'Data limită de valabilitate este obligatorie'
+        type_required: 'Tipul ofertei este obligatoriu'
+        subject_required: 'Subiectul ofertei este obligatoriu'
+        valid_until_future: 'Data de valabilitate nu poate fi în trecut'
+        lines_required: 'Oferta trebuie să conțină cel puțin o linie de produse/servicii.'
+
+    # Offer Lines
+    offer_line:
+        quantity:
+            required: 'Cantitatea este obligatorie'
+            positive: 'Cantitatea trebuie să fie pozitivă'
+            max: 'Cantitatea nu poate depăși 999.999'
+        unit:
+            required: 'Unitatea de măsură este obligatorie'
+        unit_price:
+            positive: 'Prețul unitar trebuie să fie pozitiv sau zero'
+            max: 'Prețul unitar nu poate depăși 99.999.999'
+        discount:
+            positive: 'Discountul trebuie să fie pozitiv sau zero'
+            max: 'Discountul nu poate depăși 100%'
+        total_value:
+            max: 'Valoarea totală a liniei depășește limita admisă'
+
+    # Products
+    product:
+        name:
+            required: 'Numele produsului/serviciului este obligatoriu'
+        code:
+            max_length: 'Codul nu poate depăși {{ limit }} caractere'
+        code_unique: 'Codul produsului există deja în sistem'
+        unit:
+            required: 'Unitatea de măsură este obligatorie'
+        type:
+            required: 'Tipul este obligatoriu'
+            choice: 'Tipul trebuie să fie "product" sau "service"'
+        price:
+            positive: 'Prețul trebuie să fie pozitiv'
+
+    # Product Categories
+    product_category:
+        name:
+            required: 'Numele categoriei este obligatoriu'
+
+    # Projects
+    project:
+        name:
+            required: 'Numele proiectului este obligatoriu'
+        currency:
+            required: 'Moneda este obligatorie'
+        contract_client_mismatch: 'Contractul selectat aparține unui alt client.'
+        planned_end_date:
+            required: 'Data finalizării planificată nu poate fi înainte de data de început.'
+    # Phase
+    phase:
+        amount_max: "Suma este prea mare. Valoarea maximă permisă este {{ limit }}."
+        parent_self: "O etapă nu poate fi propriul său părinte."
+        parent_other_project: "Etapa părinte trebuie să aparțină aceluiași proiect."
+        parent_cycle: "Referință circulară detectată între etape."
+        parent_max_depth: "Ierarhia etapelor nu poate depăși {max} niveluri."
+    # Stock Items
+    stock_item:
+        name:
+            required: 'Denumirea articolului este obligatorie'
+        type:
+            required: 'Tipul articolului este obligatoriu'
+        unit:
+            required: 'Unitatea de măsură este obligatorie'
+        code_unique: 'Codul articolului există deja în sistem'
+
+    # Stock Lots
+    stock_lot:
+        stock_item:
+            required: 'Articolul de stoc este obligatoriu'
+        lot_number:
+            required: 'Numărul de lot este obligatoriu'
+        unit:
+            required: 'Unitatea de măsură este obligatorie'
+        received_date:
+            required: 'Data de recepție este obligatorie'
+        lot_number_unique: 'Acest număr de lot există deja pentru articolul selectat'
+        quantity:
+            max: 'Cantitatea depășește valoarea maximă admisă'
+
+    # Stock Movements
+    stock_movement:
+        lot:
+            required: 'Lotul este obligatoriu'
+        type:
+            required: 'Tipul mișcării este obligatoriu'
+        quantity:
+            positive: 'Cantitatea trebuie să fie mai mare decât zero'
+            max: 'Cantitatea depășește valoarea maximă admisă'
+        date:
+            required: 'Data mișcării este obligatorie'
+        lot_not_available: 'Nu se pot adăuga mișcări pe un lot care nu este activ (status: retras sau expirat).'
+        insufficient_stock: 'Stoc insuficient pentru „{item}". Disponibil: {available}'
+
+    # Equipments
+    equipment:
+        name:
+            required: 'Denumirea echipamentului este obligatorie'
+        inventory_number:
+            required: 'Numărul de inventar este obligatoriu'
+        inventory_number_unique: 'Numărul de inventar există deja în sistem'
+        record_date:
+            required: 'Data înregistrării este obligatorie'
+        commissioning_before_purchase: 'Data punerii în funcțiune nu poate fi înainte de data achiziției.'
+        next_date_before_record: 'Data următoarei programări nu poate fi înainte de data înregistrării.'
+        cost:
+            max: 'Costul depășește valoarea maximă admisă'
+
+    # Tests
+    test:
+        test_number:
+            required: 'Numărul testului este obligatoriu.'
+        test_number_unique: 'Acest număr de test există deja.'
+        client:
+            required: 'Clientul este obligatoriu.'
+        test_type:
+            required: 'Tipul de test este obligatoriu.'
+        sample_code:
+            required: 'Codul probei este obligatoriu.'
+        responsible_person:
+            required: 'Responsabilul intern este obligatoriu.'
+        received_at:
+            required: 'Data recepției este obligatorie.'
+        contract_client_mismatch: 'Contractul selectat aparține unui alt client.'
+        project_client_mismatch: 'Proiectul selectat aparține unui alt client.'
+    test_type:
+        name:
+            required: 'Denumirea este obligatorie.'
+        code:
+            required: 'Codul este obligatoriu.'
+        code_unique: 'Acest cod de tip test există deja.'
+    test_result:
+        parameter_name:
+            required: 'Numele parametrului este obligatoriu.'
+        sort_order:
+            range: 'Ordinea trebuie să fie între {{ min }} și {{ max }}.'
+        reference_min_greater_than_max: 'Referința minimă nu poate fi mai mare decât referința maximă.'
+    test_consumption:
+        stock_item:
+            required: 'Articolul de stoc este obligatoriu.'
+        quantity:
+            positive: 'Cantitatea trebuie să fie pozitivă.'
+            max: 'Cantitatea depășește valoarea maximă admisă.'
+    test_type_bom_line:
+        test_type:
+            required: 'Tipul de test este obligatoriu.'
+        stock_item:
+            required: 'Articolul de stoc este obligatoriu.'
+        quantity:
+            positive: 'Cantitatea trebuie să fie pozitivă.'
+            max: 'Cantitatea depășește valoarea maximă admisă.'
+
+    # Currencies
+    currency:
+        required: 'Moneda este obligatorie'
+        code:
+            required: 'Codul monedei este obligatoriu'
+        code_unique: 'Codul monedei există deja în sistem'
+        name:
+            required: 'Denumirea monedei este obligatorie'
+        symbol:
+            required: 'Simbolul monedei este obligatoriu'
+
+    # Elements
+    elements:
+        name:
+            not_blank: "Numele elementului nu poate fi gol."
+
+    # Files
+    files:
+        max_count: 'Poți încărca maximum {{ limit }} fișiere odată.'
+
+    # Counties
+    counties:
+        country:
+            required: 'Țara este obligatorie'

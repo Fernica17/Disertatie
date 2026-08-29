@@ -1,0 +1,36 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var paginator \EasyCorp\Bundle\EasyAdminBundle\Orm\EntityPaginator #}
+{% set ea = ea() %}
+{% trans_default_domain 'EasyAdminBundle' %}
+
+<div class="mg-pagination">
+    <div class="mg-pagination-info">
+        {% if render_detailed_pagination is defined ? render_detailed_pagination : true %}
+            {{ 'paginator.results'|trans({'%count%': paginator.numResults|format})|raw }}
+        {% endif %}
+    </div>
+
+    {% if paginator.hasPreviousPage or paginator.hasNextPage %}
+        <div class="mg-pagination-pages">
+            <a href="{{ not paginator.hasPreviousPage ? '#' : paginator.generateUrlForPage(paginator.previousPage) }}" class="mg-page-btn {{ not paginator.hasPreviousPage ? 'disabled' }}">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+
+            {% if render_detailed_pagination is defined ? render_detailed_pagination : true %}
+                {% for page in paginator.pageRange %}
+                    {% if page is null %}
+                        <span class="mg-page-btn disabled">&hellip;</span>
+                    {% else %}
+                        <a href="{{ paginator.generateUrlForPage(page) }}" class="mg-page-btn {{ page == paginator.currentPage ? 'active' }}">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <a href="{{ paginator.generateUrlForPage(paginator.currentPage) }}" class="mg-page-btn active">{{ paginator.currentPage }}</a>
+            {% endif %}
+
+            <a href="{{ not paginator.hasNextPage ? '#' : paginator.generateUrlForPage(paginator.nextPage) }}" class="mg-page-btn {{ not paginator.hasNextPage ? 'disabled' }}">
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    {% endif %}
+</div>

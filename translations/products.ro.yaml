@@ -1,0 +1,78 @@
+enum:
+    unit_of_measure:
+        buc: buc
+        kg: kg
+        l: l
+        m: m
+        m2: m²
+        m3: m³
+        ora: oră
+        set: set
+        to: to
+        zi: zi
+products:
+    action:
+        new: 'Adaugă produs'
+        edit: 'Editează'
+        detail: 'Detalii'
+        delete: 'Șterge'
+    categories:
+        action:
+            new: 'Adaugă categorie'
+        entity:
+            plural: 'Categorii produse'
+            singular: 'Categorie produse'
+        field:
+            created_at: 'Creat la'
+            description: Descriere
+            is_active: Activ
+            name: Denumire
+            updated_at: 'Actualizat la'
+        filter:
+            is_active: 'Status activ'
+        page:
+            edit: 'Editare: {name}'
+            index: 'Gestionare categorii'
+            new: 'Adaugă categorie'
+        flash:
+            created: 'Categoria a fost creată cu succes.'
+            updated: 'Categoria a fost actualizată cu succes.'
+            deleted: 'Categoria a fost ștearsă cu succes.'
+    choice:
+        'no': 'Nu'
+        product: Produs
+        service: Serviciu
+        'yes': Da
+    entity:
+        plural: 'Produse / Servicii'
+        singular: Produs
+    field:
+        category: Categorie
+        code: Cod
+        created_at: 'Creat la'
+        currency: Moneda
+        default_price: 'Preț implicit'
+        description: Descriere
+        is_active: Activ
+        name: Denumire
+        type: Tip
+        unit: 'Unitate de măsură'
+        updated_at: 'Actualizat la'
+    filter:
+        category: Categorie
+        is_active: 'Status activ'
+        type: Tip
+    help:
+        code: 'Cod intern unic pentru identificare'
+        price: 'Preț implicit fără TVA'
+    page:
+        edit: 'Editare: {name}'
+        index: 'Gestionare produse'
+        new: 'Adaugă produs'
+    widget:
+        search_placeholder: 'Caută produse...'
+    flash:
+        created: 'Produsul a fost creat cu succes.'
+        updated: 'Produsul a fost actualizat cu succes.'
+        deleted: 'Produsul a fost șters cu succes.'
+

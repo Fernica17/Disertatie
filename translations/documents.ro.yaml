@@ -1,0 +1,109 @@
+documents:
+  page_title: "Documente"
+  page_title_system: "Documente sistem"
+  page_title_custom: "Documente interne"
+  page_title_client: "Documente clienți"
+  page_subtitle: "Gestionează fișiere și foldere"
+  page_subtitle_system: "Documente generate automat din modulele sistemului"
+  page_subtitle_custom: "Foldere și documente interne create manual"
+  page_subtitle_client: "Documente organizate pe clienți"
+
+  tree:
+    section_system: "Foldere sistem"
+    section_custom: "Foldere interne"
+    section_clients: "Foldere clienți"
+
+  toolbar:
+    new_folder: "Folder nou"
+    upload: "Încarcă fișiere"
+    search_placeholder: "Caută documente..."
+    search_label: "Căutare:"
+
+  folder:
+    create_title: "Creare folder"
+    rename_title: "Redenumire folder"
+    move_title: "Mutare folder"
+    delete_title: "Ștergere folder"
+    name_label: "Nume folder"
+    parent_label: "Folder părinte"
+    select_target: "Selectează folderul destinație"
+    go_to_entity: "Detalii"
+    cancel: "Anulează"
+    save: "Salvează"
+
+  file:
+    move_title: "Mutare fișier"
+    delete_title: "Ștergere fișier"
+    name: "Nume"
+    size: "Dimensiune"
+    type: "Tip"
+    date: "Data"
+    actions: "Acțiuni"
+    download: "Descarcă"
+    move: "Mută"
+    delete: "Șterge"
+    view: "Vizualizează"
+
+  flash:
+    folder_created: "Folderul a fost creat cu succes."
+    folder_renamed: "Folderul a fost redenumit cu succes."
+    folder_deleted: "Folderul a fost șters cu succes."
+    folder_moved: "Folderul a fost mutat cu succes."
+    files_uploaded: "{count} fișier(e) încărcat(e) cu succes."
+    file_moved: "Fișierul a fost mutat cu succes."
+    file_deleted: "Fișierul a fost șters cu succes."
+
+  error:
+    invalid_token: "Token CSRF invalid."
+    folder_not_empty: "Folderul nu poate fi șters deoarece conține fișiere sau subfoldere."
+    folder_not_custom: "Operația este permisă doar pe foldere personalizate."
+    cannot_move_to_self: "Folderul nu poate fi mutat în propriul subtree."
+    slug_conflict: "Un folder cu acest nume există deja în locația selectată."
+    upload_failed: "Încărcarea fișierului a eșuat."
+    name_required: "Numele folderului este obligatoriu."
+    parent_not_found: "Folderul părinte nu a fost găsit."
+    target_not_found: "Folderul destinație nu a fost găsit."
+    no_files_provided: "Nu au fost selectate fișiere."
+    max_files_exceeded: "Poți încărca maximum {max} fișiere odată."
+    file_too_large: 'Fișierul „{name}" depășește dimensiunea maximă permisă ({max}).'
+    target_id_required: "ID-ul folderului destinație este obligatoriu."
+    generic: "A apărut o eroare. Încearcă din nou."
+    load_failed: "Eroare la încărcarea folderelor."
+    delete_failed: "Eroare la ștergere."
+    rename_failed: "Eroare la redenumire."
+    create_failed: "Eroare la creare."
+    move_failed: "Eroare la mutare."
+
+  loading: "Se încarcă..."
+
+  stats:
+    folders: "foldere"
+    files: "fișiere"
+    and: "și"
+
+  empty:
+    select_folder: "Selectează un folder"
+    no_files: "Niciun document în acest folder."
+    no_folders: "Niciun folder disponibil."
+    no_results: "Niciun rezultat găsit."
+    upload_hint: 'Niciun document. Folosește butonul „Încarcă fișiere" pentru a adăuga.'
+
+  breadcrumb:
+    root: "Documente"
+    root_level: "Root (nivel principal)"
+
+  confirm:
+    title: "Confirmare"
+    yes: "Da, șterge"
+    yes_move: "Da, mută"
+    cancel: "Anulează"
+    delete_folder: "Sigur dorești să ștergi folderul \"{name}\"?"
+    delete_folder_recursive: "Se vor șterge: "
+    delete_file: "Sigur dorești să ștergi fișierul \"{name}\"?"
+    move: "Sigur dorești să muți în \"{target}\"?"
+
+enum:
+  folder_type:
+    system: "Sistem"
+    custom: "Personalizat"
+    client: "Client"

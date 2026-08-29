@@ -1,0 +1,48 @@
+# translations/notifications.ro.yaml
+notifications:
+    header:
+        new_notification: "Notificare nouă"
+    crud:
+        singular: "Notificare"
+        plural: "Notificări"
+        field:
+            title: "Titlu"
+            type: "Tip Notificare"
+            channel: "Canal"
+            created_at: "Data primirii"
+            read_at: "Citită la"
+            unread: "Necitită"
+        action:
+            view_target: "Vizualizează"
+    user_onboarding:
+        title: "Bun venit pe ERP!"
+        greeting: "Salutare, {firstName} {lastName},"
+        account_created: "Contul tău a fost creat pentru tine."
+        label_email: "Email (Utilizator):"
+        login_instruction: "Te rugăm să te autentifici folosind butonul de mai jos."
+        security_warning: "Din motive de securitate, <strong>vei fi rugat să îți schimbi parola imediat după autentificare.</strong>"
+        button_action: "Verifică și autentifică-te"
+        footer_auto_generated: "Acest email a fost generat automat. Te rugăm să nu răspunzi la acest mesaj."
+    resend_verification:
+        title: "Verificare adresă email - ERP"
+        greeting: "Salutare, {firstName} {lastName},"
+        instruction: "Ai solicitat retransmiterea link-ului pentru verificarea adresei de email asociate contului tău ERP."
+        action_prompt: "Te rugăm să îți confirmi adresa accesând butonul de mai jos. Acest link este valabil pentru o perioadă limitată de timp."
+        button: "Verifică adresa de email"
+        security_info: "Dacă nu ai solicitat acest lucru, poți ignora acest mesaj în siguranță. Contul tău este în continuare protejat."
+        footer_auto_generated: "Acest email a fost generat automat. Te rugăm să nu răspunzi la acest mesaj."
+        missing_email: "Adresa de email lipsește."
+        generic_success: "Dacă adresa există în sistem, un nou email de verificare a fost trimis."
+        success: "Emailul de verificare a fost retrimis! Te rugăm să îți verifici și folderul Spam."
+    verify_email:
+        success: "Adresa de email a fost verificată cu succes!"
+        invalid_id: "ID-ul utilizatorului lipsește din cerere."
+        user_not_found: "Utilizatorul nu a fost găsit."
+email:
+    reset_password:
+        subject: "Resetare parolă - ERP"
+        greeting: "Bună, {name},"
+        intro: "Am primit o solicitare de resetare a parolei pentru contul tău asociat adresei {email}."
+        instruction: "Pentru a alege o parolă nouă, te rugăm să apeși butonul de mai jos:"
+        button: "Resetează parola"
+        warning: "Atenție: Acest link este valabil pentru o perioadă limitată de timp. Dacă nu ai solicitat tu această resetare, te rugăm să ignori acest mesaj. Contul tău este în siguranță și parola va rămâne neschimbată."

@@ -1,0 +1,45 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block mg_breadcrumb %}
+    <li class="active">{{ 'admin.settings.title'|trans({}, 'admin') }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-settings-page">
+        <div class="mg-settings-header">
+            <h1><i class="fa-solid fa-gear"></i> {{ 'admin.settings.title'|trans({}, 'admin') }}</h1>
+            <p class="mg-settings-subtitle">{{ 'admin.settings.subtitle'|trans({}, 'admin') }}</p>
+        </div>
+
+        {{ form_start(form, {attr: {novalidate: 'novalidate', 'data-controller': 'settings-form'}}) }}
+
+        {% for groupKey, fieldKeys in fieldGroups %}
+            <div class="mg-settings-group">
+                <div class="mg-settings-group-header">
+                    <i class="{{ groupIcons[groupKey] ?? 'fa-solid fa-cog' }}"></i>
+                    <h2>{{ groupLabels[groupKey] ?? groupKey }}</h2>
+                </div>
+                <div class="mg-settings-group-body">
+                    {% for key in fieldKeys %}
+                        <div class="mg-settings-field">
+                            {{ form_label(form[key], null, {label_attr: {class: 'mg-settings-label'}}) }}
+                            <div class="mg-settings-input-wrapper">
+                                {{ form_widget(form[key]) }}
+                                <div class="mg-form-error">{{ form_errors(form[key]) }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="mg-settings-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                {{ 'admin.settings.save'|trans({}, 'admin') }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

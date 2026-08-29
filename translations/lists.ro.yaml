@@ -1,0 +1,34 @@
+lists:
+    action:
+        new: 'Adaugă listă'
+        edit: 'Editează'
+        detail: 'Detalii'
+    entity:
+        plural: Liste
+        singular: Listă
+    field:
+        elements: Elemente
+        name: Nume
+        parent_format: 'Liste părinte'
+    page:
+        detail: 'Detalii listă'
+        edit: 'Editare: {name}'
+        index: Liste
+        new: 'Adaugă listă nouă'
+    flash:
+        created: 'Lista a fost adăugată cu succes.'
+        updated: 'Lista a fost actualizată cu succes.'
+
+elements:
+    field:
+        is_active: Activ
+        name: Nume
+        sub_list: 'Listă subordonată'
+    status:
+        active: Activ
+        inactive: Inactiv
+    template:
+        empty_list: 'Fără elemente'
+        no_results: 'Niciun rezultat pentru „{search}"'
+        search_placeholder: 'Căutare elemente...'
+        status: Status

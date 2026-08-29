@@ -1,0 +1,128 @@
+/* ============================================================
+   Changelog page
+   ============================================================ */
+
+.mg-changelog-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.mg-changelog-header {
+    margin-bottom: 24px;
+
+    h1 {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0 0 4px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        i {
+            color: var(--mg-primary, #22c55e);
+        }
+    }
+}
+
+.mg-changelog-subtitle {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0 0 12px;
+}
+
+.mg-changelog-current {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.mg-changelog-content {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: var(--mg-radius, 8px);
+    padding: 28px 32px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    /* Hide the top-level title — the page already has its own header */
+    > h1:first-child {
+        display: none;
+    }
+
+    > p:first-of-type {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 0;
+    }
+
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 28px 0 8px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid #e5e7eb;
+
+        &:first-of-type {
+            margin-top: 0;
+        }
+    }
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #334155;
+        margin: 16px 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    ul {
+        margin: 8px 0 16px;
+        padding-left: 22px;
+    }
+
+    li {
+        margin-bottom: 6px;
+        line-height: 1.55;
+        color: #475569;
+
+        strong {
+            color: #0f172a;
+        }
+    }
+
+    p {
+        line-height: 1.6;
+        color: #475569;
+    }
+
+    a {
+        color: var(--mg-primary, #22c55e);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    code {
+        background: #f1f5f9;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.9em;
+        color: #e11d48;
+    }
+}
+
+.mg-changelog-empty {
+    color: #94a3b8;
+    font-style: italic;
+    text-align: center;
+    padding: 40px;
+}

@@ -1,0 +1,45 @@
+<button class="mg-header-btn mg-notifications-toggle" type="button" aria-label="{{ 'admin.notifications.title'|trans({}, 'admin') }}">
+    <i class="fa-solid fa-bell"></i>
+    {% if unreadCount > 0 %}
+        <span class="mg-badge-count">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+    {% endif %}
+</button>
+
+<div class="mg-notifications-dropdown">
+    <div class="mg-notifications-header">
+        <span>{{ 'admin.notifications.title'|trans({}, 'admin') }} ({{ unreadCount }})</span>
+        {% if unreadCount > 0 %}
+            <a href="{{ path('admin_notifications_read_all') }}">
+                {{ 'admin.notifications.mark_all_read'|trans({}, 'admin') }}
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="mg-notifications-list">
+        {% for item in notifications %}
+            <a href="{{ item.url }}" class="mg-notification-item {{ item.isRead ? '' : 'unread' }}">
+                <div class="mg-notification-icon bg-{{ item.color }}">
+                    <i class="{{ item.icon }}"></i>
+                </div>
+                <div class="mg-notification-body">
+                    <div class="mg-notification-text">{{ item.title }}</div>
+                    <div class="mg-notification-time">
+                        <i class="fa-regular fa-clock me-1"></i>
+                        {{ item.createdAt|ago }}
+                    </div>
+                </div>
+            </a>
+        {% else %}
+            <div class="mg-notification-empty">
+                <i class="fa-solid fa-bell-slash mb-3"></i>
+                <p>{{ 'admin.notifications.none'|trans({}, 'admin') }}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mg-notifications-footer">
+        <a href="{{ viewAllUrl|default('#') }}">
+            {{ 'admin.notifications.view_all'|trans({}, 'admin') }}
+        </a>
+    </div>
+</div>

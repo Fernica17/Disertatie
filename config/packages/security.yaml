@@ -1,0 +1,49 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\Users:
+            algorithm: auto
+            cost: 14
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\Users
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            user_checker: App\Security\UserChecker
+
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                default_target_path: admin
+                enable_csrf: true
+
+            logout:
+                path: app_logout
+                target: app_login
+
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800 # 1 week
+                path: /
+
+            # Rate limiting for login attempts
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_MANAGER]
+
+    access_control:
+        - { path: ^/admin, roles: IS_AUTHENTICATED_REMEMBERED }
+        - { path: ^/api, roles: API_ACCESS }

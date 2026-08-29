@@ -1,0 +1,398 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block content %}
+    {# Page header #}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">{{ 'admin.dashboard.title'|trans({}, 'admin') }}</h1>
+            <p class="mg-page-subtitle">{{ 'admin.dashboard.welcome'|trans({}, 'admin') }}{% if app.user %}, {{ app.user.firstName|default(app.user.email) }}{% endif %}! {{ 'admin.dashboard.last_update'|trans({}, 'admin') }} {{ 'now'|date('d.m.Y, H:i') }}</p>
+        </div>
+    </div>
+
+    {# ============================================================ #}
+    {# ROLE_ADMIN                                                    #}
+    {# ============================================================ #}
+    {% if role == 'ROLE_ADMIN' %}
+
+        {# KPI Cards (6) #}
+        <div class="mg-finance-stats">
+            <a href="{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('index') }}" class="mg-finance-card blue mg-finance-card-link">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_total'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_total }}</div>
+            </a>
+            <a href="{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('index').set('filters[status][comparison]', '=').set('filters[status][value]', 'active') }}" class="mg-finance-card green mg-finance-card-link">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_active'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_active }}</div>
+            </a>
+            <a href="{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('index').set('filters[status][comparison]', '=').set('filters[status][value]', 'prospect') }}" class="mg-finance-card orange mg-finance-card-link">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_prospect'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_prospect }}</div>
+            </a>
+            <a href="{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\UsersCrudController').setAction('index') }}" class="mg-finance-card purple mg-finance-card-link">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.users_active'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.users_active }}</div>
+            </a>
+            <div class="mg-finance-card red">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.users_inactive'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.users_inactive }}</div>
+            </div>
+        </div>
+
+        {# Charts row 1: the two distributions #}
+        <div class="dashboard-charts-pair">
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-pie"></i> {{ 'admin.dashboard.chart.companies_by_status'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.donut_chart(data.charts.companies_by_status, ['#6c757d', '#2ec4b6', '#ff6b35', '#e63946', '#4361ee']) }}
+                </div>
+            </div>
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-pie"></i> {{ 'admin.dashboard.chart.users_by_role'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.donut_chart(data.charts.users_by_role, ['#e63946', '#4361ee', '#06b6d4', '#2ec4b6', '#a855f7']) }}
+                </div>
+            </div>
+        </div>
+
+        {# Charts row 2: the two trends #}
+        <div class="dashboard-charts-pair">
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-column"></i> {{ 'admin.dashboard.chart.companies_per_month'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.bar_chart(data.charts.companies_per_month, 'admin.dashboard.chart.companies'|trans({}, 'admin'), '#4361ee') }}
+                </div>
+            </div>
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-column"></i> {{ 'admin.dashboard.chart.users_per_month'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.bar_chart(data.charts.users_per_month, 'admin.dashboard.chart.users'|trans({}, 'admin'), '#2ec4b6') }}
+                </div>
+            </div>
+        </div>
+
+        {# Tables + side column #}
+        <div class="dashboard-grid">
+            <div>
+                {{ _self.companies_table(data.recent_companies) }}
+                {{ _self.users_table(data.recent_users) }}
+            </div>
+            <div class="dashboard-sidebar">
+                {{ _self.alerts_card(data.alerts) }}
+                {{ _self.nomenclator_card(data.nomenclator) }}
+                {{ _self.notifications_card(data.notifications) }}
+            </div>
+        </div>
+
+    {# ============================================================ #}
+    {# ROLE_MANAGER                                                  #}
+    {# ============================================================ #}
+    {% elseif role == 'ROLE_MANAGER' %}
+
+        <div class="mg-finance-stats">
+            <a href="{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('index') }}" class="mg-finance-card blue mg-finance-card-link">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_total'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_total }}</div>
+            </a>
+            <div class="mg-finance-card green">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_active'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_active }}</div>
+            </div>
+            <div class="mg-finance-card orange">
+                <div class="mg-finance-label">{{ 'admin.dashboard.kpi.companies_prospect'|trans({}, 'admin') }}</div>
+                <div class="mg-finance-value">{{ data.kpi.companies_prospect }}</div>
+            </div>
+        </div>
+
+        <div class="dashboard-charts-pair">
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-pie"></i> {{ 'admin.dashboard.chart.companies_by_status'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.donut_chart(data.charts.companies_by_status, ['#6c757d', '#2ec4b6', '#ff6b35', '#e63946', '#4361ee']) }}
+                </div>
+            </div>
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-chart-column"></i> {{ 'admin.dashboard.chart.companies_per_month'|trans({}, 'admin') }}</div>
+                </div>
+                <div class="mg-card-body">
+                    {{ _self.bar_chart(data.charts.companies_per_month, 'admin.dashboard.chart.companies'|trans({}, 'admin'), '#4361ee') }}
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div>{{ _self.companies_table(data.recent_companies) }}</div>
+            <div class="dashboard-sidebar">
+                {{ _self.alerts_card(data.alerts) }}
+                {{ _self.notifications_card(data.notifications) }}
+            </div>
+        </div>
+
+    {# ============================================================ #}
+    {# ROLE_CLIENT                                                   #}
+    {# ============================================================ #}
+    {% else %}
+
+        {% if data.company %}
+            <div class="mg-card" style="margin-bottom: 1rem;">
+                <div class="mg-card-header">
+                    <div class="section-title"><i class="fa-solid fa-building"></i> {{ data.company.name }}</div>
+                    <span class="{{ data.company.status.badgeClass }}">{{ data.company.status.label|trans({}, 'companies') }}</span>
+                </div>
+                <div class="mg-card-body">
+                    <div class="ct-detail-grid">
+                        <div class="ct-detail-field">
+                            <div class="ct-detail-field-label">{{ 'companies.field.fiscal_code'|trans({}, 'companies') }}</div>
+                            <div class="ct-detail-field-value">{{ data.company.fiscalCode ?? '—' }}</div>
+                        </div>
+                        <div class="ct-detail-field">
+                            <div class="ct-detail-field-label">{{ 'companies.field.address'|trans({}, 'companies') }}</div>
+                            <div class="ct-detail-field-value">{{ data.company.fullAddress|default('—') }}</div>
+                        </div>
+                        <div class="ct-detail-field">
+                            <div class="ct-detail-field-label">{{ 'companies.field.email'|trans({}, 'companies') }}</div>
+                            <div class="ct-detail-field-value">{{ data.company.email ?? '—' }}</div>
+                        </div>
+                        <div class="ct-detail-field">
+                            <div class="ct-detail-field-label">{{ 'companies.field.phone'|trans({}, 'companies') }}</div>
+                            <div class="ct-detail-field-value">{{ data.company.phone ?? '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            <div>{{ _self.users_table(data.colleagues) }}</div>
+            <div class="dashboard-sidebar">{{ _self.notifications_card(data.notifications) }}</div>
+        </div>
+
+    {% endif %}
+{% endblock %}
+
+{# ============================================================ #}
+{# MACROS                                                        #}
+{# ============================================================ #}
+
+{% macro donut_chart(chartData, colors) %}
+    {% if chartData.series|length > 0 %}
+        <div data-controller="chart"
+             data-chart-options-value="{{ {
+                chart: { type: 'donut', height: 280 },
+                series: chartData.series,
+                labels: chartData.labels,
+                colors: colors
+             }|json_encode|e('html_attr') }}"
+             style="min-height: 280px;">
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+    {% endif %}
+{% endmacro %}
+
+{% macro bar_chart(chartData, seriesName, color) %}
+    {% if chartData.series|length > 0 %}
+        <div data-controller="chart"
+             data-chart-options-value="{{ {
+                chart: { type: 'bar', height: 280 },
+                series: [{ name: seriesName, data: chartData.series }],
+                xaxis: { categories: chartData.labels },
+                colors: [color]
+             }|json_encode|e('html_attr') }}"
+             style="min-height: 280px;">
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+    {% endif %}
+{% endmacro %}
+
+{% macro horizontal_bar_chart(chartData, seriesName) %}
+    {% if chartData.series|length > 0 %}
+        <div data-controller="chart"
+             data-chart-options-value="{{ {
+                chart: { type: 'bar', height: 280 },
+                series: [{ name: seriesName, data: chartData.series }],
+                xaxis: { categories: chartData.labels },
+                colors: ['#e63946'],
+                plotOptions: { bar: { horizontal: true, borderRadius: 4 } }
+             }|json_encode|e('html_attr') }}"
+             style="min-height: 280px;">
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 40px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+    {% endif %}
+{% endmacro %}
+
+{% macro companies_table(companies) %}
+    <div class="mg-card" style="margin-bottom: 1rem;">
+        <div class="mg-card-header">
+            <div class="section-title">
+                <i class="fa-solid fa-building"></i>
+                {{ 'admin.dashboard.recent_companies'|trans({}, 'admin') }}
+            </div>
+        </div>
+        <div class="mg-card-body" style="padding: 0;">
+            {% if companies|length > 0 %}
+                <div class="eq-table-wrap">
+                    <table class="eq-table">
+                        <thead>
+                        <tr>
+                            <th>{{ 'companies.field.name'|trans({}, 'companies') }}</th>
+                            <th>{{ 'companies.field.fiscal_code'|trans({}, 'companies') }}</th>
+                            <th>{{ 'companies.field.status'|trans({}, 'companies') }}</th>
+                            <th>{{ 'companies.field.city'|trans({}, 'companies') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for company in companies %}
+                            <tr onclick="window.location='{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('detail').setEntityId(company.id) }}'" style="cursor:pointer;">
+                                <td><strong>{{ company.name }}</strong></td>
+                                <td>{{ company.fiscalCode ?? '—' }}</td>
+                                <td><span class="{{ company.status.badgeClass }}">{{ company.status.label|trans({}, 'companies') }}</span></td>
+                                <td>{{ company.city ? company.city.name : '—' }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 24px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro users_table(users) %}
+    <div class="mg-card" style="margin-bottom: 1rem;">
+        <div class="mg-card-header">
+            <div class="section-title">
+                <i class="fa-solid fa-users"></i>
+                {{ 'admin.dashboard.recent_users'|trans({}, 'admin') }}
+            </div>
+        </div>
+        <div class="mg-card-body" style="padding: 0;">
+            {% if users|length > 0 %}
+                <div class="eq-table-wrap">
+                    <table class="eq-table">
+                        <thead>
+                        <tr>
+                            <th>{{ 'users.field.full_name'|trans({}, 'users') }}</th>
+                            <th>{{ 'users.field.email'|trans({}, 'users') }}</th>
+                            <th>{{ 'users.field.company'|trans({}, 'users') }}</th>
+                            <th>{{ 'users.field.is_active'|trans({}, 'users') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for u in users %}
+                            <tr>
+                                <td><strong>{{ u.fullName|default(u.email) }}</strong></td>
+                                <td>{{ u.email }}</td>
+                                <td>{{ u.company ? u.company.name : '—' }}</td>
+                                <td>
+                                    {% if u.isActive %}
+                                        <span class="mg-badge mg-badge-completed">{{ 'admin.dashboard.active'|trans({}, 'admin') }}</span>
+                                    {% else %}
+                                        <span class="mg-badge mg-badge-blocked">{{ 'admin.dashboard.inactive'|trans({}, 'admin') }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 24px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro nomenclator_card(nomenclator) %}
+    <div class="mg-card" style="margin-bottom: 1rem;">
+        <div class="mg-card-header">
+            <div class="section-title">
+                <i class="fa-solid fa-database"></i>
+                {{ 'admin.dashboard.nomenclator'|trans({}, 'admin') }}
+            </div>
+        </div>
+        <div class="mg-card-body">
+            <div class="ct-detail-field">
+                <div class="ct-detail-field-label">{{ 'admin.nav.countries'|trans({}, 'admin') }}</div>
+                <div class="ct-detail-field-value">{{ nomenclator.countries }}</div>
+            </div>
+            <div class="ct-detail-field">
+                <div class="ct-detail-field-label">{{ 'admin.nav.counties'|trans({}, 'admin') }}</div>
+                <div class="ct-detail-field-value">{{ nomenclator.counties }}</div>
+            </div>
+            <div class="ct-detail-field">
+                <div class="ct-detail-field-label">{{ 'admin.nav.cities'|trans({}, 'admin') }}</div>
+                <div class="ct-detail-field-value">{{ nomenclator.cities }}</div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro alerts_card(alerts) %}
+    <div class="mg-card" style="border-left: 3px solid var(--mg-danger); margin-bottom: 1rem;">
+        <div class="mg-card-header" style="border-bottom: 1px solid var(--mg-border); padding-bottom: 12px;">
+            <div class="section-title">
+                <i class="fa-solid fa-bell"></i>
+                {{ 'admin.dashboard.alerts'|trans({}, 'admin') }}
+            </div>
+            {% if alerts|length > 0 %}
+                <span class="badge-count">{{ alerts|length }}</span>
+            {% endif %}
+        </div>
+        <div class="mg-card-body" style="padding: 0 20px;">
+            {% for alert in alerts|slice(0, 10) %}
+                <a href="{{ alert.controller is defined ? ea_url().unsetAll().setController(alert.controller).setAction('index') : '#' }}" class="alert-item alert-item-link" style="text-decoration: none; color: inherit;">
+                    <div class="alert-icon" style="background: var(--mg-{{ alert.type }}-bg); color: var(--mg-{{ alert.type }});">
+                        <i class="fa-solid {{ alert.icon }}"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 500; color: var(--mg-text);">{{ alert.title }}</div>
+                        <div style="font-size: 12px; color: var(--mg-text-muted);">{{ alert.subtitle }}</div>
+                    </div>
+                </a>
+            {% else %}
+                <div style="text-align: center; padding: 24px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro notifications_card(notifications) %}
+    <div class="mg-card">
+        <div class="mg-card-header">
+            <div class="section-title">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                {{ 'admin.dashboard.recent_notifications'|trans({}, 'admin') }}
+            </div>
+        </div>
+        <div class="mg-card-body">
+            {% if notifications|length > 0 %}
+                <div class="mini-timeline">
+                    {% for notification in notifications %}
+                        <div class="mini-timeline-item">
+                            <div class="mini-timeline-dot blue"></div>
+                            <div class="mini-timeline-text">{{ notification.title }}</div>
+                            <div class="mini-timeline-meta">{{ notification.createdAt|date('d.m.Y H:i') }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 24px; color: var(--mg-text-muted);">{{ 'admin.dashboard.no_data'|trans({}, 'admin') }}</div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}

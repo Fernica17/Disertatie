@@ -1,0 +1,144 @@
+projects:
+    entity:
+        singular: Proiect
+        plural: Proiecte
+    page:
+        index: Proiecte
+        new: Proiect nou
+        edit: Editare proiect
+        detail: Detalii proiect
+    field:
+        name: Nume proiect
+        client: Client
+        contract: Contract
+        type: Tip proiect
+        description: Descriere
+        start_date: Data start
+        planned_end_date: Data estimată finalizare
+        status: Status
+        phases: Etape
+        created_at: Creat la
+        updated_at: Actualizat la
+        phases_progress: Etape
+        total_amount: Valoare totală
+        invoiced_amount: Facturat
+        currency: Monedă
+    fieldset:
+        identification: Identificare
+        dates: Perioade
+        details: Detalii
+    action:
+        new: Adaugă Proiect
+        edit: Editare
+        detail: Detalii
+        delete: Șterge
+        start: Începe
+        complete: Finalizează
+        hold: Suspendă
+        cancel: Anulează
+        resume: Reia
+        add_phase: Adaugă etapă
+        add_sub_phase: Adaugă sub-etapă
+        add_test: Adaugă testare
+        upload_document: Încarcă document
+        view_detail: Vezi detalii
+    confirm:
+        delete: Ești sigur că dorești să ștergi acest proiect? Această acțiune este ireversibilă.
+        start: Ești sigur că dorești să începi acest proiect?
+        complete: Ești sigur că dorești să finalizezi acest proiect?
+        hold: Ești sigur că dorești să suspendezi acest proiect?
+        cancel: Ești sigur că dorești să anulezi acest proiect?
+        resume: Ești sigur că dorești să reiei acest proiect?
+        delete_phase: Ești sigur că dorești să ștergi această etapă?
+        delete_document: Ești sigur că dorești să ștergi acest document?
+    flash:
+        created: Proiectul a fost creat cu succes.
+        updated: Proiectul a fost actualizat cu succes.
+        deleted: 'Proiectul "{name}" a fost șters cu succes.'
+        started: Proiectul a fost pornit.
+        completed: Proiectul a fost finalizat.
+        on_hold: Proiectul a fost suspendat.
+        cancelled: Proiectul a fost anulat.
+        resumed: Proiectul a fost reluat.
+        phase_created: Etapa a fost adăugată cu succes.
+        phase_updated: Etapa a fost actualizată cu succes.
+        phase_deleted: Etapa a fost ștearsă cu succes.
+        document_uploaded: Documentul a fost încărcat cu succes.
+        document_deleted: Documentul a fost șters cu succes.
+        phase_document_uploaded: Documentul etapei a fost încărcat cu succes.
+        phase_document_deleted: Documentul etapei a fost șters cu succes.
+        no_files_selected: Nu a fost selectat niciun fișier.
+    form:
+        subtitle_new: Completează datele proiectului nou
+        subtitle_edit: Modifică datele proiectului
+        cancel: Anulează
+        save: Salvează proiect
+        save_changes: Salvează modificările
+    filter:
+        status: Status
+        type: Tip
+        client: Client
+        start_date: Data start
+    detail:
+        info: Informații proiect
+        created: Creat
+        updated: Actualizat
+        no_description: Fără descriere
+        no_phases: Nu există etape definite.
+        no_tests: Nu există testări asociate.
+        no_documents: Nu există documente încărcate.
+        total_phases: Etape
+        completed_phases: Finalizate
+        total_amount: Valoare totală
+        invoiced_amount: Facturat
+    tab:
+        phases: Etape
+        tests: Testări
+        documents: Documente
+        info: Informații
+    phase:
+        page:
+            new: Etapă nouă
+            edit: Editare etapă
+        field:
+            description: Descriere
+            assigned_to: Responsabil
+            deadline: Termen
+            status: Status
+            amount: Sumă
+            is_invoiced: Facturat
+            is_invoiced_yes: Da
+            is_invoiced_no: Nu
+            parent: Etapă părinte
+            sub_phases: Sub-etape
+            documents: Documente
+        no_assigned: Neatribuit
+        no_parent: '— Fără etapă părinte —'
+        no_sub_phases: Nu există sub-etape.
+        no_documents: Nu există documente încărcate.
+    test:
+        field:
+            number: Număr
+            type: Tip
+            sample_code: Cod probă
+            received_at: Data recepție
+            status: Status
+    error:
+        not_found: Proiectul nu a fost găsit.
+
+enum:
+    project_status:
+        planning: Planificare
+        in_progress: În lucru
+        on_hold: Suspendat
+        completed: Finalizat
+        cancelled: Anulat
+    project_type:
+        consulting: Consultanță
+        implementation: Implementare
+        laboratory: Laborator
+        mixed: Mixt
+    phase_status:
+        planned: Planificat
+        in_progress: În lucru
+        completed: Finalizat

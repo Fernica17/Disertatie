@@ -1,0 +1,108 @@
+{# templates/admin/profile/edit.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+
+{% block content %}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">{{ 'profile.edit.title'|trans({}, 'admin') }}</h1>
+            <p class="mg-page-subtitle">{{ 'profile.edit.subtitle'|trans({}, 'admin') }}</p>
+        </div>
+    </div>
+
+    {{ form_start(profileForm, {'action': path('admin_profile_update'), 'attr': {'enctype': 'multipart/form-data', novalidate: 'novalidate'}}) }}
+
+        {# Global form errors #}
+        {% if profileForm.vars.errors|length > 0 %}
+            <div class="alert alert-danger">
+                {{ form_errors(profileForm) }}
+            </div>
+        {% endif %}
+
+        <div class="mg-card">
+
+            {# Section 1: Avatar #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i class="fa-solid fa-user-edit ct-icon-primary"></i> {{ 'profile.edit.personal_data_avatar'|trans({}, 'admin') }}</h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="avatar-upload-container">
+                    <div class="avatar-preview-wrapper" id="avatarPreview">
+                        {% if ea.userMenu.avatarUrl %}
+                            <img src="{{ ea.userMenu.avatarUrl }}" alt="{{ 'profile.edit.avatar_preview'|trans({}, 'admin') }}">
+                        {% else %}
+                            {% set _initials = (user.firstName|default('?')|first|upper) ~ (user.lastName|default('')|first|upper) %}
+                            {% set _fullName = user.firstName ~ ' ' ~ user.lastName %}
+                            {% set _colors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                            {% set _bgColor = _colors[_fullName|length % 9] %}
+                            <div class="avatar-initials" style="background-color: {{ _bgColor }};">
+                                {{ _initials }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="of-label">{{ 'profile.edit.avatar_label'|trans({}, 'admin') }}</label>
+                        <div class="mg-mt-4">
+                            {{ form_widget(profileForm.avatar, {
+                                'attr': {
+                                    'class': 'd-none js-avatar-input'
+                                }
+                            }) }}
+
+                            <label for="{{ profileForm.avatar.vars.id }}" class="custom-file-upload">
+                                <i class="fa-solid fa-camera"></i> {{ 'profile.edit.choose_new_photo'|trans({}, 'admin') }}
+                            </label>
+                            <p class="mg-form-help">{{ 'profile.edit.avatar_help'|trans({}, 'admin') }}</p>
+                        </div>
+                        <div class="mg-form-error">{{ form_errors(profileForm.avatar) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 2: Date personale #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i class="fa-solid fa-id-card ct-icon-primary"></i> {{ 'profile.personal_data'|trans({}, 'admin') }}</h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-2">
+                    <div>
+                        <label class="of-label" for="{{ profileForm.firstName.vars.id }}">{{ 'profile.form.first_name'|trans({}, 'admin') }}</label>
+                        {{ form_widget(profileForm.firstName, {'attr': {'class': 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(profileForm.firstName) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ profileForm.lastName.vars.id }}">{{ 'profile.form.last_name'|trans({}, 'admin') }}</label>
+                        {{ form_widget(profileForm.lastName, {'attr': {'class': 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(profileForm.lastName) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-grid-2 ct-form-row">
+                    <div>
+                        <label class="of-label" for="{{ profileForm.phone.vars.id }}">{{ 'profile.form.phone'|trans({}, 'admin') }}</label>
+                        {{ form_widget(profileForm.phone, {'attr': {'class': 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(profileForm.phone) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label" for="{{ profileForm.email.vars.id }}">{{ 'profile.form.email'|trans({}, 'admin') }}</label>
+                        {{ form_widget(profileForm.email, {'attr': {'class': 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(profileForm.email) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Bottom actions #}
+            <div class="ct-form-actions">
+                <a href="{{ path('admin_profile') }}" class="mg-btn mg-btn-secondary"><i class="fa-solid fa-arrow-left"></i> {{ 'profile.edit.back_to_profile'|trans({}, 'admin') }}</a>
+                <div class="ct-form-actions-right">
+                    <button type="submit" class="mg-btn mg-btn-primary mg-btn-lg"><i class="fa-solid fa-floppy-disk"></i> {{ 'profile.edit.save_changes'|trans({}, 'admin') }}</button>
+                </div>
+            </div>
+
+        </div>
+
+    {{ form_end(profileForm) }}
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('profile-edit') }}
+{% endblock %}

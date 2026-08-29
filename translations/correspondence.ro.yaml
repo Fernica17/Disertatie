@@ -1,0 +1,88 @@
+enum:
+    correspondence_direction:
+        in: Intrare
+        out: Ieșire
+    correspondence_document_type:
+        address: Adresă
+        request: Solicitare
+        notification: Notificare
+        verbal_process: Proces verbal
+        offer: Ofertă
+        response: Răspuns
+        report: Raport
+        other: Altele
+    correspondence_channel:
+        email: E-mail
+        post: Poștă
+        courier: Curier
+        physical: Predare fizică
+
+correspondence:
+    entity:
+        singular: Corespondență
+        plural: Corespondențe
+
+    page:
+        index: Registru de corespondență
+        new: Adaugă corespondență
+        edit: Editează corespondența
+
+    action:
+        new: Adaugă corespondență
+        edit: Editează
+        delete: Șterge
+        detail: Vezi detalii
+
+    field:
+        registry_number: Nr. registru
+        direction: Tip registru
+        document_date: Data documentului
+        document_type: Tip document
+        channel: Canal
+        counterparty: Expeditor/Destinatar
+        subject: Subiect
+        client: Client
+        project: Proiect
+        test: Testare
+        work_point: Punct de lucru
+        notes: Observații
+
+    fieldset:
+        main: Date principale
+        associations: Asocieri
+        details: Detalii
+
+    tab:
+        documents: Documente atașate
+
+    filter:
+        direction: Tip registru
+        document_date: Data documentului
+        document_type: Tip document
+        channel: Canal
+        client: Client
+
+    detail:
+        documents: Documente atașate
+        created_at: Creat
+        updated_at: Actualizat
+
+    form:
+        subtitle_new: Înregistrează o nouă corespondență în sistem
+        subtitle_edit: Modifică datele corespondenței selectate
+        cancel: Anulează
+        save: Salvează
+        save_changes: Salvează modificările
+        auto_generated: Generat automat (RI/RE)
+        existing_documents: Documente existente
+        remove: Șterge fișier
+        upload_hint: Trage fișierele aici sau apasă pentru a încărca
+        no_documents: Nu există documente atașate.
+
+    flash:
+        created: 'Corespondența {registryNumber} a fost înregistrată cu succes.'
+        updated: 'Corespondența {registryNumber} a fost actualizată.'
+        deleted: 'Corespondența a fost ștearsă.'
+
+    error:
+        not_found: Corespondența nu a fost găsită.

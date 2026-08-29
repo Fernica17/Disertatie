@@ -1,0 +1,150 @@
+enum:
+    equipment_record_type:
+        maintenance: Mentenanță
+        calibration: Etalonare
+    equipment_status:
+        active: Activ
+        in_service: 'În service'
+        decommissioned: Dezafectat
+
+equipments:
+    entity:
+        singular: Echipament
+        plural: Echipamente
+    action:
+        new: 'Adaugă echipament'
+        edit: Editează
+        detail: Detalii
+        delete: Șterge
+        add_maintenance: 'Adaugă mentenanță'
+        add_calibration: 'Adaugă etalonare'
+        upload_document: 'Încarcă document'
+    field:
+        name: Denumire
+        inventory_number: 'Nr. inventar'
+        manufacturer: Producător
+        model: Model
+        serial_number: 'Nr. serie'
+        purchase_date: 'Data achiziție'
+        commissioning_date: 'Data punerii în funcțiune'
+        usage_conditions: 'Condiții de utilizare'
+        notes: Observații
+        status: Status
+        category: Categorie
+        location: Locație
+        supplier: Furnizor
+        responsible_person: 'Responsabil tehnic'
+        maintenance_date: 'Data mentenanță'
+        description: Descriere
+        cost: Cost
+        currency: Monedă
+        next_maintenance_date: 'Data următoarei mentenanțe'
+        service_provider: 'Furnizor service'
+        calibration_date: 'Data etalonare'
+        calibration_provider: 'Laborator/Firmă etalonare'
+        next_calibration_date: 'Data următoarei etalonări'
+    page:
+        index: 'Evidență echipamente'
+        new: 'Echipament nou'
+        edit: 'Editare echipament'
+    filter:
+        status: Status
+        category: Categorie
+        location: Locație
+        supplier: Furnizor
+        responsible_person: 'Responsabil tehnic'
+    tab:
+        info: 'Informații generale'
+        maintenances: Mentenanțe
+        calibrations: 'Etalonări/Calibrări'
+        documents: Documente
+    fieldset:
+        identification: 'Identificare echipament'
+        technical: 'Detalii tehnice'
+        details: 'Observații și condiții'
+        people_info: 'Responsabil și clasificare'
+    kpi:
+        next_maintenance: 'Următoarea mentenanță'
+        next_calibration: 'Următoarea etalonare'
+        total_records: 'Total înregistrări'
+        maint_calib: 'mentenanțe / etalonări'
+        days_remaining: 'zile rămase'
+        overdue: 'depășit!'
+    record:
+        entity_singular: 'Înregistrare echipament'
+        entity_plural: 'Înregistrări echipament'
+    maintenance:
+        no_maintenances: 'Nu există înregistrări de mentenanță.'
+        entity_singular: Mentenanță
+        entity_plural: Mentenanțe
+        page_new: 'Mentenanță nouă'
+        page_edit: 'Editare mentenanță'
+        for_equipment: 'Pentru echipamentul {name}'
+    calibration:
+        no_calibrations: 'Nu există înregistrări de etalonare.'
+        entity_singular: Etalonare
+        entity_plural: Etalonări
+        page_new: 'Etalonare nouă'
+        page_edit: 'Editare etalonare'
+        for_equipment: 'Pentru echipamentul {name}'
+    documents:
+        no_documents: 'Nu există documente atașate.'
+    confirm:
+        delete: 'Ești sigur că vrei să ștergi acest echipament? Acțiunea este ireversibilă.'
+        delete_document: 'Ești sigur că dorești să ștergi acest document?'
+    form:
+        cancel: Anulează
+        save: 'Salvează echipament'
+        save_changes: 'Salvează modificările'
+        subtitle_new: 'Completează datele pentru noul echipament'
+        subtitle_edit: 'Modifică datele echipamentului'
+        existing_documents: 'Documente existente'
+        upload_hint: 'Click sau drag & drop pentru upload'
+        remove: Elimină
+    detail:
+        created: Creat
+        updated: Actualizat
+    error:
+        not_found: 'Echipamentul nu a fost găsit.'
+    flash:
+        created: 'Echipamentul {name} a fost creat cu succes.'
+        updated: 'Echipamentul {name} a fost actualizat.'
+        deleted: 'Echipamentul {name} a fost șters cu succes.'
+        maintenance_created: 'Mentenanța a fost adăugată cu succes.'
+        maintenance_updated: 'Mentenanța a fost actualizată.'
+        calibration_created: 'Etalonarea a fost adăugată cu succes.'
+        calibration_updated: 'Etalonarea a fost actualizată.'
+        document_uploaded: 'Documentul a fost încărcat cu succes.'
+        document_deleted: 'Documentul a fost șters cu succes.'
+        no_files_selected: 'Nu a fost selectat niciun fișier.'
+    schedule:
+        no_records: 'Nu există înregistrări.'
+        equipment: Echipament
+        type: Tip
+        last_date: 'Ultima dată'
+        next_date: 'Următoarea dată'
+        days_left: 'Zile rămase'
+        days_overdue: 'Zile restante'
+        provider: Furnizor
+        description: Descriere
+        days: zile
+        type_maintenance: Mentenanță
+        type_calibration: Etalonare
+        view_equipment: 'Vezi echipament'
+    notifications:
+        footer_auto_generated: 'Acest email a fost generat automat. Nu răspunde la acest mesaj.'
+        digest:
+            subject: 'Sumar echipamente - alerte mentenanță/etalonare'
+            title: 'Alerte echipamente'
+            summary: '{count} echipamente necesită atenție (mentenanță/etalonare)'
+            greeting: 'Bună, {firstName}'
+            message: 'Acesta este un sumar al echipamentelor care necesită atenție:'
+            col_equipment: Echipament
+            col_type: Tip
+            col_next_date: 'Data programată'
+            col_days_left: 'Zile rămase'
+            type_maintenance: Mentenanță
+            type_calibration: Etalonare
+            days: zile
+            view: Detalii
+            action: 'Planifică intervențiile necesare în timp util.'

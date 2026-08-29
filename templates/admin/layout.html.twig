@@ -1,0 +1,266 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block head_metas %}
+    {{ parent() }}
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app') }}
+    {{ encore_entry_link_tags('admin') }}
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('app') }}
+    {{ encore_entry_script_tags('admin') }}
+{% endblock %}
+
+{% block wrapper_wrapper %}
+    {% block flash_messages %}{% endblock %}
+
+    {# Sidebar overlay (mobile) #}
+    <div class="mg-sidebar-overlay"></div>
+
+    <div class="mg-wrapper">
+
+        {# ============================================================
+           SIDEBAR
+           ============================================================ #}
+        <aside class="mg-sidebar">
+            {# Brand #}
+            <a href="{{ path('admin') }}" class="mg-sidebar-brand">
+                <img src="{{ asset('images/logo_white.svg') }}" alt="{{ setting('company_name') ?? 'Compania mea' }}" class="mg-sidebar-brand-logo">
+            </a>
+
+            {# Navigation #}
+            <nav class="mg-sidebar-nav">
+                {% set menu_items = ea.mainMenu.items %}
+                {% set current_crud = ea.crud is defined and ea.crud.controllerFqcn is defined ? ea.crud.controllerFqcn : app.request.query.get('crudControllerFqcn') %}
+                {% set current_route = app.request.attributes.get('_route') %}
+
+                {% for item in menu_items %}
+                    {% if item.isMenuSection %}
+                        <div class="mg-nav-section">{{ item.label|trans({}, 'admin') }}</div>
+                    {% elseif item.hasSubItems is defined and item.hasSubItems %}
+                        {% set sub_active = false %}
+                        {% for sub in item.subItems %}
+                            {% if sub.routeParameters.crudControllerFqcn is defined and current_crud == sub.routeParameters.crudControllerFqcn %}
+                                {% set sub_active = true %}
+                            {% endif %}
+                        {% endfor %}
+                        <div class="mg-nav-submenu {{ sub_active ? 'open' : '' }}">
+                            <button type="button" class="mg-nav-link mg-nav-submenu-toggle {{ sub_active ? 'active' : '' }}">
+                                {% if item.icon is not empty %}
+                                    <i class="{{ item.icon }}"></i>
+                                {% endif %}
+                                <span>{{ item.label|trans({}, 'admin') }}</span>
+                                <i class="fa fa-chevron-down mg-nav-submenu-arrow"></i>
+                            </button>
+                            <div class="mg-nav-submenu-items">
+                                {% for sub in item.subItems %}
+                                    {% set is_sub_active = sub.routeParameters.crudControllerFqcn is defined and current_crud == sub.routeParameters.crudControllerFqcn %}
+                                    <a href="{{ sub.linkUrl }}" class="mg-nav-link {{ is_sub_active ? 'active' : '' }}">
+                                        {% if sub.icon is not empty %}
+                                            <i class="{{ sub.icon }}"></i>
+                                        {% endif %}
+                                        <span>{{ sub.label|trans({}, 'admin') }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        {% set is_active = false %}
+                        {% if current_route == 'admin' and current_crud is null and item.linkUrl == path('admin') %}
+                            {% set is_active = true %}
+                        {% elseif item.routeParameters.crudControllerFqcn is defined and current_crud == item.routeParameters.crudControllerFqcn %}
+                            {% set is_active = true %}
+                        {% elseif item.routeParameters.routeName is defined and current_route == item.routeParameters.routeName %}
+                            {% set is_active = true %}
+                        {% elseif item.routeName is defined and item.routeName != 'admin' and current_route == item.routeName %}
+                            {% set is_active = true %}
+                        {% endif %}
+
+                        <div class="mg-nav-item">
+                            <a href="{{ item.linkUrl }}" class="mg-nav-link {{ is_active ? 'active' : '' }}">
+                                {% if item.icon is not empty %}
+                                    <i class="{{ item.icon }}"></i>
+                                {% endif %}
+                                <span>{{ item.label|trans({}, 'admin') }}</span>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+
+            {% set _app_version = changelog_version() %}
+            {% if _app_version %}
+                <div class="mg-sidebar-footer">
+                    {{ 'admin.sidebar.version'|trans({'%version%': _app_version}, 'admin') }}
+                </div>
+            {% endif %}
+
+        </aside>
+
+        {# ============================================================
+           MAIN CONTENT
+           ============================================================ #}
+        <main class="mg-main">
+
+            {# Header #}
+            <header class="mg-header">
+                <div class="mg-header-left">
+                    <button class="mg-sidebar-toggle" type="button" aria-label="Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <ul class="mg-breadcrumb">
+                        <li><a href="{{ path('admin') }}">{{ setting('app_title') ?? 'ERP' }}</a></li>
+                        {% block mg_breadcrumb %}
+                            {% if ea.crud is defined and ea.crud.entityLabelInPlural is defined and ea.crud.entityLabelInPlural is not null %}
+                                {% set crud_action = ea.crud.currentAction|default('index') %}
+                                {% if crud_action in ['detail', 'edit', 'new'] %}
+                                    <li><a href="{{ ea_url().setAction('index') }}">{{ ea.crud.entityLabelInPlural|trans|striptags }}</a></li>
+                                    {% if crud_action == 'new' %}
+                                        <li class="active">{{ 'admin.breadcrumb.new'|trans({}, 'admin') }}</li>
+                                    {% elseif crud_action == 'edit' %}
+                                        <li class="active">{{ ea.entity is defined and ea.entity.instance is defined ? ea.entity.instance : 'admin.breadcrumb.edit'|trans({}, 'admin') }}</li>
+                                    {% elseif crud_action == 'detail' %}
+                                        <li class="active">{{ ea.entity is defined and ea.entity.instance is defined ? ea.entity.instance : 'admin.breadcrumb.detail'|trans({}, 'admin') }}</li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="active">{{ ea.crud.entityLabelInPlural|trans|striptags }}</li>
+                                {% endif %}
+                            {% else %}
+                                <li class="active">{{ 'admin.breadcrumb.dashboard'|trans({}, 'admin') }}</li>
+                            {% endif %}
+                        {% endblock %}
+                    </ul>
+                </div>
+
+                <div class="mg-header-right">
+                    <div class="mg-notifications-wrapper">
+                        {{ render(controller('App\\Controller\\Admin\\NotificationHeaderController::renderDropdown')) }}
+                    </div>
+
+                    {# User dropdown #}
+                    {% set _avatarColors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                    {% set _avatarFullName = app.user ? (app.user.firstName ~ ' ' ~ app.user.lastName) : '' %}
+                    {% set _avatarBgColor = _avatarColors[_avatarFullName|length % 9] %}
+                    {% set _avatarInitials = app.user ? (app.user.firstName|default('?')|first|upper ~ app.user.lastName|default('')|first|upper) : '?' %}
+
+                    <div class="mg-user-menu-wrapper">
+                        <button class="mg-user-menu-toggle" type="button" aria-label="User menu">
+                            <div class="mg-header-avatar" style="background-color: {{ _avatarBgColor }};">
+                                {% if ea.userMenu.avatarUrl %}
+                                    <img src="{{ ea.userMenu.avatarUrl }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                {% else %}
+                                    {{ _avatarInitials }}
+                                {% endif %}
+                            </div>
+                            <span class="mg-user-menu-name">
+                                {% if app.user %}
+                                    {{ app.user.fullName|default(app.user.email) }}
+                                {% else %}
+                                    {{ 'admin.nav.users'|trans({}, 'admin') }}
+                                {% endif %}
+                            </span>
+                            <i class="fa-solid fa-chevron-down mg-user-menu-chevron"></i>
+                        </button>
+
+                        <div class="mg-user-menu-dropdown">
+                            <div class="mg-user-menu-header">
+                                <div class="mg-header-avatar lg" style="background-color: {{ _avatarBgColor }};">
+                                    {% if ea.userMenu.avatarUrl %}
+                                        <img src="{{ ea.userMenu.avatarUrl }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                    {% else %}
+                                        {{ _avatarInitials }}
+                                    {% endif %}
+                                </div>
+                                <div class="mg-user-menu-info">
+                                    <div class="mg-user-menu-fullname">
+                                        {{ app.user ? app.user.fullName|default(app.user.email) : '' }}
+                                    </div>
+                                    {% if app.user %}
+                                        {% set roleName = app.user.primaryRole|replace({'ROLE_': ''})|lower %}
+                                        <div class="mg-user-menu-role">
+                                            <span class="mg-badge-inline mg-badge-role-{{ roleName }}">
+                                                {{ ('role.' ~ roleName)|trans({}, 'admin') }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="mg-user-menu-divider"></div>
+                            {% for item in ea.userMenu.items %}
+                                <a href="{{ item.linkUrl }}" class="mg-user-menu-item {{ item.cssClass|default('') }}" target="{{ item.linkTarget }}">
+                                    {% if item.icon is not empty %}
+                                        <i class="{{ item.icon }}"></i>
+                                    {% endif %}
+                                    <span>{{ item.label|trans({}, 'admin') }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {# Content #}
+            <div class="mg-content">
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="mg-flash mg-flash-{{ type }}">
+                            <i class="fa-solid {% if type == 'success' %}fa-circle-check{% elseif type == 'danger' %}fa-circle-xmark{% elseif type == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+                {% block content %}
+                    <article class="content">
+                        {% block content_header_wrapper %}
+                            {% set has_help_message = (ea.crud.helpMessage ?? '') is not empty %}
+                            <section class="content-header">
+                                {% block content_header %}
+                                    <div class="content-header-title">
+                                        <h1 class="title">
+                                            {% block content_title %}{% endblock %}
+
+                                            {% block content_help %}
+                                                {% if has_help_message %}
+                                                    <a tabindex="0" class="content-header-help" data-bs-toggle="popover" data-bs-custom-class="ea-content-help-popover" data-bs-animation="true" data-bs-html="true" data-bs-placement="bottom" data-bs-trigger="focus" data-bs-content="{{ ea.crud.helpMessage|trans|e('html') }}">
+                                                        <i class="fa-solid fa-circle-info"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endblock %}
+                                        </h1>
+                                    </div>
+
+                                    {% block page_actions_wrapper %}
+                                        <div class="page-actions">{% block page_actions %}{% endblock %}</div>
+                                    {% endblock %}
+                                {% endblock content_header %}
+                            </section>
+                        {% endblock content_header_wrapper %}
+
+                        <section id="main" class="content-body">
+                            {% block main %}{% endblock %}
+                        </section>
+
+                        {% block content_footer_wrapper %}
+                            {% if block('content_footer') is not empty %}
+                                <section class="content-footer">
+                                    {% block content_footer %}{% endblock %}
+                                </section>
+                            {% endif %}
+                        {% endblock %}
+                    </article>
+                {% endblock content %}
+            </div>
+
+        </main>
+
+    </div>
+{% endblock wrapper_wrapper %}
+
+{% block body_javascript %}{% endblock body_javascript %}

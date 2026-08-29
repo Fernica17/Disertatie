@@ -1,0 +1,223 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block mg_breadcrumb %}
+    <li class="active">{{ ('documents.page_title_' ~ folderType)|trans({}, 'documents') }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-documents-page"
+         data-controller="folder-manager"
+         data-folder-manager-tree-url-value="{{ path('admin_folders_tree') }}"
+         data-folder-manager-contents-url-value="{{ path('admin_folders_contents', {id: '__ID__'}) }}"
+         data-folder-manager-create-url-value="{{ path('admin_folders_create') }}"
+         data-folder-manager-search-url-value="{{ path('admin_folders_search') }}"
+         data-folder-manager-csrf-token-value="{{ csrf_token('folders_action') }}"
+         data-folder-manager-is-client-value="{{ isClient ? '1' : '0' }}"
+         data-folder-manager-can-manage-value="{{ canManage ? '1' : '0' }}"
+         data-folder-manager-folder-type-value="{{ folderType }}"
+         data-folder-manager-label-create-value="{{ 'documents.folder.create_title'|trans({}, 'documents') }}"
+         data-folder-manager-label-create-sub-value="{{ 'documents.folder.create_title'|trans({}, 'documents') }}"
+         data-folder-manager-label-rename-value="{{ 'documents.folder.rename_title'|trans({}, 'documents') }}"
+         data-folder-manager-label-move-folder-value="{{ 'documents.folder.move_title'|trans({}, 'documents') }}"
+         data-folder-manager-label-move-file-value="{{ 'documents.file.move_title'|trans({}, 'documents') }}"
+         data-folder-manager-label-name-value="{{ 'documents.folder.name_label'|trans({}, 'documents') }}"
+         data-folder-manager-label-confirm-delete-folder-value="{{ 'documents.confirm.delete_folder'|trans({}, 'documents') }}"
+         data-folder-manager-label-confirm-delete-file-value="{{ 'documents.confirm.delete_file'|trans({}, 'documents') }}"
+         data-folder-manager-label-empty-value="{{ 'documents.empty.no_files'|trans({}, 'documents') }}"
+         data-folder-manager-label-root-level-value="{{ 'documents.breadcrumb.root_level'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-load-value="{{ 'documents.error.load_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-upload-value="{{ 'documents.error.upload_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-delete-value="{{ 'documents.error.delete_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-rename-value="{{ 'documents.error.rename_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-create-value="{{ 'documents.error.create_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-error-move-value="{{ 'documents.error.move_failed'|trans({}, 'documents') }}"
+         data-folder-manager-label-search-value="{{ 'documents.toolbar.search_label'|trans({}, 'documents') }}"
+         data-folder-manager-label-col-name-value="{{ 'documents.file.name'|trans({}, 'documents') }}"
+         data-folder-manager-label-col-size-value="{{ 'documents.file.size'|trans({}, 'documents') }}"
+         data-folder-manager-label-col-date-value="{{ 'documents.file.date'|trans({}, 'documents') }}"
+         data-folder-manager-label-col-actions-value="{{ 'documents.file.actions'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-cancel-value="{{ 'documents.folder.cancel'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-save-value="{{ 'documents.folder.save'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-move-value="{{ 'documents.file.move'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-view-value="{{ 'documents.file.view'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-download-value="{{ 'documents.file.download'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-entity-value="{{ 'documents.folder.go_to_entity'|trans({}, 'documents') }}"
+         data-folder-manager-label-btn-delete-value="{{ 'documents.file.delete'|trans({}, 'documents') }}"
+         data-folder-manager-label-swal-title-value="{{ 'documents.confirm.title'|trans({}, 'documents') }}"
+         data-folder-manager-label-swal-confirm-value="{{ 'documents.confirm.yes'|trans({}, 'documents') }}"
+         data-folder-manager-label-swal-cancel-value="{{ 'documents.confirm.cancel'|trans({}, 'documents') }}"
+         data-folder-manager-label-confirm-delete-recursive-value="{{ 'documents.confirm.delete_folder_recursive'|trans({}, 'documents') }}"
+         data-folder-manager-label-confirm-move-value="{{ 'documents.confirm.move'|trans({}, 'documents') }}"
+         data-folder-manager-label-swal-confirm-move-value="{{ 'documents.confirm.yes_move'|trans({}, 'documents') }}"
+         data-folder-manager-label-stats-folders-value="{{ 'documents.stats.folders'|trans({}, 'documents') }}"
+         data-folder-manager-label-stats-files-value="{{ 'documents.stats.files'|trans({}, 'documents') }}"
+         data-folder-manager-label-empty-upload-value="{{ 'documents.empty.upload_hint'|trans({}, 'documents') }}"
+         data-folder-manager-label-delete-folder-value="{{ 'documents.folder.delete_title'|trans({}, 'documents') }}">
+
+        {# Page header #}
+        <div class="mg-page-header">
+            <div>
+                <h1 class="mg-page-title">{{ ('documents.page_title_' ~ folderType)|trans({}, 'documents') }}</h1>
+                <p class="mg-page-subtitle">{{ ('documents.page_subtitle_' ~ folderType)|trans({}, 'documents') }}</p>
+            </div>
+            <div class="mg-page-actions">
+                <div class="mg-documents-search">
+                    <i class="fa fa-search mg-search-icon"></i>
+                    <input type="text"
+                           class="form-control mg-search-input"
+                           placeholder="{{ 'documents.toolbar.search_placeholder'|trans({}, 'documents') }}"
+                           data-folder-manager-target="searchInput"
+                           data-action="input->folder-manager#onSearchInput">
+                    <button type="button" class="mg-search-clear"
+                            data-folder-manager-target="searchClear"
+                            data-action="click->folder-manager#clearSearch"
+                            title="{{ 'documents.folder.cancel'|trans({}, 'documents') }}">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {# Main content - full width, no sidebar #}
+        <div class="mg-documents-card">
+            {# Breadcrumb + stats #}
+            <div class="mg-documents-nav-bar">
+                <div class="mg-documents-breadcrumb" data-folder-manager-target="breadcrumb">
+                    <span class="mg-breadcrumb-item active">{{ ('documents.page_title_' ~ folderType)|trans({}, 'documents') }}</span>
+                </div>
+                <div class="mg-documents-stats" data-folder-manager-target="statsBar">
+                    {% if not app.request.query.get('folder') %}
+                        <span class="mg-stats-item">
+                            <i class="fa fa-folder"></i> {{ tree|length }} {{ 'documents.stats.folders'|trans({}, 'documents') }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Toolbar - visible at root only for custom folders; for client/system, JS shows it when navigating into a subfolder #}
+            <div class="mg-documents-toolbar" data-folder-manager-target="toolbar" {% if not canManage or folderType != 'custom' %}style="display: none;"{% endif %}>
+                {% if canManage %}
+                    <button class="btn btn-sm btn-outline-primary mg-toolbar-btn"
+                            data-action="click->folder-manager#createFolderAction"
+                            data-folder-manager-target="btnNewFolder">
+                        <i class="fa fa-folder-plus"></i> {{ 'documents.toolbar.new_folder'|trans({}, 'documents') }}
+                    </button>
+                    <button class="btn btn-sm btn-outline-success mg-toolbar-btn"
+                            data-action="click->folder-manager#uploadFiles"
+                            data-folder-manager-target="btnUpload"
+                            style="display: none;">
+                        <i class="fa fa-upload"></i> {{ 'documents.toolbar.upload'|trans({}, 'documents') }}
+                    </button>
+                    <input type="file" multiple
+                           data-folder-manager-target="fileInput"
+                           data-action="change->folder-manager#onFilesSelected"
+                           style="display: none;">
+                {% endif %}
+            </div>
+
+            {# Content area: show loading if deep-linking to a folder, otherwise show folder grid #}
+            <div class="mg-documents-files" data-folder-manager-target="content">
+                {% if app.request.query.get('folder') %}
+                    <div class="mg-documents-empty">
+                        <div class="spinner-border spinner-border-sm text-muted" role="status"></div>
+                        <p class="mt-2 text-muted" style="font-size: 0.85rem;">{{ 'documents.loading'|trans({}, 'documents') }}</p>
+                    </div>
+                {% elseif tree|length > 0 %}
+                    <table class="table table-hover mg-documents-table">
+                        <thead>
+                            <tr>
+                                <th>{{ 'documents.file.name'|trans({}, 'documents') }}</th>
+                                <th>{{ 'documents.file.size'|trans({}, 'documents') }}</th>
+                                <th>{{ 'documents.file.date'|trans({}, 'documents') }}</th>
+                                <th>{{ 'documents.file.actions'|trans({}, 'documents') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for folder in tree %}
+                                <tr class="mg-folder-row"
+                                    data-action="click->folder-manager#selectFolder"
+                                    data-folder-id="{{ folder.id }}"
+                                    style="cursor: pointer;">
+                                    <td>
+                                        <i class="{{ folder.type.icon }} me-2"></i>
+                                        {{ folder.name }}
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="mg-file-actions">
+                                        {% if canManage and folder.type.value == 'custom' %}
+                                            <button class="mg-action-btn" data-action="click->folder-manager#renameFolder"
+                                                    data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}"
+                                                    data-bs-tooltip title="{{ 'documents.folder.rename_title'|trans({}, 'documents') }}">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                            <button class="mg-action-btn" data-action="click->folder-manager#moveFolderAction"
+                                                    data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}"
+                                                    data-bs-tooltip title="{{ 'documents.folder.move_title'|trans({}, 'documents') }}">
+                                                <i class="fa fa-arrows-alt"></i>
+                                            </button>
+                                            <button class="mg-action-btn mg-action-btn--danger" data-action="click->folder-manager#deleteFolder"
+                                                    data-folder-id="{{ folder.id }}" data-folder-name="{{ folder.name }}"
+                                                    data-bs-tooltip title="{{ 'documents.folder.delete_title'|trans({}, 'documents') }}">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="mg-documents-empty">
+                        <i class="fa fa-folder-open fa-3x text-muted"></i>
+                        <p class="mt-2 text-muted">{{ 'documents.empty.no_folders'|trans({}, 'documents') }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Pagination #}
+            <div class="mg-documents-pagination" data-folder-manager-target="pagination"></div>
+        </div>
+
+        {# Hidden data: initial folder list for JS to restore when navigating back to root #}
+        <script type="application/json" id="initialFolders">
+            {{ tree|map(f => {id: f.id, name: f.name, type: f.type.value, icon: f.type.icon, children: f.children|length})|json_encode|raw }}
+        </script>
+
+        {# Modal for folder operations #}
+        <div class="modal fade" id="folderModal" tabindex="-1" data-folder-manager-target="modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" data-folder-manager-target="modalTitle"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" data-folder-manager-target="modalBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'documents.folder.cancel'|trans({}, 'documents') }}</button>
+                        <button type="button" class="btn btn-primary" data-action="click->folder-manager#modalSubmit"
+                                data-folder-manager-target="modalSubmitBtn">{{ 'documents.folder.save'|trans({}, 'documents') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Move modal with tree picker #}
+        <div class="modal fade" id="moveModal" tabindex="-1" data-folder-manager-target="moveModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" data-folder-manager-target="moveModalTitle"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" data-folder-manager-target="moveModalBody"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'documents.folder.cancel'|trans({}, 'documents') }}</button>
+                        <button type="button" class="btn btn-primary" data-action="click->folder-manager#moveSubmit"
+                                data-folder-manager-target="moveSubmitBtn">{{ 'documents.file.move'|trans({}, 'documents') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

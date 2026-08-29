@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+# See also https://symfony.com/doc/current/service_container/import.html
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    senderName: '%env(APP_SENDER_NAME)%'
+    senderEmail: '%env(APP_EMAIL)%'
+    defaultLocale: 'ro'
+    companiesFilesDir: 'companies'
+    profilesFilesDir: 'profiles'
+    storageDir: '%kernel.project_dir%/storage'
+    appUrl: '%env(APP_URL)%'
+    uploadMaxFileSize: 10485760       # 10 MB in bytes
+    uploadMaxFileSizeMb: '10M'        # For Symfony Assert\File constraint
+    uploadMaxFiles: 10                # Max files per upload
+
+
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $companiesFilesDir: '%companiesFilesDir%'
+            $storageDir: '%storageDir%'
+            $profilesFilesDir: '%profilesFilesDir%'
+            $uploadMaxFileSize: '%uploadMaxFileSize%'
+            $uploadMaxFileSizeMb: '%uploadMaxFileSizeMb%'
+            $uploadMaxFiles: '%uploadMaxFiles%'
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+
+    App\Twig\ChangelogExtension:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Helper\Mailer:
+        public: true
+        arguments:
+            $senderEmail: '%senderEmail%'
+            $senderName: '%senderName%'
+            $defaultLocale: '%defaultLocale%'
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+

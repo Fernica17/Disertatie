@@ -1,0 +1,28 @@
+# Audit System Configuration
+parameters:
+    audit.enabled: true
+    audit.anonymize_ip: true
+    audit.retention_days: 1825
+    audit.database_url: '%env(resolve:DATABASE_AUDIT_URL)%'
+
+doctrine:
+    dbal:
+        connections:
+            audit:
+                url: '%audit.database_url%'
+                driver: 'pdo_pgsql'
+                server_version: '16'
+                charset: utf8
+
+    orm:
+        entity_managers:
+            audit:
+                connection: audit
+                naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+                mappings:
+                    Audit:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/src/Audit/Entity'
+                        prefix: 'App\Audit\Entity'
+                        alias: Audit

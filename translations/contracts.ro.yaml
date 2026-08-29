@@ -1,0 +1,127 @@
+enum:
+    contract_status:
+        draft: Ciornă
+        negotiation: Negociere
+        active: Activ
+        suspended: Suspendat
+        expired: Expirat
+        terminated: Reziliat
+    contract_type:
+        consultancy: Consultanță
+        testing: Testare
+        subscription: Abonament
+        maintenance: Mentenanță
+        mixed: Mixt
+
+contracts:
+    entity:
+        singular: Contract
+        plural: Contracte
+    action:
+        new: 'Adaugă contract'
+        edit: Editează
+        detail: Detalii
+        delete: Șterge
+        activate: Activează
+        suspend: Suspendă
+        terminate: Reziliază
+        negotiate: 'Trece în negociere'
+        create_from_offer: 'Creează contract'
+    field:
+        contract_number: 'Nr. contract'
+        title: Titlu
+        client: Client
+        offer: 'Sursă ofertă'
+        status: Status
+        type: 'Tip contract'
+        currency: Moneda
+        total_value: 'Valoare totală'
+        vat_percent: 'TVA (%)'
+        vat_amount: 'Valoare TVA'
+        total_with_vat: 'Total cu TVA'
+        payment_term_days: 'Termen plată (zile)'
+        payment_conditions: 'Condiții plată'
+        signed_date: 'Data semnării'
+        start_date: 'Data început'
+        end_date: 'Data sfârșit'
+        notice_period_days: 'Perioadă preaviz (zile)'
+        responsible_person: 'Responsabil intern'
+        description: Descriere
+        notes: 'Note interne'
+    page:
+        index: 'Gestionare contracte'
+        new: 'Contract nou'
+        edit: 'Editare contract'
+        detail: 'Detalii contract'
+    filter:
+        status: Status
+        type: 'Tip contract'
+        client: Client
+        start_date: 'Data început'
+        end_date: 'Data sfârșit'
+        responsible_person: 'Responsabil intern'
+    tab:
+        general: 'Date generale'
+        documents: Documente
+    fieldset:
+        identification: Identificare
+        values: Valori
+        dates: 'Perioade și date'
+        details: Detalii
+        system_info: 'Info sistem'
+    error:
+        not_found: 'Contractul nu a fost găsit.'
+    confirm:
+        activate: 'Ești sigur că vrei să activezi acest contract?'
+        suspend: 'Ești sigur că vrei să suspezi acest contract?'
+        terminate: 'Ești sigur că vrei să reziliezi acest contract? Acțiunea este ireversibilă.'
+        negotiate: 'Ești sigur că vrei să treci contractul în negociere?'
+        delete: 'Ești sigur că vrei să ștergi acest contract? Acțiunea este ireversibilă.'
+    form:
+        cancel: Anulează
+        save: 'Salvează contract'
+        save_changes: 'Salvează modificările'
+        auto_generated: 'Se generează automat'
+        subtitle_new: 'Completează datele pentru noul contract'
+        subtitle_edit: 'Modifică datele contractului'
+        existing_documents: 'Documente existente'
+        existing_addenda: 'Acte adiționale existente'
+        upload_hint: 'Click sau drag & drop pentru upload'
+        remove: Elimină
+        no_documents: 'Niciun document contract.'
+        no_addenda: 'Niciun act adițional.'
+    detail:
+        documents: 'Documente contract'
+        addenda: 'Acte adiționale'
+        days_until_expiry: 'Zile până la expirare'
+        days_expired: 'zile expirat'
+        expired_label: Expirat
+        expiring_soon: 'Expiră curând!'
+        days_label: zile
+    flash:
+        created: 'Contractul {contractNumber} a fost creat cu succes.'
+        updated: 'Contractul {contractNumber} a fost actualizat.'
+        deleted: 'Contractul a fost șters.'
+        activated: 'Contractul {contractNumber} a fost activat.'
+        suspended: 'Contractul {contractNumber} a fost suspendat.'
+        terminated: 'Contractul {contractNumber} a fost reziliat.'
+        negotiation: 'Contractul {contractNumber} a fost trecut în negociere.'
+        created_from_offer: 'Contractul {contractNumber} a fost creat din oferta {offerNumber}.'
+    notifications:
+        footer_auto_generated: 'Acest email a fost generat automat. Nu răspunde la acest mesaj.'
+        digest:
+            subject: 'Sumar contracte - alerte expirare'
+            title: 'Alerte contracte'
+            summary: '{expiring_count} contracte în curs de expirare, {expired_count} contracte expirate'
+            greeting: 'Bună, {firstName}'
+            message: 'Acesta este un sumar al contractelor care necesită atenție:'
+            section_expiring: 'Contracte în curs de expirare'
+            section_expired: 'Contracte expirate'
+            col_number: 'Nr. contract'
+            col_end_date: 'Data expirare'
+            col_days_left: 'Zile rămase'
+            col_status: Status
+            status_expired: Expirat
+            days: zile
+            view: Detalii
+            action: 'Ia măsurile necesare pentru gestionarea contractelor de mai sus.'

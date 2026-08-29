@@ -1,0 +1,176 @@
+// Settings Page Styles
+
+.mg-settings-page {
+    max-width: 900px;
+}
+
+.mg-settings-header {
+    margin-bottom: 2rem;
+
+    h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--mg-text);
+        margin: 0 0 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: var(--mg-primary);
+        }
+    }
+}
+
+.mg-settings-subtitle {
+    color: var(--mg-text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.mg-settings-group {
+    background: var(--mg-bg-card);
+    border: 1px solid var(--mg-border);
+    border-radius: var(--mg-radius-lg);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--mg-shadow-sm);
+}
+
+.mg-settings-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 1rem 1.5rem;
+    background: var(--mg-bg);
+    border-bottom: 1px solid var(--mg-border);
+    border-radius: var(--mg-radius-lg) var(--mg-radius-lg) 0 0;
+
+    i {
+        color: var(--mg-primary);
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--mg-text);
+        margin: 0;
+    }
+}
+
+.mg-settings-group-body {
+    padding: 1rem 1.5rem;
+}
+
+.mg-settings-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 0;
+
+    &:not(:last-child) {
+        border-bottom: 1px solid var(--mg-border);
+    }
+}
+
+.mg-settings-label {
+    flex: 0 0 220px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--mg-text);
+    padding-top: 0.5rem;
+}
+
+.mg-settings-input-wrapper {
+    flex: 1;
+
+    .form-control,
+    .form-select {
+        border: 1px solid var(--mg-border);
+        border-radius: var(--mg-radius-sm);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--mg-text);
+        transition: border-color var(--mg-transition);
+        max-width: 100%;
+        width: 100%;
+
+        &:focus {
+            border-color: var(--mg-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+    }
+
+    .ts-wrapper {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .form-check-input {
+        width: 2.5rem;
+        height: 1.25rem;
+        cursor: pointer;
+
+        &:checked {
+            background-color: var(--mg-primary);
+            border-color: var(--mg-primary);
+        }
+    }
+}
+
+.mg-settings-help {
+    display: block;
+    color: var(--mg-text-muted);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.mg-settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 0 2rem;
+
+    .btn-primary {
+        background: var(--mg-primary);
+        border-color: var(--mg-primary);
+        padding: 0.625rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: var(--mg-radius);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all var(--mg-transition);
+
+        &:hover {
+            background: var(--mg-primary-hover);
+            border-color: var(--mg-primary-hover);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .mg-settings-field {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .mg-settings-label {
+        flex: none;
+        padding-top: 0;
+    }
+
+    .mg-settings-input-wrapper {
+        width: 100%;
+
+        .form-control,
+        .form-select,
+        .ts-wrapper {
+            max-width: 100%;
+            width: 100%;
+        }
+    }
+}

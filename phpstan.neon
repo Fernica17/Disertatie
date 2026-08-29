@@ -1,0 +1,29 @@
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+        - tests
+    symfony:
+        containerXmlPath: var/cache/test/App_KernelTestDebugContainer.xml
+
+    ignoreErrors:
+        # FoldersService::CLIENT_ENTITY_MAP is a deliberate extension point: it is
+        # empty until a document-owning module (contracts, offers, tests, ...) is
+        # added, so PHPStan sees the entity-resolution branch as unreachable.
+        # The code is kept live for that registration.
+        -
+            identifier: nullCoalesce.offset
+            path: src/Service/FoldersService.php
+        -
+            identifier: identical.alwaysTrue
+            path: src/Service/FoldersService.php
+        -
+            identifier: deadCode.unreachable
+            path: src/Service/FoldersService.php
+        -
+            identifier: foreach.emptyArray
+            path: src/Service/FoldersService.php

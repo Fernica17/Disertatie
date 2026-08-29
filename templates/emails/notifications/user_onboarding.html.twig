@@ -1,0 +1,31 @@
+{% extends 'emails/base_email.html.twig' %}
+{% trans_default_domain 'notifications' %}
+
+{% block extra_styles %}
+    .btn { display: inline-block; padding: 12px 24px; background-color: #109B44; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; }
+    .credentials { background-color: #f9fafb; border: 1px solid #e5e7eb; border-left: 4px solid #109B44; padding: 16px; margin: 20px 0; border-radius: 6px; }
+{% endblock %}
+
+{% block header_subtitle %}{{ 'notifications.user_onboarding.title'|trans }}{% endblock %}
+
+{% block email_body %}
+    <p>{{ 'notifications.user_onboarding.greeting'|trans({'{firstName}': user.firstName, '{lastName}': user.lastName}) }}</p>
+
+    <p>{{ 'notifications.user_onboarding.account_created'|trans }}</p>
+
+    <div class="credentials">
+        <p style="margin: 0;"><strong>{{ 'notifications.user_onboarding.label_email'|trans }}</strong> {{ user.email }}</p>
+    </div>
+
+    <p>{{ 'notifications.user_onboarding.login_instruction'|trans }}</p>
+    <p>{{ 'notifications.user_onboarding.security_warning'|trans|raw }}</p>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ meta.signedUrl }}" class="btn" style="color: #ffffff;">{{ 'notifications.user_onboarding.button_action'|trans }}</a>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <p>{{ 'notifications.user_onboarding.footer_auto_generated'|trans }}</p>
+    <p>&copy; {{ 'now'|date('Y') }} {{ setting('app_title') ?? 'ERP' }}</p>
+{% endblock %}

@@ -1,0 +1,173 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% extends '@!EasyAdmin/crud/detail.html.twig' %}
+
+{% block detail_fields %}
+    {% for field in entity.fields %}
+        {% if field.isFormLayoutField %}
+            {{ _self.render_layout_field(field) }}
+        {% else %}
+            {{ _self.render_field_contents(entity, field) }}
+        {% endif %}
+    {% endfor %}
+{% endblock detail_fields %}
+
+{% macro render_field_contents(entity, field) %}
+    {% set has_help = field.help is not same as(false) and field.help is not null and field.help is not same as('') %}
+
+    <div class="field-group {{ field.cssClass }}" {% for name, value in field.htmlAttributes %}{{ name }}="{{ value|e('html') }}" {% endfor %}>
+        {% if field.label is same as (false) %}
+        {% else %}
+            <div class="field-label">
+                {%- set label_html_attributes -%}
+                    {%- if has_help -%}
+                        data-bs-toggle="tooltip" data-bs-placement="auto" data-bs-animation="false"
+                        data-bs-html="true" data-bs-custom-class="ea-detail-label-tooltip"
+                        data-bs-title="{{ field.help|trans|e('html') }}"
+                    {%- endif -%}
+                {%- endset -%}
+
+                <div {{ label_html_attributes }}>
+                    {{ field.label|trans|raw }}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="field-value">
+            {% if field.value is null or (field.formattedValue is defined and field.formattedValue is null) %}
+                <span class="null-value">—</span>
+            {% else %}
+                {{ include(field.templatePath, {field: field, entity: entity}, with_context: false) }}
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_layout_field(field) %}
+    {% if field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormTabListType' %}
+        {{ _self.render_tab_list(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormTabPaneGroupOpenType' %}
+        {{ _self.render_tab_group_open(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormTabPaneGroupCloseType' %}
+        {{ _self.render_tab_group_close(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormTabPaneOpenType' %}
+        {{ _self.render_tab_open(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormTabPaneCloseType' %}
+        {{ _self.render_tab_close(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormColumnGroupOpenType' %}
+        {{ _self.render_column_group_open(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormColumnGroupCloseType' %}
+        {{ _self.render_column_group_close(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormColumnOpenType' %}
+        {{ _self.render_column_open(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormColumnCloseType' %}
+        {{ _self.render_column_close(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormFieldsetOpenType' %}
+        {{ _self.render_fieldset_open(field) }}
+    {% elseif field.formType == 'EasyCorp\\Bundle\\EasyAdminBundle\\Form\\Type\\Layout\\EaFormFieldsetCloseType' %}
+        {{ _self.render_fieldset_close(field) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_tab_list(field) %}
+    {% set tab_id_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_TAB_ID') %}
+    {% set tab_is_active_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_TAB_IS_ACTIVE') %}
+    {% set tab_error_count_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_TAB_ERROR_COUNT') %}
+
+    <div class="nav-tabs-custom form-tabs-tablist">
+        <ul class="nav nav-tabs">
+            {% for tab in field.getCustomOption('tabs') %}
+                <li class="nav-item">
+                    <a class="nav-link {% if tab.getCustomOption(tab_is_active_option_name) %}active{% endif %}" href="#{{ tab.getCustomOption(tab_id_option_name) }}" id="tablist-{{ tab.getCustomOption(tab_id_option_name) }}" data-bs-toggle="tab">
+                        {%- if tab.getCustomOption('icon')|default(false) -%}
+                            <twig:ea:Icon name="{{ tab.getCustomOption('icon') }}" class="tab-nav-item-icon"/>
+                        {%- endif -%}
+                        {{ tab.label|trans(domain: ea().i18n.translationDomain)|raw }}
+
+                        {% set tab_error_count = tab.getCustomOption(tab_error_count_option_name) %}
+                        {%- if tab_error_count > 0 -%}
+                            <span class="badge badge-danger" title="{{ 'form.tab.error_badge_title'|trans({'%count%': tab_error_count}, 'EasyAdminBundle') }}">
+                                {{- tab_error_count -}}
+                            </span>
+                        {%- endif -%}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% macro render_tab_group_open(field) %}
+    <div class="nav-tabs-custom form-tabs-content">
+        <div class="tab-content">
+{% endmacro %}
+
+{% macro render_tab_group_close(field) %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_tab_open(field) %}
+    {% set tab_id_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_TAB_ID') %}
+    {% set tab_is_active_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_TAB_IS_ACTIVE') %}
+
+    <div id="{{ field.getCustomOption(tab_id_option_name) }}" class="tab-pane {% if field.getCustomOption(tab_is_active_option_name) %}active{% endif %} {{ field.cssClass }}" {% for key, value in field.getFormTypeOption('attr') %}{{ key }}="{{ value|e('html') }}"{% endfor %}>
+        {% if field.help %}
+            <div class="content-header-help tab-help">
+                {{ field.help|trans(domain: ea().i18n.translationDomain)|raw }}
+            </div>
+        {% endif %}
+
+        <div class="row">
+{% endmacro %}
+
+{% macro render_tab_close(field) %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_column_group_open(field) %}
+    {% if not field.getFormTypeOption('ea_is_inside_tab')|default(false) %}
+        <div class="row">
+    {% endif %}
+{% endmacro %}
+
+{% macro render_column_group_close(field) %}
+    {% if not field.getFormTypeOption('ea_is_inside_tab')|default(false) %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_column_open(field) %}
+    <div class="{{ field.cssClass }}">
+{% endmacro %}
+
+{% macro render_column_close(field) %}
+    </div>
+{% endmacro %}
+
+{% macro render_fieldset_open(field) %}
+    {% set has_label = field.label is not same as(false) and field.label is not null and field.label is not same as('') %}
+    {% set has_help = field.help is not same as(false) and field.help is not null and field.help is not same as('') %}
+
+    <div class="{{ field.cssClass }}">
+        {% if has_label %}
+            <div class="field-group field-group-title">
+                <div class="field-label">
+                    <div>
+                        {%- if field.getCustomOption('icon')|default(false) -%}
+                            <twig:ea:Icon name="{{ field.getCustomOption('icon') }}" class="field-group-icon"/>
+                        {%- endif -%}
+                        {{ field.label|trans(domain: ea().i18n.translationDomain)|raw }}
+                    </div>
+                </div>
+                {% if has_help %}
+                    <div class="field-value field-help">{{ field.help|trans(domain: ea().i18n.translationDomain)|raw }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+{% endmacro %}
+
+{% macro render_fieldset_close(field) %}
+    </div>
+{% endmacro %}

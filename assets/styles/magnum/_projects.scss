@@ -1,0 +1,267 @@
+/* ============================================================
+   PROJECTS - Phase cards, detail page, and project-specific styles
+   Prefix: pj- (project)
+   ============================================================ */
+
+/* --- Detail avatar --- */
+.pj-detail-avatar {
+    background: #7c3aed;
+}
+
+/* --- Summary grid override for 4 cards --- */
+.pj-summary-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* --- Progress section in overview card --- */
+.pj-progress-section {
+    margin-bottom: 16px;
+}
+
+.pj-progress-bar-container {
+    height: 8px;
+    background: var(--mg-bg, #f0f0f0);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.pj-progress-bar-fill {
+    height: 100%;
+    background: var(--mg-primary, #2563eb);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.pj-progress-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mg-text-muted, #6b7280);
+}
+
+.pj-progress-details {
+    margin-top: 12px;
+}
+
+.pj-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+}
+
+.pj-progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pj-progress-item-text {
+    flex: 1;
+    color: var(--mg-text, #1f2937);
+}
+
+/* --- Phases card container --- */
+.pj-phases-card {
+    padding: 0;
+}
+
+.pj-phases-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--mg-border, #e5e7eb);
+}
+
+/* --- Add phase form (collapsible) --- */
+.pj-add-phase-form {
+    border-bottom: 1px solid var(--mg-border, #e5e7eb);
+    background: var(--mg-bg, #f9fafb);
+}
+
+/* --- Phase edit section inside expanded card --- */
+.pj-phase-edit-section {
+    padding: 12px 0;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--mg-border, #e5e7eb);
+}
+
+/* --- Generic section inside phase (documents, sub-phases) --- */
+.pj-section {
+    margin-top: 12px;
+}
+
+.pj-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.pj-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mg-text, #1f2937);
+    margin: 0;
+
+    i {
+        color: var(--mg-primary, #2563eb);
+        margin-right: 6px;
+    }
+}
+
+/* --- Expandable phase cards --- */
+.mg-phase-card {
+    background: var(--mg-bg-card, #fff);
+    border: 1px solid var(--mg-border, #dee2e6);
+    border-radius: 8px;
+    margin: 0 16px 12px;
+    overflow: hidden;
+
+    &:first-of-type {
+        margin-top: 16px;
+    }
+
+    &:last-of-type {
+        margin-bottom: 16px;
+    }
+
+    // Direct-child selectors so the expanded state of a root card does NOT
+    // force-open the body of nested sub-phase cards (they have their own .expanded toggle).
+    &.expanded > .mg-phase-header .mg-phase-expand-icon {
+        transform: rotate(180deg);
+    }
+
+    &.expanded > .mg-phase-body {
+        max-height: 4000px;
+    }
+}
+
+.mg-phase-card--sub {
+    margin-left: 0;
+    margin-right: 0;
+    border-left: 3px solid var(--mg-primary, #2563eb);
+    background: #fafbfc;
+
+    .mg-phase-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+
+    .mg-phase-name {
+        font-size: 13px;
+    }
+}
+
+.pj-sub-phases-list {
+    margin: 8px 0 0;
+    padding: 0 0 0 20px;
+    border-left: 2px dashed var(--mg-border, #e5e7eb);
+    margin-left: 18px;
+
+    .mg-phase-card {
+        margin: 0 0 8px 0;
+
+        &:first-of-type {
+            margin-top: 0;
+        }
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.mg-phase-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+        background: var(--mg-bg, #f8f9fa);
+    }
+}
+
+.mg-phase-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+.mg-phase-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: #e7f3ff;
+    color: #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+
+    &.complete {
+        background: #d4edda;
+        color: #28a745;
+    }
+}
+
+.mg-phase-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #212529;
+}
+
+.mg-phase-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mg-phase-expand-icon {
+    font-size: 14px;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+}
+
+.mg-phase-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.mg-phase-body-content {
+    padding: 16px 18px;
+    border-top: 1px solid #dee2e6;
+}
+
+/* --- Phase actions bar inside expanded card --- */
+.pj-phase-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* --- Full description in expanded phase --- */
+.pj-phase-description {
+    font-size: 13px;
+    color: var(--mg-text, #1f2937);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: var(--mg-bg, #f9fafb);
+    border-radius: 6px;
+}
+
+/* --- Phases list container --- */
+.pj-phases-list {
+    padding: 0;
+}

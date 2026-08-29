@@ -1,0 +1,67 @@
+'Account has expired.': 'Contul a expirat.'
+'Account is disabled.': 'Contul este dezactivat.'
+'Account is locked.': 'Contul este blocat.'
+'An authentication exception occurred.': 'A apărut o eroare de autentificare.'
+'Authentication credentials could not be found.': 'Informațiile de autentificare nu au fost găsite.'
+'Authentication request could not be processed due to a system problem.': 'Sistemul nu a putut procesa cererea de autentificare din cauza unei erori.'
+'Cookie has already been used by someone else.': 'Cookie este folosit deja de altcineva.'
+'Credentials have expired.': 'Datele de autentificare au expirat.'
+'Invalid CSRF token.': 'Token CSRF este invalid.'
+'Invalid credentials.': 'Date de autentificare invalide.'
+'Invalid or expired login link.': 'Link de autentificare invalid sau expirat.'
+'No authentication provider found to support the authentication token.': 'Nu a fost găsit nici un agent de autentificare pentru tokenul specificat.'
+'No session available, it either timed out or cookies are not enabled.': 'Sesiunea nu mai este disponibilă, a expirat sau suportul pentru cookies nu este activat.'
+'No token could be found.': 'Tokenul nu a putut fi găsit.'
+'Not privileged to request the resource.': 'Permisiuni insuficiente pentru resursa cerută.'
+'Too many failed login attempts, please try again in %minutes% minute.': 'Prea multe încercări nereușite, încearcă din nou în %minutes% minut.'
+'Too many failed login attempts, please try again in %minutes% minutes.': 'Prea multe încercări eșuate de autentificare, te rog să încerci din nou peste %minutes% minut.|Prea multe încercări eșuate de autentificare, te rog să încerci din nou peste %minutes% minute.'
+'Too many failed login attempts, please try again later.': 'Prea multe încercări de autentificare eșuate, te rog să încerci din nou mai târziu.'
+'Username could not be found.': 'Numele de utilizator nu a fost găsit.'
+security:
+    reset:
+        title: "Resetare parolă"
+        heading: "Setează o nouă parolă"
+        subtitle: "Te rugăm să introduci și să confirmi noua parolă pentru contul tău."
+        submit: "Salvează noua parolă"
+        back_to_login: "Înapoi la autentificare"
+        error_invalid_token: "Link-ul de resetare este invalid sau a expirat."
+        password_change_success: "Parola ta a fost schimbată cu succes. Te poți autentifica acum."
+    login:
+        forgot_password: "Ai uitat parola?"
+        email_label: 'Email sau utilizator'
+        heading: Autentificare
+        password_label: Parolă
+        remember_me: 'Ține-mă minte'
+        submit: Autentificare
+        subtitle: 'Introdu credențialele pentru a accesa platforma'
+        title: Autentificare
+        toggle_password: 'Arată/Ascunde parolă'
+        version: 'Versiunea %version%'
+    user_checker:
+        account_disabled: 'Contul tău a fost dezactivat.'
+        company_inactive: 'Compania asociată contului tău nu este activă. Contactează administratorul.'
+        company_missing: 'Contul tău nu este asociat unei companii. Contactează administratorul.'
+        email_not_verified: 'Te rugăm să îți verifici adresa de email înainte de a te autentifica.'
+    change_password:
+        title: 'Securitate cont'
+        subtitle: 'Din motive de securitate, este necesar să îți setezi o parolă nouă înainte de a continua.'
+        new_password_label: 'Parolă nouă'
+        confirm_password_label: 'Confirmă parola nouă'
+        placeholder: '••••••••'
+        submit: 'Salvează parola și continuă'
+        success: 'Parola a fost actualizată cu succes!'
+        passwords_mismatch: 'Parolele introduse nu coincid.'
+        password_required: 'Te rugăm să introduci o parolă nouă.'
+        password_min_length: 'Parola ta trebuie să aibă cel puțin {{ limit }} caractere.'
+        current_password_label: "Parola curentă"
+        current_password_required: "Te rugăm să introduci parola curentă."
+        current_password_invalid: "Parola curentă este incorectă."
+    forgot_password:
+        title: 'Recuperare parolă'
+        heading: 'Recuperare parolă'
+        subtitle: 'Introdu adresa de email pentru a primi instrucțiunile de resetare.'
+        email_label: 'Adresa de email'
+        back_to_login: 'Înapoi la autentificare'
+        submit: 'Trimite link de resetare'
+        success_message: 'Dacă adresa de email există în sistem, un link de resetare a fost trimis.'
+        invalid_csrf: 'Cerere invalidă. Te rugăm să încerci din nou.'

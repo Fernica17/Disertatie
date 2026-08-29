@@ -1,0 +1,283 @@
+# Tests / Determinations module translations
+
+enum:
+    test_status:
+        pending: 'În așteptare'
+        in_progress: 'În lucru'
+        completed: 'Finalizată'
+        report_sent: 'Raport trimis'
+
+tests:
+    entity:
+        singular: 'Testare'
+        plural: 'Testări'
+    page:
+        index: 'Testări / Determinări'
+        new: 'Testare nouă'
+        edit: 'Editare testare'
+    action:
+        new: 'Adaugă testare'
+        edit: 'Editează'
+        detail: 'Vezi detalii'
+        delete: 'Șterge'
+    field:
+        test_number: 'Nr. test'
+        test_type: 'Tip test'
+        method: 'Metodă / Standard'
+        client: 'Client'
+        project: 'Proiect'
+        contract: 'Contract'
+        sample_code: 'Cod probă'
+        sample_description: 'Descriere probă'
+        sample_source: 'Sursă probă'
+        received_at: 'Data recepție'
+        tested_at: 'Data testării'
+        responsible_person: 'Responsabil intern'
+        status: 'Status'
+        conclusion: 'Concluzie'
+        notes: 'Observații'
+    fieldset:
+        identification: 'Identificare testare'
+        sample: 'Informații probă'
+        personnel: 'Personal'
+        conclusion: 'Concluzie și observații'
+    filter:
+        status: 'Status'
+        client: 'Client'
+        test_type: 'Tip test'
+        responsible_person: 'Responsabil intern'
+        received_at: 'Data recepție'
+    tab:
+        info: 'Informații generale'
+        results: 'Rezultate'
+        consumptions: 'Consumuri'
+        documents: 'Documente'
+    kpi:
+        results: 'Rezultate'
+        consumptions: 'Consumuri'
+        confirmed: 'confirmate'
+        documents: 'Documente'
+    detail:
+        created: 'Creat'
+        updated: 'Actualizat'
+    flash:
+        created: 'Testarea {number} a fost creată cu succes.'
+        updated: 'Testarea {number} a fost actualizată.'
+        deleted: 'Testarea a fost ștearsă.'
+        delete_error_general: 'A apărut o eroare neprevăzută la încercarea de ștergere a testării.'
+    confirm:
+        delete: 'Ești sigur că dorești să ștergi această testare? Consumurile confirmate vor fi anulate.'
+    form:
+        subtitle_new: 'Completează datele testării'
+        subtitle_edit: 'Modifică datele testării'
+        cancel: 'Anulează'
+        save: 'Salvează'
+        save_changes: 'Salvează modificările'
+        existing_documents: 'Documente existente'
+        remove: 'Elimină'
+        upload_hint: 'Trageți fișierele aici sau click pentru a selecta'
+    documents:
+        no_documents: 'Niciun document atașat'
+
+    # Test Types
+    test_type:
+        entity_singular: 'Tip test'
+        entity_plural: 'Tipuri test'
+        page:
+            index: 'Tipuri de test'
+            new: 'Tip test nou'
+            edit: 'Editare tip test'
+        action:
+            new: 'Adaugă tip test'
+            add_bom_line: 'Adaugă linie rețetar'
+            detail: 'Vezi detalii'
+            delete: 'Șterge'
+        field:
+            code: 'Cod'
+            name: 'Denumire'
+            method: 'Metodă / Standard'
+            description: 'Descriere'
+            is_active: 'Activ'
+        filter:
+            is_active: 'Activ'
+        fieldset:
+            info: 'Informații tip test'
+        tab:
+            bom: 'Rețetar (BOM)'
+        flash:
+            created: 'Tipul de test „{name}" a fost creat.'
+            updated: 'Tipul de test „{name}" a fost actualizat.'
+            deleted: 'Tipul de test a fost șters cu succes.'
+            delete_error_used: 'Acest tip de test nu poate fi șters deoarece este utilizat în cadrul unor testări existente.'
+            delete_error_general: 'A apărut o eroare neprevăzută la încercarea de ștergere.'
+        active: 'Activ'
+        inactive: 'Inactiv'
+        no_bom_lines: 'Nicio linie de rețetar definită'
+
+    # BOM Lines
+    bom:
+        entity_singular: 'Linie rețetar'
+        entity_plural: 'Linii rețetar'
+        page:
+            new: 'Linie rețetar nouă'
+            edit: 'Editare linie rețetar'
+        field:
+            stock_item: 'Articol stoc'
+            quantity: 'Cantitate'
+            unit: 'UM'
+            notes: 'Observații'
+        fieldset:
+            info: 'Detalii linie rețetar'
+        form:
+            subtitle: 'Rețetar pentru {name}'
+        flash:
+            created: 'Linia de rețetar a fost adăugată.'
+            updated: 'Linia de rețetar a fost actualizată.'
+
+    # Test Results
+    result:
+        entity_singular: 'Rezultat'
+        entity_plural: 'Rezultate'
+        page:
+            new: 'Rezultat nou'
+            edit: 'Editare rezultat'
+        action:
+            new: 'Adaugă rezultat'
+        field:
+            parameter_name: 'Parametru'
+            result_value: 'Valoare'
+            unit: 'UM'
+            reference_min: 'Ref. min'
+            reference_max: 'Ref. max'
+            reference_description: 'Interval referință'
+            reference_range: 'Interval referință'
+            is_compliant: 'Conform'
+            sort_order: 'Ordine'
+            notes: 'Observații'
+        fieldset:
+            info: 'Detalii rezultat'
+        form:
+            subtitle: 'Rezultat pentru testarea {number}'
+        flash:
+            created: 'Rezultatul a fost adăugat.'
+            updated: 'Rezultatul a fost actualizat.'
+        compliant: 'Conform'
+        non_compliant: 'Neconform'
+        no_results: 'Niciun rezultat înregistrat'
+
+    # Test Consumptions
+    consumption:
+        entity_singular: 'Consum'
+        entity_plural: 'Consumuri'
+        page:
+            new: 'Consum nou'
+            edit: 'Editare consum'
+        action:
+            new: 'Adaugă consum'
+            generate_proposal: 'Generează din rețetar'
+            confirm: 'Confirmă consumurile'
+        field:
+            stock_item: 'Articol stoc'
+            lot: 'Lot'
+            quantity: 'Cantitate'
+            status: 'Status'
+            notes: 'Observații'
+            stock_label: 'stoc'
+        fieldset:
+            info: 'Detalii consum'
+        form:
+            subtitle: 'Consum pentru testarea {number}'
+        flash:
+            created: 'Consumul a fost adăugat.'
+            updated: 'Consumul a fost actualizat.'
+            deleted: 'Consumul a fost șters.'
+            proposal_generated: '{count} linii de consum generate din rețetar.'
+            confirmed: 'Consumurile au fost confirmate și stocul actualizat.'
+        movement_note: 'Consum testare: {number}'
+        confirm:
+            title: 'Confirmare'
+            generate_proposal: 'Se vor genera propunerile de consum din rețetarul tipului de test. Continui?'
+            confirm_consumptions: 'Se vor confirma toate consumurile nesalvate. Stocul va fi scăzut automat. Continui?'
+            delete_consumption: 'Se va șterge consumul selectat. Dacă era confirmat, stocul va fi refăcut automat. Continui?'
+            yes_continue: 'Da, continuă'
+            yes_delete: 'Da, șterge'
+            cancel: 'Anulează'
+        confirmed: 'Confirmat'
+        pending: 'Neconfirmat'
+        no_consumptions: 'Niciun consum înregistrat'
+
+    # PDF Bulletin
+    pdf:
+        title: 'Buletin de testare'
+        section_title: 'Buletin de testare (PDF)'
+        date: 'Data'
+        client: 'Client'
+        test_type: 'Tip test'
+        method: 'Metodă / Standard'
+        sample_info: 'Informații probă'
+        sample_code: 'Cod probă'
+        sample_source: 'Sursă probă'
+        received_at: 'Data recepție'
+        tested_at: 'Data testării'
+        results: 'Rezultate determinări'
+        parameter: 'Parametru'
+        result_value: 'Valoare'
+        unit: 'UM'
+        reference_range: 'Interval referință'
+        compliance: 'Conformitate'
+        compliant: 'CONFORM'
+        non_compliant: 'NECONFORM'
+        conclusion: 'Concluzie'
+        notes: 'Observații'
+        responsible_person: 'Responsabil intern'
+        responsible: 'Responsabil'
+        signature: 'Semnătura'
+        not_generated: 'Buletinul de testare nu a fost generat încă.'
+        other_documents: 'Alte documente'
+        action:
+            generate: 'Generează buletin'
+            regenerate: 'Regenerează buletin'
+        confirm:
+            generate: 'Se va genera buletinul de testare PDF. Dacă există deja, va fi înlocuit. Continui?'
+        flash:
+            generated: 'Buletinul de testare a fost generat cu succes.'
+
+    # Errors
+    error:
+        title: 'Eroare'
+        no_lot_selected: 'Consumul pentru „{item}" nu are lot selectat.'
+        invalid_token: 'Token de securitate invalid. Reîncarcă pagina și încearcă din nou.'
+
+    # Report: Consumptions
+    report:
+        consumptions_title: 'Consumuri pe testări'
+        recalled_title: 'Testări afectate de loturi retrase'
+        recalled_action_view_test: 'Vezi testarea'
+        recalled_action_view_lot: 'Vezi lotul'
+        aggregated_title: 'Consumuri agregate pe articol stoc'
+        aggregated_subtitle: 'Total cantități consumate per articol stoc, cu posibilitate de filtrare pe client, proiect și perioadă.'
+        filter:
+            test: 'Testare'
+            stock_item: 'Articol stoc'
+            lot: 'Lot'
+            period: 'Perioadă'
+            client: 'Client'
+            project: 'Proiect'
+            all: 'Toate'
+            date_from: 'De la'
+            date_to: 'Până la'
+            apply: 'Filtrează'
+            clear: 'Resetează'
+        aggregated:
+            col:
+                stock_item: 'Articol stoc'
+                code: 'Cod'
+                unit: 'UM'
+                total_quantity: 'Cantitate totală'
+                consumptions: 'Nr. consumuri'
+                tests: 'Nr. testări'
+                lots: 'Nr. loturi'
+            total: 'TOTAL'
+            summary: '{count} articole | {consumptions} consumuri | {tests} testări distincte'
+            no_results: 'Nu există consumuri înregistrate.'
+            no_results_filtered: 'Nu au fost găsite consumuri pentru filtrele selectate.'

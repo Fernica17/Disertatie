@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ setting('app_title') ?? 'ERP' }}{% endblock %}</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon.png') }}">
+
+    {{ encore_entry_link_tags('login') }}
+    {{ encore_entry_script_tags('login') }}
+</head>
+<body class="login-page">
+    <div class="login-wrapper">
+        <div class="login-card">
+            {# Branding #}
+            <div class="login-brand">
+                <img src="{{ asset('images/logo.svg') }}" alt="{{ setting('company_name') ?? 'Compania mea' }}" class="login-brand-logo">
+            </div>
+
+            <div class="login-divider"></div>
+
+            {% block content %}{% endblock %}
+
+            {# Footer #}
+            <div class="login-footer">
+                &copy; {{ 'now'|date('Y') }} {{ setting('company_name') ?? 'Compania mea' }}
+                {% set _app_version = changelog_version() %}
+                {% if _app_version %}
+                    <div class="login-footer-version">{{ 'security.login.version'|trans({'%version%': _app_version}, 'security') }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

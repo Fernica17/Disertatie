@@ -1,0 +1,14 @@
+framework:
+    cache:
+        # The "app" cache stores to the filesystem by default.
+        # The data in this cache should persist between deploys.
+        app: cache.adapter.filesystem
+
+        # System cache for Doctrine metadata/query parsing and Symfony internals
+        system: cache.adapter.system
+
+        pools:
+            doctrine.system_cache_pool:
+                adapter: cache.adapter.system
+            doctrine.result_cache_pool:
+                adapter: cache.adapter.filesystem

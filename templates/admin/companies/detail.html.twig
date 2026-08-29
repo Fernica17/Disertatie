@@ -1,0 +1,283 @@
+{% extends '@!EasyAdmin/crud/detail.html.twig' %}
+
+{% set company = entity.instance %}
+{% set companyLogo = companyLogo|default([]) %}
+{% set companyDocuments = companyDocuments|default([]) %}
+{% set companyUsers = companyUsers|default([]) %}
+
+{% block content_header_wrapper %}{% endblock %}
+
+{% block main %}
+    {# DETAIL HEADER #}
+    <div class="mg-detail-header">
+        <div class="mg-detail-header-top">
+            <div class="mg-detail-header-info">
+                <div class="mg-detail-avatar eq-detail-avatar {% if companyLogo|length > 0 %}bg-transparent{% endif %}">
+                    {% if companyLogo|length > 0 %}
+                        <img src="{{ path('admin_file_view', {id: companyLogo[0].id}) }}" style="width: 64px; height: 64px; object-fit: contain; border-radius: 8px;">
+                    {% else %}
+                        {% set firstLetter = company.name ? company.name|upper|slice(0, 1) : '?' %}
+                        {% set colors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                        <div style="width: 64px; height: 64px; background-color: {{ colors[company.name|length % 9] }}; color: white; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; font-size: 28px;">{{ firstLetter }}</div>
+                    {% endif %}
+                </div>
+                <div class="mg-detail-title-group">
+                    <h1 class="mg-detail-title">{{ company.name }}</h1>
+                    <div class="mg-detail-meta">
+                        {% if company.fiscalCode %}
+                            <span class="mg-detail-meta-item">
+                                <i class="fa-solid fa-id-card"></i> CUI: <strong>{{ company.fiscalCode }}</strong>
+                            </span>
+                        {% endif %}
+                        <span class="mg-detail-meta-item">
+                            {% set statusColors = {'prospect': '#0284c7', 'active': '#16a34a', 'suspended': '#d97706', 'blocked': '#dc2626', 'finalized': '#6b7280'} %}
+                            {% set sColor = statusColors[company.status.value] ?? '#6b7280' %}
+                            <span class="ct-badge" style="background:{{ sColor }}15; color:{{ sColor }}; border:1px solid {{ sColor }}30;">
+                                {{ ('companies.status.' ~ company.status.value)|trans({}, 'companies') }}
+                            </span>
+                        </span>
+                        <span class="mg-detail-meta-item">
+                            <i class="fa-solid fa-user"></i> {{ ('companies.choice.' ~ (company.personType.value == 'legal' ? 'legal_person' : 'physical_person'))|trans({}, 'companies') }}
+                        </span>
+                        <span class="mg-detail-meta-item ct-detail-meta-right">
+                            {{ 'companies.field.created_at'|trans({}, 'companies') }}: {{ company.createdAt|date('d.m.Y H:i') }} · {{ 'companies.field.updated_at'|trans({}, 'companies') }}: {{ company.updatedAt|date('d.m.Y H:i') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mg-page-actions ct-detail-actions">
+            {% block page_actions %}
+                {{ parent() }}
+            {% endblock %}
+        </div>
+    </div>
+
+    {# TABS #}
+    <div class="mg-card eq-tabs-card" data-controller="detail-tabs">
+    <div class="eq-tabs" id="mainTabs">
+        <button class="eq-tab active" data-tab="info" data-detail-tabs-target="tab" data-action="click->detail-tabs#switch">
+            <i class="fa-solid fa-building"></i>
+            {{ 'companies.detail.tab_info'|trans({}, 'companies') }}
+        </button>
+        <button class="eq-tab" data-tab="utilizatori" data-detail-tabs-target="tab" data-action="click->detail-tabs#switch">
+            <i class="fa-solid fa-users"></i>
+            {{ 'companies.detail.tab_users'|trans({}, 'companies') }}
+            <span class="eq-tab-count">{{ companyUsers|length }}</span>
+        </button>
+    </div>
+
+    {# TAB 1: INFORMATII COMPANIE #}
+    <div class="eq-tab-content active" id="tab-info" data-detail-tabs-target="content">
+        {# SUMMARY CARDS #}
+        <div class="ct-summary-grid">
+            <div class="mg-card ct-summary-card">
+                <div class="ct-summary-label">{{ 'companies.field.status'|trans({}, 'companies') }}</div>
+                <div class="ct-summary-value">{{ ('companies.status.' ~ company.status.value)|trans({}, 'companies') }}</div>
+                <div class="ct-summary-sub">{{ ('companies.choice.' ~ (company.personType.value == 'legal' ? 'legal_person' : 'physical_person'))|trans({}, 'companies') }}</div>
+            </div>
+            <div class="mg-card ct-summary-card">
+                <div class="ct-summary-label">{{ 'companies.field.account_manager'|trans({}, 'companies') }}</div>
+                <div class="ct-summary-value">{{ company.accountManager ? company.accountManager.fullName : '—' }}</div>
+                <div class="ct-summary-sub">{{ company.accountManager ? company.accountManager.email : '' }}</div>
+            </div>
+            <div class="mg-card ct-summary-card">
+                <div class="ct-summary-label">{{ 'companies.field.industry'|trans({}, 'companies') }} / {{ 'companies.field.client_type'|trans({}, 'companies') }}</div>
+                <div class="ct-summary-value">{{ company.industry ? company.industry.name : '—' }}</div>
+                <div class="ct-summary-sub">{{ company.clientType ? company.clientType.name : '—' }}</div>
+            </div>
+            <div class="mg-card ct-summary-card">
+                <div class="ct-summary-label">{{ 'companies.field.company_size'|trans({}, 'companies') }} / {{ 'companies.field.payment_term'|trans({}, 'companies') }}</div>
+                <div class="ct-summary-value">{{ company.companySize ? company.companySize.name : '—' }}</div>
+                <div class="ct-summary-sub">{% if company.paymentTermDays is not null %}{{ company.paymentTermDays }} zile{% else %}—{% endif %}</div>
+            </div>
+        </div>
+
+        {# INFO GRID - 2 COLUMN #}
+        <div class="ct-detail-grid">
+            <div class="mg-card ct-detail-card">
+                <h3 class="ct-detail-card-title"><i class="fa-solid fa-location-dot"></i> {{ 'companies.fieldset.address'|trans({}, 'companies') }} & {{ 'companies.fieldset.contact'|trans({}, 'companies') }}</h3>
+                {% if company.fullAddress %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.address'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.fullAddress }}</div>
+                    </div>
+                {% endif %}
+                {% if company.phone %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.phone'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.phone }}</div>
+                    </div>
+                {% endif %}
+                {% if company.email %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.email'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value"><a href="mailto:{{ company.email }}">{{ company.email }}</a></div>
+                    </div>
+                {% endif %}
+                {% if company.website %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.website'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value"><a href="{{ company.website }}" target="_blank">{{ company.website }}</a></div>
+                    </div>
+                {% endif %}
+                {% if company.fax %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.fax'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.fax }}</div>
+                    </div>
+                {% endif %}
+                {% if company.tradeRegisterNumber %}
+                    <div class="ct-detail-field">
+                        <div class="ct-detail-field-label">{{ 'companies.field.trade_register'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.tradeRegisterNumber }}</div>
+                    </div>
+                {% endif %}
+                {% if not company.fullAddress and not company.phone and not company.email and not company.website %}
+                    <div class="ct-detail-empty">—</div>
+                {% endif %}
+            </div>
+
+            <div class="mg-card ct-detail-card">
+                <h3 class="ct-detail-card-title"><i class="fa-solid fa-user-tie"></i> {{ 'companies.fieldset.main_contact'|trans({}, 'companies') }} & {{ 'companies.tab.financial'|trans({}, 'companies') }}</h3>
+                <div class="ct-detail-info-grid">
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.contact_name'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.contactPersonName ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.contact_position'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.contactPersonPosition ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.contact_phone'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.contactPersonPhone ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.contact_email'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.contactPersonEmail ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.bank_name'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.bankName ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.bank_account'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{{ company.bankAccount ?? '—' }}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.credit_limit'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{% if company.creditLimit is not null %}{{ company.creditLimit|format_number(2, false) }} {{ setting('default_currency') ?? 'RON' }}{% else %}—{% endif %}</div>
+                    </div>
+                    <div>
+                        <div class="ct-detail-field-label">{{ 'companies.field.payment_term'|trans({}, 'companies') }}</div>
+                        <div class="ct-detail-field-value">{% if company.paymentTermDays is not null %}{{ company.paymentTermDays }} zile{% else %}—{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {# NOTES #}
+        {% if company.notes %}
+            <div class="mg-card ct-detail-card" style="margin-bottom: 1rem;">
+                <h3 class="ct-detail-card-title"><i class="fa-solid fa-note-sticky"></i> {{ 'companies.tab.notes'|trans({}, 'companies') }}</h3>
+                <div class="ct-detail-field">
+                    <div class="ct-detail-field-value">{{ company.notes|nl2br }}</div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# DOCUMENTS - 2 COLUMN GRID #}
+        <div class="ct-detail-grid">
+            <div class="mg-card ct-detail-card">
+                <h3 class="ct-detail-card-title"><i class="fa-solid fa-image"></i> Logo</h3>
+                {% if companyLogo|length > 0 %}
+                    {% for doc in companyLogo %}
+                        <div style="text-align: center; padding: 1rem;">
+                            <img src="{{ path('admin_file_view', {id: doc.id}) }}" style="max-height: 120px; object-fit: contain;">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ct-detail-empty">{{ 'companies.detail.no_logo'|trans({}, 'companies') }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mg-card ct-detail-card">
+                <h3 class="ct-detail-card-title"><i class="fa-solid fa-paperclip"></i> {{ 'companies.field.attached_documents'|trans({}, 'companies') }}</h3>
+                {% if companyDocuments|length > 0 %}
+                    {% for doc in companyDocuments %}
+                        <div class="of-file-item">
+                            <i class="fa-solid {% if 'pdf' in doc.mimeType %}fa-file-pdf{% elseif doc.mimeType starts with 'image/' %}fa-file-image{% else %}fa-file{% endif %} ct-file-icon"></i>
+                            <a href="{{ path('admin_file_view', {id: doc.id}) }}" target="_blank" class="of-file-name ct-file-link">{{ doc.originalName }}</a>
+                            <span class="of-file-size">{{ doc.formattedSize }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ct-detail-empty">{{ 'companies.detail.no_documents'|trans({}, 'companies') }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# TAB 2: UTILIZATORI #}
+    <div class="eq-tab-content" id="tab-utilizatori" data-detail-tabs-target="content">
+        {% if companyUsers is empty %}
+            <div style="padding:24px; text-align:center; color:var(--mg-text-muted);">
+                <i class="fa-solid fa-users" style="font-size:32px; margin-bottom:12px; display:block;"></i>
+                {{ 'companies.detail.no_users'|trans({}, 'companies') }}
+            </div>
+        {% else %}
+            <div class="eq-table-wrap">
+                <table class="eq-table">
+                    <thead>
+                    <tr>
+                        <th>{{ 'users.field.full_name'|trans({}, 'users') }}</th>
+                        <th>{{ 'users.field.email'|trans({}, 'users') }}</th>
+                        <th>{{ 'users.field.phone'|trans({}, 'users') }}</th>
+                        <th>{{ 'users.field.role'|trans({}, 'users') }}</th>
+                        <th>{{ 'users.field.is_active'|trans({}, 'users') }}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in companyUsers %}
+                        <tr onclick="window.location='{{ ea_url().unsetAll().setController('App\\Controller\\Admin\\UsersCrudController').setAction('detail').setEntityId(user.id) }}'" style="cursor:pointer;">
+                            <td><strong>{{ user.fullName }}</strong></td>
+                            <td>
+                                <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                            </td>
+                            <td>{{ user.phone ?? '—' }}</td>
+                            <td>
+                                {% set roleColors = {
+                                    'ROLE_ADMIN': {'bg': '#fee2e2', 'color': '#dc2626'},
+                                    'ROLE_MANAGER': {'bg': '#dbeafe', 'color': '#2563eb'},
+                                    'ROLE_CLIENT': {'bg': '#fef3c7', 'color': '#d97706'}
+                                } %}
+                                {% set roleName = user.primaryRole|replace({'ROLE_': ''})|lower %}
+                                {% set rBadge = roleColors[user.primaryRole] ?? {'bg': '#f1f5f9', 'color': '#64748b'} %}
+                                <span class="mg-tag" style="background:{{ rBadge.bg }}; color:{{ rBadge.color }};">
+                                        {{ ('role.' ~ roleName)|trans({}, 'admin') }}
+                                    </span>
+                            </td>
+                            <td>
+                                {% if user.isActive %}
+                                    <span class="mg-tag" style="background:#d1fae5; color:#059669;">{{ 'users.field.is_active'|trans({}, 'users') }}</span>
+                                {% else %}
+                                    <span class="mg-tag" style="background:#fee2e2; color:#dc2626;">{{ 'companies.detail.user_inactive'|trans({}, 'companies') }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+    </div>{# /detail-tabs wrapper #}
+
+    {# Delete form (required by EasyAdmin) #}
+    {% block delete_form %}
+        {{ include('@EasyAdmin/crud/includes/_action_confirmation_modal.html.twig', with_context: false) }}
+    {% endblock %}
+{% endblock %}

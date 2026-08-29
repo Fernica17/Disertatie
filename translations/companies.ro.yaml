@@ -1,0 +1,145 @@
+companies:
+    action:
+        new: 'Adaugă companie'
+        edit: 'Editare companie'
+        detail: 'Detalii companie'
+        delete: 'Șterge companie'
+    choice:
+        legal_person: "Persoană juridică"
+        physical_person: "Persoană fizică"
+    detail:
+        no_contracts: "Nu există contracte pentru această companie."
+        no_documents: "Nu există documente atașate."
+        no_logo: "Nu există logo încărcat."
+        no_offers: "Nu există oferte pentru această companie."
+        no_products: "Nu există produse / servicii asociate."
+        tab_contracts: "Contracte"
+        tab_info: "Informații"
+        tab_offers: "Oferte"
+        tab_users: "Utilizatori"
+        no_users: "Nu există utilizatori asociați acestei companii."
+        user_inactive: "Inactiv"
+    entity:
+        plural: 'Companii'
+        singular: 'Companie'
+    field:
+        id: "ID"
+        logo: "Logo"
+        logo_upload: "Logo companie"
+        name: "Nume"
+        account_manager: "Responsabil intern"
+        name_company: 'Denumire companie'
+        fiscal_code: "CUI"
+        fiscal_code_full: 'Cod fiscal (CUI)'
+        trade_register: 'Nr. Reg. Comerț'
+        trade_register_full: 'Nr. Registrul Comerțului'
+        client_type: "Tip"
+        industry: "Industrie"
+        company_size: "Mărime companie"
+        person_type: 'Tip persoană'
+        phone: "Telefon"
+        email: "Email"
+        website: "Website"
+        fax: "Fax"
+        status: "Status"
+        created_at: 'Creat la'
+        updated_at: 'Actualizat la'
+        address: "Adresa"
+        city: "Oraș"
+        county: "Județ"
+        country: 'Țară'
+        postal_code: 'Cod poștal'
+        contact_name: 'Nume'
+        contact_name_form: 'Nume contact'
+        contact_position: 'Funcție'
+        contact_phone: 'Telefon'
+        contact_phone_form: 'Telefon contact'
+        contact_email: 'Email'
+        contact_email_form: 'Email contact'
+        bank_name: 'Banca'
+        bank_account: 'IBAN'
+        credit_limit: 'Plafon credit'
+        credit_limit_full: 'Plafon de credit'
+        payment_term: 'Termen plată (zile)'
+        payment_term_full: 'Termen de plată (zile)'
+        supplied_products: 'Produse / Servicii oferite'
+        notes: 'Observații'
+        attached_documents: "Documente atașate"
+        add_documents: "Adaugă documente"
+        no_category: 'Fără categorie'
+        contact_person_name: 'Responsabil intern'
+    fieldset:
+        address: 'Adresa'
+        classification: 'Clasificare'
+        contact: 'Contact'
+        financial: 'Date financiare'
+        main_contact: 'Persoana de contact principală'
+        system_info: 'Informații sistem'
+    filter:
+        person_type: 'Tip persoană'
+        status: 'Status'
+    flash:
+        created: "Compania {name} a fost creată cu succes."
+        updated: "Compania {name} a fost actualizată cu succes."
+        deleted: "Compania {name} a fost ștearsă cu succes."
+    form:
+        cancel: 'Anulează'
+        existing_documents: 'Documente existente'
+        existing_logo: 'Logo existent'
+        no_documents: 'Nu există documente.'
+        remove: 'Elimină'
+        save: 'Salvează compania'
+        save_changes: 'Salvează modificările'
+        subtitle_edit: 'Actualizează informațiile companiei.'
+        subtitle_new: 'Completează informațiile necesare pentru a adăuga o companie nouă.'
+        upload_hint: 'Trage fișierele aici sau fă click pentru a selecta'
+    help:
+        logo_format: "Format acceptat: .jpg, .png, .webp"
+        logo_upload: "Alege un fișier (JPG, PNG, WEBP) pentru logo-ul companiei."
+        name: 'Denumirea oficială a companiei'
+        account_manager: "Selectează responsabilul intern pentru această companie."
+        fiscal_code: 'Ex: RO32787182'
+        trade_register: 'Ex: J40/1234/2020'
+        bank_account: 'Ex: RO49AAAA1B31007593840000'
+        credit_limit: 'Plafonul maxim de credit acordat'
+        payment_term: 'Numărul de zile până la scadență'
+        types: 'O companie poate avea mai multe tipuri simultan'
+        client_type: "Categoria din care face parte compania."
+        industry: "Domeniul principal de activitate."
+        supplied_products: 'Selectează produsele și serviciile oferite de companie'
+        documents: "Poți selecta mai multe documente simultan (PDF, DOCX, Excel, etc.)."
+    page:
+        edit: 'Editare: {name}'
+        index: 'Gestionare companii'
+        new: 'Adaugă companie'
+    status:
+        active: 'Activ'
+        blocked: 'Blocat'
+        finalized: 'Finalizat'
+        prospect: 'Prospect'
+        suspended: 'Suspendat'
+    tab:
+        identification: 'Identificare'
+        general: 'Informații generale'
+        address: 'Adresa'
+        contact: 'Contact'
+        financial: 'Date financiare'
+        products: 'Produse / Servicii'
+        notes: 'Observații'
+        documents: "Documente"
+        files: "Fișiere"
+    unit:
+        currency: "RON"
+    message:
+        no_documents: "Nu există documente încărcate pentru această companie."
+
+enum:
+    company_status:
+        prospect: 'Prospect'
+        active: 'Activ'
+        suspended: 'Suspendat'
+        blocked: 'Blocat'
+        finalized: 'Finalizat'
+    person_type:
+        legal: 'Persoană juridică'
+        physical: 'Persoană fizică'

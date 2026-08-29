@@ -1,0 +1,382 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set isEdit = company is not null %}
+
+{% set companiesIndexUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\CompaniesCrudController').setAction('index').generateUrl() %}
+
+{% block title %}{% if isEdit %}{{ 'companies.page.edit'|trans({'{name}': company.name}, 'companies') }}{% else %}{{ 'companies.page.new'|trans({}, 'companies') }}{% endif %} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li><a href="{{ companiesIndexUrl }}">{{ entityLabel }}</a></li>
+    <li class="active">{% if isEdit %}{{ 'companies.page.edit'|trans({'{name}': company.name}, 'companies') }}{% else %}{{ 'companies.page.new'|trans({}, 'companies') }}{% endif %}</li>
+{% endblock %}
+
+{% block content %}
+    <div data-controller="company-form"
+         data-company-form-city-id-value="{{ isEdit and company.city ? company.city.id : 0 }}"
+    >
+
+        {# Page header #}
+        <div class="mg-page-header">
+            <div>
+                <h1 class="mg-page-title">{% if isEdit %}{{ 'companies.page.edit'|trans({'{name}': company.name}, 'companies') }}{% else %}{{ 'companies.page.new'|trans({}, 'companies') }}{% endif %}</h1>
+                <p class="mg-page-subtitle">{% if isEdit %}{{ 'companies.form.subtitle_edit'|trans({}, 'companies') }}{% else %}{{ 'companies.form.subtitle_new'|trans({}, 'companies') }}{% endif %}</p>
+            </div>
+            <div class="mg-page-actions">
+                <a href="{{ companiesIndexUrl }}"
+                   class="mg-btn mg-btn-secondary">{{ 'companies.form.cancel'|trans({}, 'companies') }}</a>
+            </div>
+        </div>
+
+        {{ form_start(form, {attr: {enctype: 'multipart/form-data', novalidate: 'novalidate'}}) }}
+
+        {# Global form errors #}
+        {% if form.vars.errors|length > 0 %}
+            <div class="alert alert-danger">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
+
+        <div class="mg-card">
+
+            {# Section 1: Identificare #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-building ct-icon-primary"></i> {{ 'companies.tab.identification'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-3">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.name.vars.id }}">{{ 'companies.field.name_company'|trans({}, 'companies') }}
+                            <span class="ct-required">*</span></label>
+                        {{ form_widget(form.name, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.name) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.personType.vars.id }}">{{ 'companies.field.person_type'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.personType, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.personType) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.status.vars.id }}">{{ 'companies.field.status'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.status, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.status) }}</div>
+                    </div>
+                </div>
+                <div class="ct-form-grid-2 ct-form-row">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.fiscalCode.vars.id }}">{{ 'companies.field.fiscal_code_full'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.fiscalCode, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.fiscalCode) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.tradeRegisterNumber.vars.id }}">{{ 'companies.field.trade_register_full'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.tradeRegisterNumber, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.tradeRegisterNumber) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 2: Clasificare #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-tags ct-icon-primary"></i> {{ 'companies.fieldset.classification'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-4">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.accountManager.vars.id }}">{{ 'companies.field.account_manager'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.accountManager, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.accountManager) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.clientType.vars.id }}">{{ 'companies.field.client_type'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.clientType, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.clientType) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.industry.vars.id }}">{{ 'companies.field.industry'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.industry, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.industry) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.companySize.vars.id }}">{{ 'companies.field.company_size'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.companySize, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.companySize) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 3: Adresa #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-location-dot ct-icon-primary"></i> {{ 'companies.fieldset.address'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-3">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.country.vars.id }}">{{ 'companies.field.country'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.country, {attr: {class: 'of-input', 'data-company-form-target': 'country'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.country) }}</div>
+                    </div>
+                    <div class="d-none">
+                        <label class="of-label">{{ 'companies.field.county'|trans({}, 'companies') }}</label>
+                        <select name="countyId" class="of-input" data-company-form-target="county">
+                            <option value="">— {{ 'companies.field.county'|trans({}, 'companies') }} —</option>
+                        </select>
+                    </div>
+                    <div class="d-none">
+                        <label class="of-label">{{ 'companies.field.city'|trans({}, 'companies') }}</label>
+                        {# City uses AjaxEntityType (hidden input with ID), JS manages the visible select #}
+                        {{ form_widget(form.city, {attr: {style: 'display:none', 'data-company-form-target': 'cityHidden'}}) }}
+                        <select class="of-input" data-company-form-target="city"
+                                data-action="change->company-form#onCitySelectChange">
+                            <option value="">— {{ 'companies.field.city'|trans({}, 'companies') }} —</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ct-form-grid-2 ct-form-row">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.address.vars.id }}">{{ 'companies.field.address'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.address, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.address) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.postalCode.vars.id }}">{{ 'companies.field.postal_code'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.postalCode, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.postalCode) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 4: Contact #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-address-book ct-icon-primary"></i> {{ 'companies.fieldset.contact'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-4">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.phone.vars.id }}">{{ 'companies.field.phone'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.phone, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.phone) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.email.vars.id }}">{{ 'companies.field.email'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.email, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.email) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.website.vars.id }}">{{ 'companies.field.website'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.website, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.website) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.fax.vars.id }}">{{ 'companies.field.fax'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.fax, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.fax) }}</div>
+                    </div>
+                </div>
+
+                <div class="ct-form-row" style="border-top: 1px solid #e9ecef; padding-top: 1rem; margin-top: 0.5rem;">
+                    <h4 style="font-size: 0.9rem; font-weight: 600; color: #495057; margin: 0 0 0.25rem 0;"><i
+                            class="fa-solid fa-user-tie"
+                            style="margin-right: 0.4rem; color: #6c757d;"></i>{{ 'companies.fieldset.main_contact'|trans({}, 'companies') }}
+                    </h4>
+                </div>
+                <div class="ct-form-grid-4">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.contactPersonName.vars.id }}">{{ 'companies.field.contact_name_form'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.contactPersonName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.contactPersonName) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.contactPersonPosition.vars.id }}">{{ 'companies.field.contact_position'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.contactPersonPosition, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.contactPersonPosition) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.contactPersonPhone.vars.id }}">{{ 'companies.field.contact_phone_form'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.contactPersonPhone, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.contactPersonPhone) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.contactPersonEmail.vars.id }}">{{ 'companies.field.contact_email_form'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.contactPersonEmail, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.contactPersonEmail) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 5: Financiar #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-coins ct-icon-primary"></i> {{ 'companies.fieldset.financial'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div class="ct-form-grid-4">
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.bankName.vars.id }}">{{ 'companies.field.bank_name'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.bankName, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.bankName) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.bankAccount.vars.id }}">{{ 'companies.field.bank_account'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.bankAccount, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.bankAccount) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.creditLimit.vars.id }}">{{ 'companies.field.credit_limit_full'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.creditLimit, {attr: {class: 'of-input of-input--right'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.creditLimit) }}</div>
+                    </div>
+                    <div>
+                        <label class="of-label"
+                               for="{{ form.paymentTermDays.vars.id }}">{{ 'companies.field.payment_term_full'|trans({}, 'companies') }}</label>
+                        {{ form_widget(form.paymentTermDays, {attr: {class: 'of-input'}}) }}
+                        <div class="mg-form-error">{{ form_errors(form.paymentTermDays) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section 7: Observatii #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-note-sticky ct-icon-primary"></i> {{ 'companies.tab.notes'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section">
+                <div>
+                    <label class="of-label"
+                           for="{{ form.notes.vars.id }}">{{ 'companies.field.notes'|trans({}, 'companies') }}</label>
+                    {{ form_widget(form.notes, {attr: {class: 'of-input of-input--resize-v'}}) }}
+                    <div class="mg-form-error">{{ form_errors(form.notes) }}</div>
+                </div>
+            </div>
+
+            {# Section 8: Fisiere #}
+            <div class="mg-card-header">
+                <h2 class="mg-card-title"><i
+                        class="fa-solid fa-paperclip ct-icon-primary"></i> {{ 'companies.tab.files'|trans({}, 'companies') }}
+                </h2>
+            </div>
+            <div class="ct-form-section--last">
+                <div class="ct-docs-grid">
+                    {# Logo #}
+                    <div>
+                        <h4 class="ct-docs-title">{{ 'companies.field.logo_upload'|trans({}, 'companies') }}</h4>
+                        {% if companyLogo|length > 0 %}
+                            <div class="ct-existing-files">
+                                <div
+                                    class="ct-existing-label">{{ 'companies.form.existing_logo'|trans({}, 'companies') }}
+                                    :
+                                </div>
+                                {% for doc in companyLogo %}
+                                    <div class="of-file-item">
+                                        <img src="{{ path('admin_file_view', {id: doc.id}) }}"
+                                             style="height: 40px; object-fit: contain;" alt="{{ doc.originalName }}">
+                                        <span class="of-file-name">{{ doc.originalName }}</span>
+                                        <span class="of-file-size">{{ doc.formattedSize }}</span>
+                                        <button type="button" class="of-file-remove"
+                                                title="{{ 'companies.form.remove'|trans({}, 'companies') }}"
+                                                data-file-id="{{ doc.id }}"
+                                                data-input-name="removeLogo"
+                                                data-action="click->company-form#toggleRemoveFile">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <label class="of-upload-area">
+                            {{ form_widget(form.logo, {attr: {class: 'ct-file-input', 'data-file-list': 'logo-file-list'}}) }}
+                            <i class="fa-solid fa-cloud-arrow-up ct-upload-icon"></i>
+                            <div class="ct-upload-text">{{ 'companies.form.upload_hint'|trans({}, 'companies') }}</div>
+                            <div class="ct-upload-hint">JPG, PNG, WEBP — max. 10 MB</div>
+                        </label>
+                        <div id="logo-file-list" class="ct-file-list"></div>
+                        <div class="mg-form-error">{{ form_errors(form.logo) }}</div>
+                    </div>
+
+                    {# Documents #}
+                    <div>
+                        <h4 class="ct-docs-title">{{ 'companies.field.attached_documents'|trans({}, 'companies') }}</h4>
+                        {% if companyDocuments|length > 0 %}
+                            <div class="ct-existing-files">
+                                <div
+                                    class="ct-existing-label">{{ 'companies.form.existing_documents'|trans({}, 'companies') }}
+                                    :
+                                </div>
+                                {% for doc in companyDocuments %}
+                                    <div class="of-file-item">
+                                        <i class="fa-solid {% if 'pdf' in doc.mimeType %}fa-file-pdf{% else %}fa-file{% endif %}"></i>
+                                        <span class="of-file-name">{{ doc.originalName }}</span>
+                                        <span class="of-file-size">{{ doc.formattedSize }}</span>
+                                        <button type="button" class="of-file-remove"
+                                                title="{{ 'companies.form.remove'|trans({}, 'companies') }}"
+                                                data-file-id="{{ doc.id }}"
+                                                data-input-name="removeDocuments"
+                                                data-action="click->company-form#toggleRemoveFile">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <label class="of-upload-area">
+                            {{ form_widget(form.documents, {attr: {class: 'ct-file-input', 'data-file-list': 'doc-file-list'}}) }}
+                            <i class="fa-solid fa-cloud-arrow-up ct-upload-icon"></i>
+                            <div class="ct-upload-text">{{ 'companies.form.upload_hint'|trans({}, 'companies') }}</div>
+                            <div class="ct-upload-hint">PDF, JPG, PNG, DOC, XLS — max. 10 MB</div>
+                        </label>
+                        <div id="doc-file-list" class="ct-file-list"></div>
+                        <div class="mg-form-error">{{ form_errors(form.documents) }}</div>
+                    </div>
+                </div>
+            </div>
+
+            {# Bottom actions #}
+            <div class="ct-form-actions">
+                <a href="{{ companiesIndexUrl }}" class="mg-btn mg-btn-secondary"><i
+                        class="fa-solid fa-arrow-left"></i> {{ 'companies.form.cancel'|trans({}, 'companies') }}</a>
+                <div class="ct-form-actions-right">
+                    <button type="submit" class="mg-btn mg-btn-primary mg-btn-lg"><i
+                            class="fa-solid fa-floppy-disk"></i> {% if isEdit %}{{ 'companies.form.save_changes'|trans({}, 'companies') }}{% else %}{{ 'companies.form.save'|trans({}, 'companies') }}{% endif %}
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+{% endblock %}
