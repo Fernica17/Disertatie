@@ -2,16 +2,21 @@ import { Controller } from '@hotwired/stimulus';
 import { openCamera, closeCamera, grabFrame, postFrame, drawDetectionBox } from '../js/face-camera';
 
 /**
- * Face-assisted sign in.
+ * Hands-free face sign in.
  *
- * The camera works out which account you are; the password form that follows
- * does the actual authentication. The controller never signs anyone in: it only
- * fills the username and hands over to the normal login form.
+ * The camera starts on its own and the cheap detection loop drives everything:
+ * once a face has been framed for a few consecutive polls, one recognition call
+ * fires by itself. Recognition is never polled — it costs three times a
+ * detection, sends four times the bytes and is rate limited, so running it in a
+ * loop would exhaust the allowance within seconds of opening the page.
+ *
+ * A failed attempt retries a couple of times, then stops and waits for the
+ * person rather than hammering the endpoint.
  */
 export default class extends Controller {
     static targets = [
         'video', 'overlay', 'placeholder', 'status', 'subtitle',
-        'startButton', 'captureButton',
+        'startButton', 'retryButton',
         'cameraStep', 'passwordStep',
         'identifiedName', 'identifiedEmail', 'usernameInput', 'passwordInput',
     ];
@@ -20,17 +25,32 @@ export default class extends Controller {
         detectUrl: String,
         identifyUrl: String,
         interval: { type: Number, default: 600 },
-        // Frames the detector must accept in a row before the button unlocks.
-        // A single good frame is easy to hit by accident while moving.
-        streak: { type: Number, default: 2 },
+        // Consecutive detections before recognition fires. A single good frame
+        // is easy to hit mid-movement, and a blurred face wastes an attempt.
+        streak: { type: Number, default: 3 },
+        // Automatic attempts before falling back to a manual retry.
+        maxAttempts: { type: Number, default: 3 },
+        // Gap between automatic attempts, so a person has time to reposition.
+        cooldown: { type: Number, default: 2500 },
+        // How long to wait on the permission prompt before offering a way out.
+        permissionWait: { type: Number, default: 8000 },
     };
 
     connect() {
         this.stream = null;
         this.timer = null;
+        this.starting = false;
+        this.permissionTimer = null;
         this.inFlight = false;
-        this.busy = false;
+        this.identifying = false;
+        this.finished = false;
         this.goodFrames = 0;
+        this.attempts = 0;
+        this.nextAttemptAt = 0;
+
+        // The page exists to use the camera, so do not make people ask for it.
+        // If the browser refuses, the button below takes over.
+        this.start();
     }
 
     disconnect() {
@@ -38,18 +58,34 @@ export default class extends Controller {
     }
 
     async start() {
-        if (this.stream) {
+        if (this.stream || this.starting) {
             return;
         }
 
+        this.starting = true;
         this.setStatus(this.t('starting'));
+        this.startButtonTarget.hidden = true;
+
+        // getUserMedia stays pending while the permission prompt is open, and
+        // never settles if it is dismissed. Without this the page would sit on
+        // "starting the camera" with no way forward.
+        this.permissionTimer = window.setTimeout(() => {
+            if (!this.stream) {
+                this.setStatus(this.t('permissionWaiting'), 'error');
+                this.startButtonTarget.hidden = false;
+            }
+        }, this.permissionWaitValue);
 
         try {
             this.stream = await openCamera();
         } catch (error) {
             this.setStatus(this.t('cameraError'), 'error');
+            this.startButtonTarget.hidden = false;
 
             return;
+        } finally {
+            this.starting = false;
+            window.clearTimeout(this.permissionTimer);
         }
 
         this.videoTarget.srcObject = this.stream;
@@ -57,13 +93,15 @@ export default class extends Controller {
 
         this.placeholderTarget.hidden = true;
         this.startButtonTarget.hidden = true;
-        this.captureButtonTarget.hidden = false;
+        this.retryButtonTarget.hidden = true;
 
+        this.finished = false;
+        this.attempts = 0;
         this.timer = window.setInterval(() => this.poll(), this.intervalValue);
     }
 
     async poll() {
-        if (this.inFlight || this.busy || !this.stream) {
+        if (this.inFlight || this.identifying || this.finished || !this.stream) {
             return;
         }
 
@@ -73,28 +111,37 @@ export default class extends Controller {
             const blob = await grabFrame(this.videoTarget, 320, 0.5);
             const data = await postFrame(this.detectUrlValue, blob, 'gate.jpg');
 
-            this.goodFrames = data.usable ? this.goodFrames + 1 : 0;
-            const ready = this.goodFrames >= this.streakValue;
-
-            this.captureButtonTarget.disabled = !ready;
-            this.setStatus(data.message ?? '', ready ? 'ok' : null);
             drawDetectionBox(this.overlayTarget, this.videoTarget, data.face, 320);
+
+            if (!data.usable) {
+                this.goodFrames = 0;
+                this.setStatus(data.message ?? '');
+
+                return;
+            }
+
+            this.goodFrames += 1;
+
+            if (this.goodFrames < this.streakValue || Date.now() < this.nextAttemptAt) {
+                this.setStatus(data.message ?? '', 'ok');
+
+                return;
+            }
+
+            await this.identify();
         } catch (error) {
             this.goodFrames = 0;
-            this.captureButtonTarget.disabled = true;
             this.setStatus(this.t('genericError'), 'error');
         } finally {
             this.inFlight = false;
         }
     }
 
-    async capture() {
-        if (this.busy || !this.stream) {
-            return;
-        }
-
-        this.busy = true;
-        this.captureButtonTarget.disabled = true;
+    /** One recognition attempt. Only ever called from the detection loop. */
+    async identify() {
+        this.identifying = true;
+        this.attempts += 1;
+        this.goodFrames = 0;
         this.setStatus(this.t('matching'));
 
         try {
@@ -102,7 +149,7 @@ export default class extends Controller {
             const data = await postFrame(this.identifyUrlValue, blob, 'capture.jpg');
 
             if (data.matched && data.redirect) {
-                // The server already signed the user in.
+                this.finished = true;
                 this.teardown();
                 this.setStatus(`${this.t('greeting')} ${data.user.name}`, 'ok');
                 window.location.href = data.redirect;
@@ -111,20 +158,50 @@ export default class extends Controller {
             }
 
             if (data.matched && data.user) {
+                this.finished = true;
                 this.showPasswordStep(data.user);
 
                 return;
             }
 
-            this.setStatus(data.message ?? this.t('genericError'), 'error');
+            this.handleMiss(data.message);
         } catch (error) {
-            this.setStatus(this.t('genericError'), 'error');
+            this.handleMiss(this.t('genericError'));
         } finally {
-            this.busy = false;
+            this.identifying = false;
         }
     }
 
-    /** Camera off, password on. The stream stops as soon as it is not needed. */
+    /** Backs off after a miss, and gives up rather than looping forever. */
+    handleMiss(message) {
+        if (this.attempts >= this.maxAttemptsValue) {
+            this.finished = true;
+            this.stopPolling();
+            this.setStatus(message ?? this.t('genericError'), 'error');
+            this.retryButtonTarget.hidden = false;
+
+            return;
+        }
+
+        this.nextAttemptAt = Date.now() + this.cooldownValue;
+        this.setStatus(this.t('retrying'), 'error');
+    }
+
+    /** Manual restart once the automatic attempts are spent. */
+    retry() {
+        this.retryButtonTarget.hidden = true;
+        this.attempts = 0;
+        this.goodFrames = 0;
+        this.nextAttemptAt = 0;
+        this.finished = false;
+
+        if (!this.timer) {
+            this.timer = window.setInterval(() => this.poll(), this.intervalValue);
+        }
+
+        this.setStatus(this.t('idle'));
+    }
+
     showPasswordStep(user) {
         this.teardown();
 
@@ -139,26 +216,14 @@ export default class extends Controller {
         this.passwordInputTarget.focus();
     }
 
-    restart() {
-        this.passwordStepTarget.hidden = true;
-        this.cameraStepTarget.hidden = false;
-        this.subtitleTarget.hidden = false;
-
-        this.passwordInputTarget.value = '';
-        this.usernameInputTarget.value = '';
-
-        this.placeholderTarget.hidden = false;
-        this.startButtonTarget.hidden = false;
-        this.captureButtonTarget.hidden = true;
-        this.captureButtonTarget.disabled = true;
-
-        this.setStatus(this.t('idle'));
+    stopPolling() {
+        window.clearInterval(this.timer);
+        this.timer = null;
     }
 
     teardown() {
-        window.clearInterval(this.timer);
-        this.timer = null;
-
+        this.stopPolling();
+        window.clearTimeout(this.permissionTimer);
         closeCamera(this.stream);
         this.stream = null;
         this.goodFrames = 0;

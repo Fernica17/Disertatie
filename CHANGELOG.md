@@ -6,6 +6,13 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
 ### Adăugat
 
+- **Recunoaștere fără apăsare de buton** pe pagina de autentificare cu fața:
+  camera pornește singură, iar recunoașterea se declanșează automat după trei
+  cadre consecutive cu o față stabilă. Recunoașterea nu se apelează în buclă —
+  costă de trei ori cât o detecție și e limitată la 20 de cereri pe minut, deci
+  o buclă la 600 ms ar epuiza limita în ~12 secunde. Bucla ieftină de detecție
+  rămâne declanșatorul.
+
 - `FACE_LOGIN_REQUIRE_PASSWORD` — când este `false`, potrivirea facială
   autentifică direct, fără parolă. Setat pe `false` pentru demo. Pentru orice
   mediu real trebuie `true`, cât timp nu există detecție de viu: o fotografie

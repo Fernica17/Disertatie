@@ -70,10 +70,12 @@ security:
     face_login:
         title: 'Autentificare cu fața'
         subtitle: 'Privește spre cameră pentru a-ți identifica contul, apoi confirmă cu parola.'
-        subtitle_direct: 'Privește spre cameră pentru a te autentifica.'
+        subtitle_direct: 'Privește spre cameră. Te recunoaștem automat.'
         start: 'Pornește camera'
         capture: 'Identifică-mă'
         retry: 'Încearcă din nou'
+        retrying: 'Nu te-am recunoscut. Mai încerc o dată…'
+        permission_waiting: 'Aștept permisiunea pentru cameră. Acceptă solicitarea browserului sau pornește manual.'
         back: 'Înapoi la autentificarea clasică'
         greeting: 'Bună,'
         no_match: 'Nu am putut identifica nicio persoană înregistrată. Încearcă din nou sau folosește emailul și parola.'

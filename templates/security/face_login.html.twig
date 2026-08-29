@@ -24,7 +24,9 @@
          data-face-login-text-matching="{{ 'users.face.detect.matching'|trans({}, 'users') }}"
          data-face-login-text-camera-error="{{ 'users.face.error.camera'|trans({}, 'users') }}"
          data-face-login-text-generic-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
-         data-face-login-text-greeting="{{ 'security.face_login.greeting'|trans({}, 'security') }}">
+         data-face-login-text-greeting="{{ 'security.face_login.greeting'|trans({}, 'security') }}"
+         data-face-login-text-retrying="{{ 'security.face_login.retrying'|trans({}, 'security') }}"
+         data-face-login-text-permission-waiting="{{ 'security.face_login.permission_waiting'|trans({}, 'security') }}">
 
         {# Step 1: camera #}
         <div data-face-login-target="cameraStep">
@@ -40,18 +42,20 @@
                 {{ 'users.face.detect.idle'|trans({}, 'users') }}
             </p>
 
-            <button type="button" class="login-btn login-btn-secondary"
+            {# Only surfaces when the browser refuses to start the camera on its own #}
+            <button type="button" class="login-btn login-btn-secondary" hidden
                     data-face-login-target="startButton"
                     data-action="face-login#start">
                 <i class="fa-solid fa-video"></i>
                 <span>{{ 'security.face_login.start'|trans({}, 'security') }}</span>
             </button>
 
-            <button type="button" class="login-btn" disabled hidden
-                    data-face-login-target="captureButton"
-                    data-action="face-login#capture">
-                <i class="fa-solid fa-camera"></i>
-                <span>{{ 'security.face_login.capture'|trans({}, 'security') }}</span>
+            {# Appears once the automatic attempts are spent #}
+            <button type="button" class="login-btn" hidden
+                    data-face-login-target="retryButton"
+                    data-action="face-login#retry">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>{{ 'security.face_login.retry'|trans({}, 'security') }}</span>
             </button>
         </div>
 

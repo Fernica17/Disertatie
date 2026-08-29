@@ -16,7 +16,9 @@ framework:
             limit: 150
             interval: '1 minute'
 
+        # Recognition fires by itself once a face is stable, with up to three
+        # attempts per visit, so the allowance has to cover a few page loads.
         face_login_identify:
             policy: 'sliding_window'
-            limit: 10
+            limit: 20
             interval: '1 minute'
