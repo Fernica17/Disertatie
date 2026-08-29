@@ -99,13 +99,13 @@
 
                             <div class="mg-photo-field-actions">
                                 {% if photo %}
-                                    <button type="button" class="btn btn-sm btn-danger"
+                                    <button type="button" class="mg-btn mg-btn-danger mg-btn-sm"
                                             data-photo-preview-target="removeButton"
                                             data-action="photo-preview#remove">
                                         <i class="fa-solid fa-trash-can"></i> {{ 'users.action.remove_photo'|trans({}, 'users') }}
                                     </button>
                                 {% endif %}
-                                <button type="button" class="btn btn-sm btn-secondary" hidden
+                                <button type="button" class="mg-btn mg-btn-secondary mg-btn-sm" hidden
                                         data-photo-preview-target="undoButton"
                                         data-action="photo-preview#undo">
                                     {{ 'users.action.undo_remove_photo'|trans({}, 'users') }}
