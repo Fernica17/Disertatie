@@ -31,6 +31,24 @@ class UsersService
     }
 
     /**
+     * Erases the reference photo and the face embedding derived from it.
+     *
+     * Both sides go together: leaving the embedding behind would keep face
+     * login working for a user whose photo the admin just deleted.
+     */
+    public function removeReferencePhoto(Users $user): void
+    {
+        foreach ($this->filesUploadService->getFilesForEntity($user, Files::TYPE_USER_AVATAR) as $file) {
+            $this->filesUploadService->remove($file);
+        }
+
+        $this->entityManager->flush();
+        $this->faceRecognition->deleteEnrollment($user);
+
+        $this->logger->info('Reference photo removed', ['user_id' => $user->getId()]);
+    }
+
+    /**
      * Stores the reference photo and registers it with the face service.
      *
      * Runs after the user is committed, because enrolment needs the user id and

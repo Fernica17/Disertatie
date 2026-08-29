@@ -240,6 +240,8 @@ class UsersCrudController extends AbstractCrudController
             ->setPermission('ROLE_ADMIN');
         yield BooleanField::new('isActive', $this->translator->trans('users.field.is_active', [], 'users'))
             ->renderAsSwitch(true);
+        $currentPhoto = $isNew ? null : $this->currentPhotoOf($this->getContext()?->getEntity()?->getInstance());
+
         yield Field::new('photoUpload', $this->translator->trans('users.field.photo', [], 'users'))
             ->setFormType(FileType::class)
             ->setFormTypeOptions([
@@ -254,8 +256,17 @@ class UsersCrudController extends AbstractCrudController
                     ),
                 ],
             ])
-            ->setHelp($this->translator->trans('users.help.photo', [], 'users'))
+            ->setHelp($this->photoHelp($currentPhoto))
+            ->setFormTypeOption('help_html', true)
             ->onlyOnForms();
+
+        // Only offer removal when there is something to remove.
+        if ($currentPhoto !== null) {
+            yield BooleanField::new('removePhoto', $this->translator->trans('users.field.remove_photo', [], 'users'))
+                ->renderAsSwitch(false)
+                ->setHelp($this->translator->trans('users.help.remove_photo', [], 'users'))
+                ->onlyOnForms();
+        }
     }
 
     private function getRoleChoices(): array
@@ -356,7 +367,17 @@ class UsersCrudController extends AbstractCrudController
             '{name}' => $entityInstance->getFullName(),
         ], 'users'));
 
-        $this->handleReferencePhoto($entityInstance, $entityInstance->getPhotoUpload());
+        $photo = $entityInstance->getPhotoUpload();
+
+        if ($photo !== null) {
+            // A new upload replaces the old one, so it also settles a removal request.
+            $this->handleReferencePhoto($entityInstance, $photo);
+        } elseif ($entityInstance->isRemovePhoto()) {
+            $this->usersService->removeReferencePhoto($entityInstance);
+            $this->addFlash('success', $this->translator->trans('users.flash.photo_removed', [
+                '{name}' => $entityInstance->getFullName(),
+            ], 'users'));
+        }
     }
 
     public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
@@ -374,6 +395,37 @@ class UsersCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn): Users
     {
         return new Users();
+    }
+
+    private function currentPhotoOf(mixed $entity): ?Files
+    {
+        if (!$entity instanceof Users || $entity->getId() === null) {
+            return null;
+        }
+
+        return $this->filesUploadService->getFilesForEntity($entity, Files::TYPE_USER_AVATAR)[0] ?? null;
+    }
+
+    /**
+     * Help text for the upload field, with a thumbnail of the current photo.
+     *
+     * The file lives outside the web root and is served through admin_file_view,
+     * so it cannot be rendered by a plain asset path.
+     */
+    private function photoHelp(?Files $photo): string
+    {
+        $text = $this->translator->trans('users.help.photo', [], 'users');
+
+        if ($photo === null) {
+            return $text;
+        }
+
+        return sprintf(
+            '<img src="%s" alt="" style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px; '
+            . 'border: 1px solid var(--mg-border, #dee2e6); display: block; margin-bottom: 8px;">%s',
+            htmlspecialchars($this->generateUrl('admin_file_view', ['id' => $photo->getId()]), \ENT_QUOTES),
+            htmlspecialchars($text, \ENT_QUOTES),
+        );
     }
 
     /**

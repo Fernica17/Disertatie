@@ -6,6 +6,10 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
 ### Adăugat
 
+- **Previzualizarea fotografiei** în formularul de utilizator și opțiunea
+  **Șterge fotografia**, care elimină atât fișierul, cât și datele de
+  recunoaștere facială. O poză nouă o înlocuiește oricum pe cea veche.
+
 - **Fotografie de referință pe utilizator** — câmp în formularul de administrare.
   La salvare, poza devine avatarul utilizatorului și este trimisă serviciului de
   recunoaștere facială pentru asociere. O poză fără față (sau cu mai multe) este
@@ -14,6 +18,13 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 - `FaceRecognitionService` — client HTTP către serviciul Python (înrolare,
   verificare 1:1, stare, ștergere).
 - Datele biometrice se șterg automat odată cu utilizatorul (GDPR Art. 17).
+
+### Corectat
+
+- `Users::__serialize()` exclude starea tranzitorie a formularului. `Users` este
+  entitatea de securitate și ajunge serializată în sesiune, iar un `UploadedFile`
+  nu poate fi serializat: fără asta, un administrator care își încărca propria
+  fotografie primea „Serialization of UploadedFile is not allowed".
 
 ## [0.4.0] - 2026-08-29
 

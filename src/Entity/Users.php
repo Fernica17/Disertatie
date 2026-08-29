@@ -73,6 +73,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private ?UploadedFile $photoUpload = null;
 
+    /**
+     * Set from the form to erase the reference photo and its face embedding.
+     */
+    private bool $removePhoto = false;
+
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isVerified = false;
 
@@ -150,7 +155,29 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Clear any temporary, sensitive data
+        $this->plainPassword = null;
+        $this->photoUpload = null;
+    }
+
+    /**
+     * Keeps transient form state out of the serialized user.
+     *
+     * Symfony stores the authenticated user in the session, and an UploadedFile
+     * cannot be serialized: leaving $photoUpload in would make every request
+     * fail with "Serialization of UploadedFile is not allowed" as soon as an
+     * admin uploads a photo for their own account.
+     */
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+
+        unset(
+            $data["\0" . self::class . "\0photoUpload"],
+            $data["\0" . self::class . "\0plainPassword"],
+            $data["\0" . self::class . "\0removePhoto"],
+        );
+
+        return $data;
     }
 
     public function getFirstName(): ?string
@@ -207,6 +234,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhotoUpload(?UploadedFile $photoUpload): self
     {
         $this->photoUpload = $photoUpload;
+
+        return $this;
+    }
+
+    public function isRemovePhoto(): bool
+    {
+        return $this->removePhoto;
+    }
+
+    public function setRemovePhoto(bool $removePhoto): self
+    {
+        $this->removePhoto = $removePhoto;
 
         return $this;
     }
