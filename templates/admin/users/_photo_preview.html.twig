@@ -1,0 +1,41 @@
+{#
+    Rendered into the help slot of the photo upload field.
+
+    The frame starts hidden when the user has no photo yet: the Stimulus
+    controller reveals it as soon as a file is picked, so creating a user shows
+    a live preview too.
+#}
+<div class="mg-photo-field" data-controller="photo-preview">
+    <div class="mg-photo-field-frame"{% if photo is null %} hidden{% endif %} data-photo-preview-target="frame">
+        <img src="{{ photo ? path('admin_file_view', {id: photo.id}) : '' }}"
+             alt=""
+             class="mg-photo-field-image"
+             data-photo-preview-target="image">
+    </div>
+
+    <div class="mg-photo-field-actions">
+        {% if photo %}
+            <button type="button"
+                    class="btn btn-sm btn-danger mg-photo-field-remove"
+                    data-photo-preview-target="removeButton"
+                    data-action="photo-preview#remove">
+                <i class="fa fa-trash-can"></i>
+                {{ 'users.action.remove_photo'|trans({}, 'users') }}
+            </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn btn-sm btn-secondary"
+                hidden
+                data-photo-preview-target="undoButton"
+                data-action="photo-preview#undo">
+            {{ 'users.action.undo_remove_photo'|trans({}, 'users') }}
+        </button>
+    </div>
+
+    <p class="mg-photo-field-pending" hidden data-photo-preview-target="pending">
+        {{ 'users.help.photo_pending_removal'|trans({}, 'users') }}
+    </p>
+
+    <p class="mg-photo-field-hint">{{ 'users.help.photo'|trans({}, 'users') }}</p>
+</div>

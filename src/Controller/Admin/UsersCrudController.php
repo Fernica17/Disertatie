@@ -256,15 +256,15 @@ class UsersCrudController extends AbstractCrudController
                     ),
                 ],
             ])
-            ->setHelp($this->photoHelp($currentPhoto))
+            ->setHelp($this->renderView('admin/users/_photo_preview.html.twig', ['photo' => $currentPhoto]))
             ->setFormTypeOption('help_html', true)
             ->onlyOnForms();
 
-        // Only offer removal when there is something to remove.
+        // Backs the red remove button in the preview widget. Hidden by the
+        // Stimulus controller so the intent is expressed once, by the button.
         if ($currentPhoto !== null) {
             yield BooleanField::new('removePhoto', $this->translator->trans('users.field.remove_photo', [], 'users'))
                 ->renderAsSwitch(false)
-                ->setHelp($this->translator->trans('users.help.remove_photo', [], 'users'))
                 ->onlyOnForms();
         }
     }
@@ -404,28 +404,6 @@ class UsersCrudController extends AbstractCrudController
         }
 
         return $this->filesUploadService->getFilesForEntity($entity, Files::TYPE_USER_AVATAR)[0] ?? null;
-    }
-
-    /**
-     * Help text for the upload field, with a thumbnail of the current photo.
-     *
-     * The file lives outside the web root and is served through admin_file_view,
-     * so it cannot be rendered by a plain asset path.
-     */
-    private function photoHelp(?Files $photo): string
-    {
-        $text = $this->translator->trans('users.help.photo', [], 'users');
-
-        if ($photo === null) {
-            return $text;
-        }
-
-        return sprintf(
-            '<img src="%s" alt="" style="width: 96px; height: 96px; object-fit: cover; border-radius: 8px; '
-            . 'border: 1px solid var(--mg-border, #dee2e6); display: block; margin-bottom: 8px;">%s',
-            htmlspecialchars($this->generateUrl('admin_file_view', ['id' => $photo->getId()]), \ENT_QUOTES),
-            htmlspecialchars($text, \ENT_QUOTES),
-        );
     }
 
     /**

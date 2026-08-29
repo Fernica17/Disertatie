@@ -6,9 +6,11 @@ Toate modificările notabile ale aplicației sunt documentate în acest fișier.
 
 ### Adăugat
 
-- **Previzualizarea fotografiei** în formularul de utilizator și opțiunea
-  **Șterge fotografia**, care elimină atât fișierul, cât și datele de
-  recunoaștere facială. O poză nouă o înlocuiește oricum pe cea veche.
+- **Previzualizarea fotografiei** în formularul de utilizator, actualizată în
+  timp real la selectarea unui fișier, cu buton roșu de ștergere lângă imagine.
+  Ștergerea elimină fișierul și datele de recunoaștere facială, dar se aplică
+  doar la salvare — până atunci poate fi anulată. O poză nouă o înlocuiește
+  oricum pe cea veche.
 
 - **Fotografie de referință pe utilizator** — câmp în formularul de administrare.
   La salvare, poza devine avatarul utilizatorului și este trimisă serviciului de

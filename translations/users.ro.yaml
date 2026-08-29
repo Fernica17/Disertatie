@@ -1,5 +1,7 @@
 users:
     action:
+        remove_photo: 'Șterge fotografia'
+        undo_remove_photo: 'Anulează'
         change_password: 'Schimbă parola'
         new: 'Adaugă utilizator'
         edit: 'Editează'
@@ -44,7 +46,7 @@ users:
         role: Rol
     help:
         photo: 'O fotografie clară, cu o singură față privind spre cameră. Este folosită ca avatar și pentru recunoașterea facială la autentificare.'
-        remove_photo: 'Șterge fotografia curentă și datele de recunoaștere facială asociate. Dacă încarci o poză nouă, aceasta o înlocuiește oricum pe cea veche.'
+        photo_pending_removal: 'Fotografia și datele de recunoaștere facială vor fi șterse la salvare.'
     face:
         error:
             no_face: 'Fotografia a fost salvată ca avatar, dar nu s-a detectat nicio față în ea, așa că autentificarea facială nu este disponibilă.'
