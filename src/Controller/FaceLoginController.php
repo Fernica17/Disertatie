@@ -32,6 +32,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FaceLoginController extends AbstractController
 {
     private const int MAX_FRAME_BYTES = 4 * 1024 * 1024;
+    private const array ALLOWED_FRAME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
     public function __construct(
         private readonly FaceRecognitionService $faceRecognition,
@@ -174,6 +175,13 @@ class FaceLoginController extends AbstractController
         $frame = $request->files->get('frame');
 
         if (!$frame instanceof UploadedFile || $frame->getSize() > self::MAX_FRAME_BYTES) {
+            return null;
+        }
+
+        // getMimeType() sniffs the content; the browser-supplied type is not
+        // evidence of anything, and neither `accept` nor the client-side check
+        // survives a request built by hand.
+        if (!\in_array($frame->getMimeType(), self::ALLOWED_FRAME_TYPES, true)) {
             return null;
         }
 

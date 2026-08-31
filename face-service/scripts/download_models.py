@@ -16,9 +16,9 @@ MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
 BASE = "https://github.com/opencv/opencv_zoo/raw/main/models"
 
 MODELS: dict[str, str] = {
-    # SCRFD-style detector, ~345 KB
+    # YuNet detector, ~227 KB
     "face_detection_yunet_2023mar.onnx": f"{BASE}/face_detection_yunet/face_detection_yunet_2023mar.onnx",
-    # SFace recognizer, 512-d embeddings, ~37 MB
+    # SFace recognizer, 128-d embeddings, ~37 MB
     "face_recognition_sface_2021dec.onnx": f"{BASE}/face_recognition_sface/face_recognition_sface_2021dec.onnx",
 }
 

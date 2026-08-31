@@ -6,6 +6,7 @@ use App\Entity\Files;
 use App\Entity\Persons;
 use App\Form\Type\PersonFormType;
 use App\Security\Voter\UsersVoter;
+use App\Service\FaceRecognitionService;
 use App\Service\FilesUploadService;
 use App\Service\PersonsService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -41,6 +42,7 @@ class PersonsCrudController extends AbstractCrudController
     public function __construct(
         private readonly PersonsService $personsService,
         private readonly FilesUploadService $filesUploadService,
+        private readonly FaceRecognitionService $faceRecognition,
         private readonly TranslatorInterface $translator,
         private readonly AdminUrlGenerator $adminUrlGenerator,
     ) {
@@ -58,7 +60,8 @@ class PersonsCrudController extends AbstractCrudController
             ->setEntityLabelInPlural($this->trans('persons.entity.plural'))
             ->setPageTitle(Crud::PAGE_INDEX, $this->trans('persons.page.index'))
             ->setDefaultSort(['lastName' => 'ASC', 'firstName' => 'ASC'])
-            ->setSearchFields(['firstName', 'lastName', 'nationalId', 'idDocument', 'phone', 'email']);
+            ->setSearchFields(['firstName', 'lastName', 'nationalId', 'idDocument', 'phone', 'email'])
+            ->showEntityActionsInlined();
     }
 
     public function configureActions(Actions $actions): Actions
@@ -67,7 +70,31 @@ class PersonsCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->setPermission(Action::NEW, UsersVoter::USERS_CREATE)
             ->setPermission(Action::EDIT, UsersVoter::USERS_EDIT)
-            ->setPermission(Action::DELETE, UsersVoter::USERS_DELETE);
+            ->setPermission(Action::DELETE, UsersVoter::USERS_DELETE)
+            ->setPermission(Action::DETAIL, UsersVoter::USERS_VIEW)
+
+            // Same icons and tooltips as the staff list, so the two read alike
+            ->update(Crud::PAGE_INDEX, Action::NEW, fn (Action $action) => $action
+                ->setIcon('far fa-square-plus')
+                ->setLabel($this->trans('persons.action.new')))
+            ->update(Crud::PAGE_INDEX, Action::DETAIL, fn (Action $action) => $action
+                ->setHtmlAttributes([
+                    'data-bs-toggle' => 'tooltip',
+                    'title' => $this->trans('persons.action.detail'),
+                ]))
+            ->update(Crud::PAGE_INDEX, Action::EDIT, fn (Action $action) => $action
+                ->setIcon('far fa-pen-to-square')
+                ->setHtmlAttributes([
+                    'data-bs-toggle' => 'tooltip',
+                    'title' => $this->trans('persons.action.edit'),
+                ]))
+            ->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action
+                ->setIcon('far fa-trash-can')
+                ->setCssClass('text-danger')
+                ->setHtmlAttributes([
+                    'data-bs-toggle' => 'tooltip',
+                    'title' => $this->trans('persons.action.delete'),
+                ]));
     }
 
     public function configureFields(string $pageName): iterable
@@ -86,6 +113,28 @@ class PersonsCrudController extends AbstractCrudController
         yield TextField::new('fullAddress', $this->trans('persons.field.address'))->onlyOnDetail();
         yield TextField::new('notes', $this->trans('persons.field.notes'))->onlyOnDetail();
         yield BooleanField::new('isActive', $this->trans('persons.field.is_active'))->renderAsSwitch(false);
+    }
+
+    /**
+     * Rendered by hand rather than by EasyAdmin's generic detail page: this is
+     * an identity record, so the photo belongs beside the data, not in a row of
+     * its own, and the page should say whether the face is actually searchable.
+     */
+    public function detail(AdminContext $context): Response
+    {
+        $person = $context->getEntity()->getInstance();
+
+        if (!$person instanceof Persons) {
+            throw $this->createNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted(UsersVoter::USERS_VIEW);
+
+        return $this->render('admin/persons/person_detail.html.twig', [
+            'person' => $person,
+            'photo' => $this->personsService->photoOf($person),
+            'faceSamples' => $this->faceRecognition->enrolledSamplesForPerson($person),
+        ]);
     }
 
     public function new(AdminContext $context): Response

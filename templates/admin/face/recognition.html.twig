@@ -24,13 +24,19 @@
          data-controller="face-capture"
          data-face-capture-detect-url-value="{{ path('admin_face_recognition_detect') }}"
          data-face-capture-search-url-value="{{ path('admin_face_recognition_search') }}"
+         data-face-capture-report-url-value="{{ path('admin_face_search_report_create') }}"
+         data-face-capture-text-report-saving="{{ 'reports.action.saving'|trans({}, 'persons') }}"
          data-face-capture-text-idle="{{ 'users.face.detect.idle'|trans({}, 'users') }}"
          data-face-capture-text-starting="{{ 'users.face.detect.starting'|trans({}, 'users') }}"
          data-face-capture-text-matching="{{ 'persons.search.matching'|trans({}, 'persons') }}"
          data-face-capture-text-camera-error="{{ 'users.face.error.camera'|trans({}, 'users') }}"
          data-face-capture-text-generic-error="{{ 'users.face.error.unavailable'|trans({}, 'users') }}"
          data-face-capture-text-file-hint="{{ 'persons.search.file_hint'|trans({}, 'persons') }}"
+         data-face-capture-text-file-type="{{ 'persons.search.file_type'|trans({}, 'persons') }}"
          data-face-capture-text-score-label="{{ 'persons.search.score'|trans({}, 'persons') }}"
+         data-face-capture-text-open-record="{{ 'persons.search.open_record'|trans({}, 'persons') }}"
+         data-face-capture-text-below-flag="{{ 'persons.search.below_flag'|trans({}, 'persons') }}"
+         data-face-capture-text-threshold-note="{{ 'persons.search.threshold_note'|trans({}, 'persons') }}"
          data-face-capture-label-national-id="{{ 'persons.field.national_id'|trans({}, 'persons') }}"
          data-face-capture-label-id-document="{{ 'persons.field.id_document'|trans({}, 'persons') }}"
          data-face-capture-label-birth-date="{{ 'persons.field.birth_date'|trans({}, 'persons') }}"
@@ -95,22 +101,29 @@
                     </div>
 
                     <div hidden data-face-capture-target="filePanel">
-                        <div class="fc-dropzone">
+                        {# The whole zone takes a drop, and a click anywhere in it opens the picker #}
+                        <div class="fc-dropzone"
+                             data-face-capture-target="dropzone"
+                             data-action="click->face-capture#pickFile
+                                          dragenter->face-capture#dragOver
+                                          dragover->face-capture#dragOver
+                                          dragleave->face-capture#dragLeave
+                                          drop->face-capture#dropped">
                             <i class="fa-solid fa-image"></i>
                             <p>{{ 'persons.search.file_hint'|trans({}, 'persons') }}</p>
                             <input type="file" accept="image/jpeg,image/png,image/webp" class="d-none"
-                                   id="faceSearchFile"
                                    data-face-capture-target="fileInput"
                                    data-action="face-capture#fileChosen">
-                            <label for="faceSearchFile" class="custom-file-upload">
+                            <span class="custom-file-upload">
                                 <i class="fa-solid fa-folder-open"></i> {{ 'persons.search.choose_file'|trans({}, 'persons') }}
-                            </label>
+                            </span>
                         </div>
                         <p class="fc-status" data-face-capture-target="fileStatus"></p>
                     </div>
                 </div>
 
                 {# The person's file #}
+                <div class="fc-column">
                 <div class="fc-result" data-face-capture-target="result">
                     <div class="fc-result-empty" data-face-capture-target="resultEmpty">
                         <i class="fa-solid fa-user-large"></i>
@@ -128,6 +141,34 @@
                             <i class="fa-solid fa-up-right-from-square"></i> {{ 'persons.search.open_record'|trans({}, 'persons') }}
                         </a>
                     </div>
+                </div>
+
+                {# The field behind the verdict, so a close call is visible #}
+                <div class="mg-card fc-ranking" hidden data-face-capture-target="ranking">
+                    <div class="mg-card-header">
+                        <h2 class="mg-card-title">
+                            <i class="fa-solid fa-list-ol ct-icon-primary"></i>
+                            {{ 'persons.search.ranking'|trans({}, 'persons') }}
+                        </h2>
+                    </div>
+                    <div class="ct-form-section">
+                        <ol class="fr-candidates" data-face-capture-target="rankingList"></ol>
+                        <p class="fc-status" data-face-capture-target="rankingNote"></p>
+                    </div>
+                </div>
+
+                {# A report can be worth keeping even when nothing matched #}
+                <div class="fc-report" hidden data-face-capture-target="reportBar">
+                    <button type="button" class="mg-btn mg-btn-secondary"
+                            data-face-capture-target="reportButton"
+                            data-action="face-capture#saveReport">
+                        <i class="fa-solid fa-file-lines"></i> {{ 'reports.action.save'|trans({}, 'persons') }}
+                    </button>
+                    <a href="#" class="mg-btn mg-btn-primary" hidden data-face-capture-target="reportLink">
+                        <i class="fa-solid fa-up-right-from-square"></i> {{ 'reports.action.open'|trans({}, 'persons') }}
+                    </a>
+                    <p class="fc-status" data-face-capture-target="reportStatus"></p>
+                </div>
                 </div>
 
             </div>

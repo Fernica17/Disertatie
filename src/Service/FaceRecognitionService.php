@@ -105,11 +105,15 @@ class FaceRecognitionService
     /**
      * Who is in the frame? Searches every enrolled face (1:N).
      *
-     * @return array{ok: bool, matched: bool, userId: ?int, score: ?float, reason: ?string}
+     * `candidates` asks the recogniser for the ranked runners-up as well, which
+     * a report needs: the verdict alone does not show how close the field was.
+     *
+     * @return array{ok: bool, matched: bool, userId: ?int, score: ?float, threshold: ?float, reason: ?string, candidates: list<array{userId: int, score: float}>}
      */
-    public function identify(File $frame, string $collection = self::COLLECTION_USERS): array
+    public function identify(File $frame, string $collection = self::COLLECTION_USERS, int $candidates = 0): array
     {
-        $result = $this->request('POST', '/faces/identify', $frame, $collection);
+        $query = $candidates > 0 ? ['candidates' => $candidates] : [];
+        $result = $this->request('POST', '/faces/identify', $frame, $collection, $query);
         $data = $result['data'];
 
         return [
@@ -117,7 +121,15 @@ class FaceRecognitionService
             'matched' => (bool) ($data['matched'] ?? false),
             'userId' => isset($data['user_id']) ? (int) $data['user_id'] : null,
             'score' => isset($data['score']) ? (float) $data['score'] : null,
+            'threshold' => isset($data['threshold']) ? (float) $data['threshold'] : null,
             'reason' => $result['reason'],
+            'candidates' => array_values(array_map(
+                static fn (array $c): array => [
+                    'userId' => (int) $c['user_id'],
+                    'score' => (float) $c['score'],
+                ],
+                $data['candidates'] ?? [],
+            )),
         ];
     }
 
@@ -152,14 +164,28 @@ class FaceRecognitionService
      */
     public function enrolledSamples(Users $user): int
     {
-        $userId = $user->getId();
+        return $this->samplesFor($user->getId(), self::COLLECTION_USERS);
+    }
 
-        if ($userId === null) {
+    /**
+     * How many reference faces the registry holds for this person.
+     *
+     * Zero means the record exists but cannot be found by face: either no photo
+     * was uploaded, or the recogniser rejected the one that was.
+     */
+    public function enrolledSamplesForPerson(Persons $person): int
+    {
+        return $this->samplesFor($person->getId(), self::COLLECTION_PERSONS);
+    }
+
+    private function samplesFor(?int $subjectId, string $collection): int
+    {
+        if ($subjectId === null) {
             return 0;
         }
 
         try {
-            $response = $this->httpClient->request('GET', $this->url(sprintf('/faces/%d?collection=%s', $userId, self::COLLECTION_USERS)), [
+            $response = $this->httpClient->request('GET', $this->url(sprintf('/faces/%d?collection=%s', $subjectId, $collection)), [
                 'headers' => ['X-API-Key' => $this->faceApiKey],
                 'timeout' => 5,
             ]);
@@ -167,7 +193,8 @@ class FaceRecognitionService
             return (int) ($response->toArray(false)['samples'] ?? 0);
         } catch (ExceptionInterface $e) {
             $this->logger->warning('Face service unreachable while reading enrolment', [
-                'user_id' => $userId,
+                'subject_id' => $subjectId,
+                'collection' => $collection,
                 'error' => $e->getMessage(),
             ]);
 
@@ -247,12 +274,19 @@ class FaceRecognitionService
     /**
      * @return array{ok: bool, reason: ?string, data: array}
      */
-    private function request(string $method, string $path, File $photo, ?string $collection = null): array
+    /**
+     * @param array<string, scalar> $query
+     */
+    private function request(string $method, string $path, File $photo, ?string $collection = null, array $query = []): array
     {
         $url = $this->url($path);
 
         if ($collection !== null) {
-            $url .= '?collection=' . urlencode($collection);
+            $query = ['collection' => $collection] + $query;
+        }
+
+        if ($query !== []) {
+            $url .= '?' . http_build_query($query);
         }
 
         try {

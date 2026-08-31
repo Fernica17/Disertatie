@@ -1,0 +1,150 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set searchUrl = path('admin_face_recognition') %}
+
+{% block title %}{{ 'reports.page.title'|trans({'{id}': report.id}, 'persons') }} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li><a href="{{ searchUrl }}">{{ 'persons.search.title'|trans({}, 'persons') }}</a></li>
+    <li class="active">{{ 'reports.page.title'|trans({'{id}': report.id}, 'persons') }}</li>
+{% endblock %}
+
+{% block content %}
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">{{ 'reports.page.title'|trans({'{id}': report.id}, 'persons') }}</h1>
+            <p class="mg-page-subtitle">
+                {{ report.createdAt|date('d.m.Y H:i') }} · {{ report.searchedByName }}
+            </p>
+        </div>
+        <div class="mg-page-actions">
+            <a href="{{ path('admin_face_report_pdf', {id: report.id}) }}" class="mg-btn mg-btn-secondary">
+                <i class="fa-solid fa-file-pdf"></i> {{ 'reports.action.pdf'|trans({}, 'persons') }}
+            </a>
+            <a href="{{ searchUrl }}" class="mg-btn mg-btn-primary">
+                <i class="fa-solid fa-magnifying-glass"></i> {{ 'reports.action.new_search'|trans({}, 'persons') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="mg-profile-layout">
+
+        <aside class="mg-profile-sidebar">
+            <div class="mg-card mg-profile-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-camera text-primary"></i> {{ 'reports.field.query'|trans({}, 'persons') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    {% if report.queryPhoto %}
+                        <img src="{{ path('admin_file_view', {id: report.queryPhoto.id}) }}"
+                             alt="{{ 'reports.field.query'|trans({}, 'persons') }}"
+                             class="fr-query-image">
+                    {% else %}
+                        <p class="mg-data-value">—</p>
+                    {% endif %}
+
+                    <div class="mg-form-grid fr-meta">
+                        <div class="mg-data-item mg-col-full">
+                            <div class="mg-data-label">{{ 'reports.field.verdict'|trans({}, 'persons') }}</div>
+                            <div class="mg-data-value">
+                                {% if report.matched %}
+                                    <span class="mg-badge mg-badge-active">
+                                        {{ 'reports.verdict.matched'|trans({'{name}': report.matchedPerson ? report.matchedPerson.fullName : '—'}, 'persons') }}
+                                    </span>
+                                {% else %}
+                                    <span class="mg-badge mg-badge-inactive">{{ 'reports.verdict.no_match'|trans({}, 'persons') }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'reports.field.top_score'|trans({}, 'persons') }}</div>
+                            <div class="mg-data-value">{{ report.topScore is null ? '—' : report.topScore|number_format(3) }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'reports.field.match_threshold'|trans({}, 'persons') }}</div>
+                            <div class="mg-data-value">{{ report.matchThreshold|number_format(2) }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'reports.field.registry_size'|trans({}, 'persons') }}</div>
+                            <div class="mg-data-value">{{ report.registrySize }}</div>
+                        </div>
+                        <div class="mg-data-item">
+                            <div class="mg-data-label">{{ 'reports.field.report_threshold'|trans({}, 'persons') }}</div>
+                            <div class="mg-data-value">{{ report.reportThreshold|number_format(2) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="mg-profile-content">
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-list-ol text-primary"></i>
+                        {{ 'reports.section.candidates'|trans({'{max}': maxCandidates}, 'persons') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    {% if report.candidates is empty %}
+                        <p class="mg-data-value mg-face-state is-off">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ 'reports.candidates.none'|trans({'{threshold}': report.reportThreshold|number_format(2)}, 'persons') }}
+                        </p>
+                    {% else %}
+                        <ol class="fr-candidates">
+                            {% for candidate in report.candidates %}
+                                {% set below = candidate.score < report.reportThreshold %}
+                                <li class="fr-candidate{{ below ? ' is-below' : '' }}">
+                                    <span class="fr-rank">{{ loop.index }}</span>
+                                    <span class="fr-avatar">
+                                        {% if candidate.photoId %}
+                                            <img src="{{ path('admin_file_view', {id: candidate.photoId}) }}" alt="">
+                                        {% else %}
+                                            <span class="fr-initials">{{ candidate.name|first|upper }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <span class="fr-name">{{ candidate.name }}</span>
+                                    {% if below %}
+                                        <span class="fr-flag">{{ 'persons.search.below_flag'|trans({}, 'persons') }}</span>
+                                    {% endif %}
+                                    <span class="fr-score {{ candidate.score >= report.matchThreshold ? 'is-over' : '' }}">
+                                        {{ candidate.score|number_format(3) }}
+                                    </span>
+                                    <a href="{{ path('admin_persons_detail', {entityId: candidate.personId}) }}"
+                                       class="mg-btn mg-btn-secondary mg-btn-sm">
+                                        <i class="fa-solid fa-up-right-from-square"></i>
+                                        {{ 'persons.search.open_record'|trans({}, 'persons') }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ol>
+
+                        <p class="fc-status fr-below">
+                            {{ 'persons.search.threshold_note'|trans({'{threshold}': report.reportThreshold|number_format(2)}, 'persons') }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if report.pdfFile and report.folder %}
+                <div class="mg-card">
+                    <div class="mg-card-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-folder-open text-primary"></i> {{ 'reports.section.stored'|trans({}, 'persons') }}
+                        </div>
+                    </div>
+                    <div class="mg-card-body">
+                        <div class="mg-data-value">
+                            <a href="{{ path('admin_documents_system', {folder: report.folder.id}) }}">
+                                {{ folderPath|join(' / ') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

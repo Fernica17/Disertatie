@@ -8,6 +8,7 @@ use App\Repository\PersonsRepository;
 use App\Repository\UsersRepository;
 use App\Security\Voter\UsersVoter;
 use App\Service\FaceRecognitionService;
+use App\Service\FaceSearchReportService;
 use App\Service\FilesUploadService;
 use App\Service\PersonsService;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
@@ -34,12 +35,14 @@ class FaceRecognitionController extends AbstractController
 {
     /** Frames larger than this are refused before reaching the face service. */
     private const int MAX_FRAME_BYTES = 4 * 1024 * 1024;
+    private const array ALLOWED_FRAME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
     public function __construct(
         private readonly FaceRecognitionService $faceRecognition,
         private readonly UsersRepository $usersRepository,
         private readonly PersonsRepository $personsRepository,
         private readonly PersonsService $personsService,
+        private readonly FaceSearchReportService $reportService,
         private readonly FilesUploadService $filesUploadService,
         private readonly TranslatorInterface $translator,
         private readonly RateLimiterFactoryInterface $faceIdentifyLimiter,
@@ -108,7 +111,11 @@ class FaceRecognitionController extends AbstractController
             return $this->json(['ok' => false, 'matched' => false, 'message' => $this->trans('users.face.error.bad_image')], Response::HTTP_BAD_REQUEST);
         }
 
-        $result = $this->faceRecognition->identify($frame, FaceRecognitionService::COLLECTION_PERSONS);
+        $result = $this->faceRecognition->identify(
+            $frame,
+            FaceRecognitionService::COLLECTION_PERSONS,
+            FaceSearchReportService::MAX_CANDIDATES,
+        );
 
         if (!$result['ok']) {
             return $this->json([
@@ -120,13 +127,15 @@ class FaceRecognitionController extends AbstractController
             ]);
         }
 
+        $ranking = $this->rankingFor($result['candidates'], $result['threshold']);
+
         if (!$result['matched'] || $result['userId'] === null) {
             return $this->json([
                 'ok' => true,
                 'matched' => false,
                 'score' => $result['score'],
                 'message' => $this->translator->trans('persons.search.no_match', [], 'persons'),
-            ]);
+            ] + $ranking);
         }
 
         $person = $this->personsRepository->find($result['userId']);
@@ -137,7 +146,7 @@ class FaceRecognitionController extends AbstractController
                 'matched' => false,
                 'score' => $result['score'],
                 'message' => $this->translator->trans('persons.search.stale', [], 'persons'),
-            ]);
+            ] + $ranking);
         }
 
         $photo = $this->personsService->photoOf($person);
@@ -166,7 +175,47 @@ class FaceRecognitionController extends AbstractController
                     ->setEntityId($person->getId())
                     ->generateUrl(),
             ],
-        ]);
+        ] + $ranking);
+    }
+
+    /**
+     * The ranked field behind the verdict.
+     *
+     * All of them, weak ones included, each flagged against the listing
+     * threshold: seeing that the runner-up sits at 0.34 is what tells you the
+     * verdict was not a close call.
+     *
+     * @param list<array{userId: int, score: float}> $candidates
+     *
+     * @return array{candidates: list<array<string, mixed>>, reportThreshold: float, matchThreshold: ?float}
+     */
+    private function rankingFor(array $candidates, ?float $matchThreshold = null): array
+    {
+        $threshold = FaceSearchReportService::REPORT_THRESHOLD;
+        $listed = [];
+
+        foreach ($this->reportService->describeCandidates($candidates) as $candidate) {
+            $listed[] = [
+                'name' => $candidate['name'],
+                'score' => $candidate['score'],
+                'below' => $candidate['score'] < $threshold,
+                'photoUrl' => $candidate['photoId'] === null
+                    ? null
+                    : $this->generateUrl('admin_file_view', ['id' => $candidate['photoId']]),
+                'detailUrl' => $this->adminUrlGenerator
+                    ->unsetAll()
+                    ->setController(PersonsCrudController::class)
+                    ->setAction('detail')
+                    ->setEntityId($candidate['personId'])
+                    ->generateUrl(),
+            ];
+        }
+
+        return [
+            'candidates' => $listed,
+            'reportThreshold' => $threshold,
+            'matchThreshold' => $matchThreshold,
+        ];
     }
 
     /**
@@ -255,6 +304,13 @@ class FaceRecognitionController extends AbstractController
         $frame = $request->files->get('frame');
 
         if (!$frame instanceof UploadedFile || $frame->getSize() > self::MAX_FRAME_BYTES) {
+            return null;
+        }
+
+        // getMimeType() sniffs the content; the browser-supplied type is not
+        // evidence of anything, and neither `accept` nor the client-side check
+        // survives a request built by hand.
+        if (!\in_array($frame->getMimeType(), self::ALLOWED_FRAME_TYPES, true)) {
             return null;
         }
 

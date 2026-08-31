@@ -26,6 +26,18 @@ class CountiesFixtures extends Fixture implements FixtureGroupInterface, Depende
         $jsonPath = __DIR__ . '/data/counties.json';
         $counties = json_decode(file_get_contents($jsonPath), true);
 
+        if ($manager->getRepository(Counties::class)->count([]) > 0) {
+            foreach ($counties as $data) {
+                $existing = $manager->getRepository(Counties::class)->findOneBy(['code' => $data['code']]);
+
+                if ($existing !== null) {
+                    $this->addReference('county-' . $data['old_id'], $existing);
+                }
+            }
+
+            return;
+        }
+
         foreach ($counties as $data) {
             $county = new Counties();
             $county->setName($data['name']);

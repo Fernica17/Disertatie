@@ -38,6 +38,8 @@ class Files
 
     public const TYPE_CORRESPONDENCE_DOCUMENT = 'correspondence_document';
     public const TYPE_FOLDER_DOCUMENT = 'folder_document';
+    public const TYPE_FACE_SEARCH_QUERY = 'face_search_query';
+    public const TYPE_FACE_SEARCH_REPORT = 'face_search_report';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

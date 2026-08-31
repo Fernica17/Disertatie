@@ -251,6 +251,18 @@ class Persons
         return $this;
     }
 
+    /**
+     * The photo lives in Files (TYPE_PERSON_PHOTO), not on the entity.
+     *
+     * EasyAdmin still needs the property to be readable: it decides whether a
+     * column is "inaccessible" before formatValue() ever runs, so without this
+     * getter the index shows that label instead of the thumbnail.
+     */
+    public function getPhoto(): ?string
+    {
+        return null;
+    }
+
     public function getPhotoUpload(): ?UploadedFile
     {
         return $this->photoUpload;

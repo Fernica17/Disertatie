@@ -1,0 +1,135 @@
+{#
+    Standalone document for dompdf.
+
+    Laid out with tables and absolute units rather than the site's stylesheet:
+    dompdf has no flexbox or grid, and images must arrive as data URIs because
+    remote fetching is switched off.
+#}
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="utf-8">
+    <title>{{ 'reports.page.title'|trans({'{id}': report.id}, 'persons') }}</title>
+    <style>
+        @page { margin: 28px 32px; }
+        body { font-family: "DejaVu Sans", sans-serif; font-size: 10pt; color: #1f2937; }
+        h1 { font-size: 15pt; margin: 0 0 2px; }
+        .sub { color: #6b7280; font-size: 9pt; margin: 0 0 16px; }
+        .rule { border-bottom: 1px solid #e5e7eb; margin: 0 0 16px; }
+        .section { font-size: 11pt; font-weight: bold; margin: 0 0 8px; }
+        .card { border: 1px solid #e5e7eb; border-radius: 6px; padding: 12px; }
+        .query-photo { width: 150px; border-radius: 6px; }
+        .label { color: #6b7280; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .4px; }
+        .value { font-size: 10pt; font-weight: bold; }
+        .meta td { padding: 3px 12px 3px 0; vertical-align: top; }
+        table.list { width: 100%; border-collapse: collapse; margin-top: 4px; }
+        table.list th { text-align: left; font-size: 8pt; color: #6b7280; text-transform: uppercase;
+                        border-bottom: 1px solid #e5e7eb; padding: 6px 4px; }
+        table.list td { border-bottom: 1px solid #f1f5f9; padding: 6px 4px; vertical-align: middle; }
+        td.rank { width: 22px; color: #6b7280; }
+        td.thumb { width: 44px; }
+        td.thumb img { width: 36px; height: 36px; border-radius: 50%; }
+        td.score { width: 60px; text-align: right; font-weight: bold; }
+        .over { color: #16a34a; }
+        .under { color: #6b7280; }
+        .matched { color: #16a34a; font-weight: bold; }
+        .nomatch { color: #6b7280; font-weight: bold; }
+        .empty { color: #6b7280; }
+        .flag { color: #9ca3af; font-size: 7.5pt; border: 1px solid #e5e7eb;
+                border-radius: 8px; padding: 1px 5px; margin-left: 6px; }
+        .foot { margin-top: 18px; color: #9ca3af; font-size: 7.5pt; }
+    </style>
+</head>
+<body>
+
+<h1>{{ 'reports.page.title'|trans({'{id}': report.id}, 'persons') }}</h1>
+<p class="sub">{{ report.createdAt|date('d.m.Y H:i') }} &middot; {{ report.searchedByName }}</p>
+<div class="rule"></div>
+
+<table width="100%">
+    <tr>
+        <td width="170" valign="top">
+            {% if queryImage %}
+                <img src="{{ queryImage }}" class="query-photo" alt="">
+            {% endif %}
+        </td>
+        <td valign="top">
+            <table class="meta">
+                <tr>
+                    <td class="label">{{ 'reports.field.verdict'|trans({}, 'persons') }}</td>
+                    <td>
+                        {% if report.matched %}
+                            <span class="matched">{{ 'reports.verdict.matched'|trans({'{name}': report.matchedPerson ? report.matchedPerson.fullName : '—'}, 'persons') }}</span>
+                        {% else %}
+                            <span class="nomatch">{{ 'reports.verdict.no_match'|trans({}, 'persons') }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">{{ 'reports.field.top_score'|trans({}, 'persons') }}</td>
+                    <td class="value">{{ report.topScore is null ? '—' : report.topScore|number_format(3) }}</td>
+                </tr>
+                <tr>
+                    <td class="label">{{ 'reports.field.match_threshold'|trans({}, 'persons') }}</td>
+                    <td class="value">{{ report.matchThreshold|number_format(2) }}</td>
+                </tr>
+                <tr>
+                    <td class="label">{{ 'reports.field.report_threshold'|trans({}, 'persons') }}</td>
+                    <td class="value">{{ report.reportThreshold|number_format(2) }}</td>
+                </tr>
+                <tr>
+                    <td class="label">{{ 'reports.field.registry_size'|trans({}, 'persons') }}</td>
+                    <td class="value">{{ report.registrySize }}</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<p class="section" style="margin-top:18px;">
+    {{ 'reports.section.candidates'|trans({'{max}': maxCandidates|default(10)}, 'persons') }}
+</p>
+
+{% if report.candidates is empty %}
+    <p class="empty">{{ 'reports.candidates.none'|trans({'{threshold}': report.reportThreshold|number_format(2)}, 'persons') }}</p>
+{% else %}
+    <table class="list">
+        <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>{{ 'persons.field.full_name'|trans({}, 'persons') }}</th>
+            <th style="text-align:right;">{{ 'persons.search.score'|trans({}, 'persons') }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for candidate in report.candidates %}
+            {% set below = candidate.score < report.reportThreshold %}
+            <tr>
+                <td class="rank">{{ loop.index }}</td>
+                <td class="thumb">
+                    {% if candidate.photoId and candidateImages[candidate.photoId] is defined %}
+                        <img src="{{ candidateImages[candidate.photoId] }}" alt="">
+                    {% endif %}
+                </td>
+                <td class="{{ below ? 'under' : '' }}">
+                    {{ candidate.name }}
+                    {% if below %}<span class="flag">{{ 'persons.search.below_flag'|trans({}, 'persons') }}</span>{% endif %}
+                </td>
+                <td class="score {{ candidate.score >= report.matchThreshold ? 'over' : 'under' }}">
+                    {{ candidate.score|number_format(3) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<p class="empty" style="margin-top:10px;">
+    {{ 'persons.search.threshold_note'|trans({'{threshold}': report.reportThreshold|number_format(2)}, 'persons') }}
+</p>
+
+<p class="foot">{{ 'reports.pdf.footer'|trans({}, 'persons') }}</p>
+
+</body>
+</html>

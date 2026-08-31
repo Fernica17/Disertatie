@@ -37,6 +37,7 @@ router = APIRouter(prefix="/faces", tags=["faces"], dependencies=[Depends(requir
 
 MODEL_NAME = "sface_2021dec"
 MAX_CANDIDATES = 5
+MAX_CANDIDATES_LIMIT = 25
 
 # Which set of faces a call operates on. Login accounts and the person registry
 # are stored separately so an id from one can never be answered for the other.
@@ -163,6 +164,12 @@ async def identify(
     request: Request,
     image: UploadFile = File(...),
     collection: str = CollectionParam,
+    candidates: int = Query(
+        default=MAX_CANDIDATES,
+        ge=1,
+        le=MAX_CANDIDATES_LIMIT,
+        description="How many ranked candidates to return alongside the verdict",
+    ),
     settings: Settings = Depends(get_settings),
 ) -> IdentifyResponse:
     """Scores the frame against every enrolled face and returns the best match.
@@ -202,7 +209,7 @@ async def identify(
         face=_to_box(face),
         candidates=[
             Candidate(user_id=uid, score=round(score, 4))
-            for uid, score in ranked[:MAX_CANDIDATES]
+            for uid, score in ranked[:candidates]
         ],
     )
 

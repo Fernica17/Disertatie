@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+#
+# Deschide aplicatia intr-un Chrome curat, fara extensii.
+#
+# Extensiile se injecteaza in fiecare pagina, inclusiv localhost, si isi scriu
+# avertismentele in consola ("MaxListenersExceededWarning", "ObjectMultiplex —
+# orphaned data for stream ..."). Nu vin din aplicatie si nu pot fi oprite din
+# codul ei: un content script ruleaza intr-un context JS separat, la care
+# pagina nu are acces.
+#
+# Profilul e tinut separat de cel personal, asa ca nu atinge nimic din Chrome-ul
+# de zi cu zi - nici extensii, nici parole, nici istoric.
+set -euo pipefail
+
+URL="${1:-http://localhost:8090}"
+PROFILE="${DEV_BROWSER_PROFILE:-${TMPDIR:-/tmp}/disertatie-chrome}"
+
+find_chrome() {
+    case "$(uname -s)" in
+        Darwin)
+            local app="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            [ -x "$app" ] && { printf '%s' "$app"; return 0; }
+            ;;
+        *)
+            for c in google-chrome google-chrome-stable chromium chromium-browser; do
+                command -v "$c" >/dev/null 2>&1 && { command -v "$c"; return 0; }
+            done
+            ;;
+    esac
+    return 1
+}
+
+CHROME="$(find_chrome)" || {
+    echo "Nu am gasit Chrome. Deschide manual: $URL" >&2
+    exit 1
+}
+
+mkdir -p "$PROFILE"
+echo "Profil: $PROFILE"
+echo "Deschid: $URL"
+
+"$CHROME" \
+    --user-data-dir="$PROFILE" \
+    --no-first-run \
+    --no-default-browser-check \
+    --disable-extensions \
+    "$URL" >/dev/null 2>&1 &

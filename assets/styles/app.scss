@@ -178,6 +178,53 @@ body {
     }
 }
 
+/* Person detail: face state and the delete panel */
+.mg-face-state {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+
+    &.is-ok {
+        color: var(--mg-success);
+    }
+
+    &.is-off {
+        color: var(--mg-text-muted);
+    }
+}
+
+.mg-data-longtext {
+    white-space: pre-line;
+    line-height: 1.6;
+}
+
+/* Kept apart from the record itself: deleting also erases the face data, so it
+   should not sit next to the ordinary actions. */
+.mg-danger-zone {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px 20px;
+    border: 1px solid var(--mg-danger-bg, #fee2e2);
+    border-radius: var(--mg-radius, 8px);
+    background: var(--mg-danger-bg, #fef2f2);
+}
+
+.mg-danger-zone-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--mg-danger);
+}
+
+.mg-danger-zone-hint {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--mg-text-muted);
+}
+
 /* Avatar upload */
 .avatar-upload-container {
     display: flex;

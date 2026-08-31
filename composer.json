@@ -13,6 +13,7 @@
         "doctrine/doctrine-fixtures-bundle": "^4.0",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.6",
+        "dompdf/dompdf": "^3.1",
         "easycorp/easyadmin-bundle": "^4.0",
         "gedmo/doctrine-extensions": "^3.0",
         "knplabs/knp-time-bundle": "^2.5",

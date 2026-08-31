@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Companies;
+use App\Entity\FaceSearchReports;
 use App\Entity\Files;
 use App\Entity\Folders;
 use App\Entity\Persons;
@@ -27,6 +28,8 @@ class FileServeController extends AbstractController
         Users::class => UsersVoter::USERS_VIEW_AVATAR,
         // The registry is guarded by the same permission as the staff list
         Persons::class => UsersVoter::USERS_VIEW,
+        // Searched frames and report PDFs follow the registry's permission
+        FaceSearchReports::class => UsersVoter::USERS_VIEW,
         Folders::class => FoldersVoter::FOLDERS_DOWNLOAD,
     ];
 

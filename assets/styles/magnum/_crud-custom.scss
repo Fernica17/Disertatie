@@ -404,19 +404,24 @@
 /* ---- Face recognition: camera stage and result ---- */
 .fc-layout {
     display: grid;
-    /* The camera keeps a 4:3 stage, so cap it or it grows to the card width */
-    grid-template-columns: minmax(0, 520px) 320px;
+    /* Equal halves filling the section, with the gap matching the section's own
+       24px side padding: the space to the card edges and the space between the
+       two panels then read as one measurement rather than three. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px;
-    align-items: start;
 
     @media (max-width: 992px) {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
 .fc-stage {
     position: relative;
-    aspect-ratio: 4 / 3;
+    /* A fixed height rather than an aspect ratio: the stage has to span its
+       column for the gutters to read as equal, and capping the height keeps the
+       buttons on screen. The video is object-fit: cover and the overlay measures
+       the rendered box, so a stage that is not 4:3 still draws a true box. */
+    height: 440px;
     background: #0f172a;
     border-radius: var(--mg-radius, 8px);
     overflow: hidden;
@@ -426,6 +431,11 @@
         height: 100%;
         object-fit: cover;
         display: block;
+    }
+
+    @media (max-width: 992px) {
+        height: auto;
+        aspect-ratio: 4 / 3;
     }
 }
 
@@ -482,12 +492,46 @@
     border-radius: var(--mg-radius, 8px);
     padding: 20px;
     display: flex;
-    align-items: center;
+    /* Top-aligned: a filled-in person card can outgrow the panel, and centring
+       it then clips the top. The empty state centres itself instead. */
+    align-items: flex-start;
     justify-content: center;
+    /* Grid stretch makes this as tall as the camera column, so the two sides
+       read as a pair; the floor is for the stacked layout. */
     min-height: 220px;
 }
 
+/* The search column: result panel with the report actions under it */
+.fc-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    /* The panel takes the height the camera column sets; the report bar keeps
+       its own. */
+    .fc-result {
+        flex: 1;
+    }
+}
+
+.fc-report {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+
+    .fc-status {
+        margin: 0;
+    }
+}
+
+.fc-report[hidden] {
+    display: none;
+}
+
 .fc-result-empty {
+    /* auto margins centre it in the flex parent without disturbing the card */
+    margin: auto;
     text-align: center;
     color: var(--mg-text-muted, #6b7280);
 
@@ -575,6 +619,23 @@
     padding: 40px 20px;
     text-align: center;
     color: var(--mg-text-muted, #6b7280);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:hover {
+        border-color: var(--mg-primary, #2563eb);
+    }
+
+    /* Children would otherwise fire their own dragleave as the pointer crosses
+       them, making the highlight flicker. */
+    &.is-dragover * {
+        pointer-events: none;
+    }
+
+    &.is-dragover {
+        border-color: var(--mg-primary, #2563eb);
+        background: var(--mg-primary-bg, #eff6ff);
+    }
 
     i {
         font-size: 32px;
@@ -614,7 +675,107 @@
     }
 }
 
-/* The result column can get tall once every field is filled in */
-.fc-result {
-    align-items: flex-start;
+/* Face search report page */
+.fr-query-image {
+    display: block;
+    width: 100%;
+    border-radius: var(--mg-radius, 8px);
+}
+
+.fr-meta {
+    margin-top: 16px;
+}
+
+.fr-candidates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.fr-candidate {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--mg-border);
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.fr-rank {
+    width: 20px;
+    color: var(--mg-text-muted, #6b7280);
+    font-size: 13px;
+    text-align: right;
+}
+
+.fr-avatar {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--mg-gray-100, #f1f5f9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.fr-initials {
+    font-weight: 600;
+    color: var(--mg-text-muted, #6b7280);
+}
+
+.fr-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--mg-text, #1f2937);
+}
+
+/* Tabular figures so the column of scores lines up */
+.fr-score {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--mg-text-muted, #6b7280);
+
+    &.is-over {
+        color: var(--mg-success, #16a34a);
+    }
+}
+
+.fr-below {
+    margin-top: 12px;
+}
+
+/* Below the listing threshold: still shown, but visibly not a contender */
+.fr-candidate.is-below {
+    .fr-name,
+    .fr-score {
+        color: var(--mg-text-muted, #6b7280);
+    }
+
+    .fr-avatar img {
+        opacity: 0.55;
+    }
+}
+
+.fr-flag {
+    font-size: 11px;
+    color: var(--mg-text-muted, #6b7280);
+    border: 1px solid var(--mg-border);
+    border-radius: 10px;
+    padding: 1px 8px;
+    white-space: nowrap;
+}
+
+.fc-ranking[hidden] {
+    display: none;
 }

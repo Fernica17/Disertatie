@@ -7,10 +7,12 @@ persons:
         new: 'Adaugă persoană'
         edit: 'Editare: {name}'
         form_subtitle: 'Datele de identificare și fotografia folosită pentru căutarea după față.'
+        detail_subtitle: 'Fișa persoanei din registru.'
     fieldset:
         identity: 'Identitate'
         photo: 'Fotografie'
         contact: 'Contact'
+        face: 'Recunoaștere facială'
         notes: 'Observații'
     field:
         full_name: 'Nume complet'
@@ -35,6 +37,12 @@ persons:
         undo: 'Anulează'
         back: 'Înapoi la listă'
         save: 'Salvează'
+        edit: 'Editează'
+        new: 'Adaugă persoană'
+        detail: 'Vezi fișa'
+        delete: 'Șterge persoana'
+        delete_hint: 'Se șterg definitiv datele de identificare, fotografia și amprenta facială.'
+        delete_confirm: 'Ștergi definitiv persoana {name}? Fotografia și amprenta facială se pierd.'
     help:
         photo: 'O fotografie clară, cu o singură față privind spre cameră. Este folosită pentru căutarea după față.'
         photo_pending_removal: 'Fotografia și datele de recunoaștere vor fi șterse la salvare.'
@@ -43,7 +51,12 @@ persons:
         updated: 'Persoana {name} a fost actualizată.'
         photo_removed: 'Fotografia și datele de recunoaștere au fost șterse.'
         face_enrolled: 'Fotografia lui {name} a fost înregistrată pentru căutare după față.'
+    status:
+        active: 'Activ'
+        inactive: 'Inactiv'
     face:
+        searchable: 'Poate fi găsită după față.'
+        not_searchable: 'Nu poate fi găsită după față — lipsește o fotografie utilizabilă.'
         failed: 'Fotografia a fost salvată, dar {reason}, așa că persoana nu va putea fi găsită după față.'
         error:
             bad_image: 'fișierul nu a putut fi citit ca imagine'
@@ -56,11 +69,45 @@ persons:
         mode_file: 'Fotografie'
         action: 'Caută'
         choose_file: 'Alege o fotografie'
-        file_hint: 'Încarcă o fotografie cu o singură persoană.'
+        file_hint: 'Încarcă o fotografie'
+        file_type: 'Acceptăm doar imagini JPEG, PNG sau WebP.'
+        drop_here: 'Dă-i drumul aici'
         matching: 'Se caută în registru…'
         result_empty: 'Niciun rezultat încă'
         no_match: 'Nicio potrivire în registru. Persoana nu are fotografie înregistrată sau scorul este sub prag.'
         stale: 'S-a găsit o potrivire, dar persoana nu mai există în registru.'
         nobody_enrolled: 'Nicio persoană din registru nu are încă fotografie, deci nu există cu ce compara.'
         score: 'Scor:'
+        ranking: 'Cine a mai semănat'
+        below_flag: 'sub prag'
+        threshold_note: 'Sub scorul de {threshold} șansele sunt mici.'
         open_record: 'Deschide fișa'
+
+reports:
+    page:
+        title: 'Raport căutare #{id}'
+    section:
+        candidates: 'Primii {max} candidați'
+        stored: 'Documente'
+    field:
+        query: 'Imaginea căutată'
+        verdict: 'Rezultat'
+        top_score: 'Cel mai bun scor'
+        match_threshold: 'Prag de potrivire'
+        report_threshold: 'Prag de listare'
+        registry_size: 'Persoane în registru'
+    verdict:
+        matched: 'Potrivire: {name}'
+        no_match: 'Fără potrivire'
+    candidates:
+        none: 'Niciun candidat peste pragul de {threshold}.'
+    action:
+        save: 'Salvează raport'
+        saving: 'Se salvează…'
+        open: 'Deschide raportul'
+        pdf: 'Descarcă PDF'
+        new_search: 'Căutare nouă'
+    flash:
+        saved: 'Raportul a fost salvat.'
+    pdf:
+        footer: 'Document generat automat. Scorurile sunt similarități cosinus între amprente faciale, în intervalul 0–1.'

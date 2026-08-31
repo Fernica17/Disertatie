@@ -1,0 +1,201 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set indexUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\PersonsCrudController').setAction('index').generateUrl() %}
+{% set editUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\PersonsCrudController').setAction('edit').setEntityId(person.id).generateUrl() %}
+{% set deleteUrl = ea_url().unsetAll().setController('App\\Controller\\Admin\\PersonsCrudController').setAction('delete').setEntityId(person.id).generateUrl() %}
+
+{% block title %}{{ person.fullName }} — {{ setting('app_title') ?? 'ERP' }}{% endblock %}
+
+{% block mg_breadcrumb %}
+    <li><a href="{{ indexUrl }}">{{ 'persons.entity.plural'|trans({}, 'persons') }}</a></li>
+    <li class="active">{{ person.fullName }}</li>
+{% endblock %}
+
+{% macro data_item(label, value, full) %}
+    <div class="mg-data-item{{ full ? ' mg-col-full' : '' }}">
+        <div class="mg-data-label">{{ label }}</div>
+        <div class="mg-data-value">{{ value|default('') is empty ? '—' : value }}</div>
+    </div>
+{% endmacro %}
+
+{% import _self as ui %}
+
+{% block content %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="mg-alert mg-alert-{{ label == 'danger' ? 'danger' : 'success' }}">
+                <i class="fa-solid {{ label == 'danger' ? 'fa-triangle-exclamation' : 'fa-check-circle' }}"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="mg-page-header">
+        <div>
+            <h1 class="mg-page-title">{{ person.fullName }}</h1>
+            <p class="mg-page-subtitle">{{ 'persons.page.detail_subtitle'|trans({}, 'persons') }}</p>
+        </div>
+    </div>
+
+    <div class="mg-profile-layout">
+
+        <aside class="mg-profile-sidebar">
+            <div class="mg-card mg-profile-card">
+                <div class="mg-profile-avatar">
+                    {% if photo %}
+                        <img src="{{ path('admin_file_view', {id: photo.id}) }}" alt="{{ person.fullName }}">
+                    {% else %}
+                        {% set initials = (person.firstName|default('?')|first|upper) ~ (person.lastName|default('')|first|upper) %}
+                        {% set colors = ['#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545', '#fd7e14', '#198754', '#20c997', '#0dcaf0'] %}
+                        <div class="mg-profile-initials" style="background-color: {{ colors[person.fullName|length % 9] }};">
+                            {{ initials }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h3 class="mg-profile-name">{{ person.fullName }}</h3>
+
+                <div class="mg-profile-role">
+                    <span class="mg-badge {{ person.isActive ? 'mg-badge-active' : 'mg-badge-inactive' }}">
+                        {{ (person.isActive ? 'persons.status.active' : 'persons.status.inactive')|trans({}, 'persons') }}
+                    </span>
+                </div>
+
+                {% if person.email %}
+                    <p class="mg-profile-email">{{ person.email }}</p>
+                {% endif %}
+
+                <div class="mg-profile-actions">
+                    <a href="{{ editUrl }}" class="mg-btn mg-btn-primary mg-btn-lg mg-btn-block">
+                        <i class="fa-solid fa-pen"></i> {{ 'persons.action.edit'|trans({}, 'persons') }}
+                    </a>
+                    <a href="{{ indexUrl }}" class="mg-btn mg-btn-secondary mg-btn-lg mg-btn-block">
+                        <i class="fa-solid fa-arrow-left"></i> {{ 'persons.action.back'|trans({}, 'persons') }}
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <section class="mg-profile-content">
+
+            {# Identitate #}
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-id-card text-primary"></i> {{ 'persons.fieldset.identity'|trans({}, 'persons') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    <div class="mg-form-grid">
+                        {{ ui.data_item('persons.field.first_name'|trans({}, 'persons'), person.firstName) }}
+                        {{ ui.data_item('persons.field.last_name'|trans({}, 'persons'), person.lastName) }}
+                        {{ ui.data_item('persons.field.national_id'|trans({}, 'persons'), person.nationalId) }}
+                        {{ ui.data_item('persons.field.id_document'|trans({}, 'persons'), person.idDocument) }}
+                        {{ ui.data_item(
+                            'persons.field.birth_date'|trans({}, 'persons'),
+                            person.birthDate ? person.birthDate|date('d.m.Y') ~ (person.age is not null ? ' (' ~ person.age ~ ')' : '') : null
+                        ) }}
+                    </div>
+                </div>
+            </div>
+
+            {# Contact #}
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-address-book text-primary"></i> {{ 'persons.fieldset.contact'|trans({}, 'persons') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    <div class="mg-form-grid">
+                        {{ ui.data_item('persons.field.phone'|trans({}, 'persons'), person.phone) }}
+                        {{ ui.data_item('persons.field.email'|trans({}, 'persons'), person.email) }}
+                        {{ ui.data_item('persons.field.address'|trans({}, 'persons'), person.fullAddress, true) }}
+                    </div>
+                </div>
+            </div>
+
+            {# Recunoastere faciala #}
+            <div class="mg-card">
+                <div class="mg-card-header">
+                    <div class="section-title">
+                        <i class="fa-solid fa-user-check text-primary"></i> {{ 'persons.fieldset.face'|trans({}, 'persons') }}
+                    </div>
+                </div>
+                <div class="mg-card-body">
+                    {% if faceSamples > 0 %}
+                        <p class="mg-data-value mg-face-state is-ok">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ 'persons.face.searchable'|trans({}, 'persons') }}
+                        </p>
+                    {% else %}
+                        <p class="mg-data-value mg-face-state is-off">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            {{ 'persons.face.not_searchable'|trans({}, 'persons') }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Observatii #}
+            {% if person.notes %}
+                <div class="mg-card">
+                    <div class="mg-card-header">
+                        <div class="section-title">
+                            <i class="fa-solid fa-note-sticky text-primary"></i> {{ 'persons.fieldset.notes'|trans({}, 'persons') }}
+                        </div>
+                    </div>
+                    <div class="mg-card-body">
+                        <div class="mg-data-value mg-data-longtext">{{ person.notes|nl2br }}</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if is_granted(constant('App\\Security\\Voter\\UsersVoter::USERS_DELETE'), person) %}
+                <div class="mg-danger-zone">
+                    <div>
+                        <div class="mg-danger-zone-title">{{ 'persons.action.delete'|trans({}, 'persons') }}</div>
+                        <p class="mg-danger-zone-hint">{{ 'persons.action.delete_hint'|trans({}, 'persons') }}</p>
+                    </div>
+                    <button type="button" class="mg-btn mg-btn-danger"
+                            data-bs-toggle="modal" data-bs-target="#deletePersonModal">
+                        <i class="fa-solid fa-trash"></i> {{ 'persons.action.delete'|trans({}, 'persons') }}
+                    </button>
+                </div>
+            {% endif %}
+
+        </section>
+    </div>
+
+    {% if is_granted(constant('App\\Security\\Voter\\UsersVoter::USERS_DELETE'), person) %}
+        <div class="modal fade" id="deletePersonModal" tabindex="-1" aria-labelledby="deletePersonModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content mg-card" style="border: none;">
+                    <div class="modal-header mg-card-header">
+                        <h5 class="modal-title section-title" id="deletePersonModalLabel">
+                            <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                            {{ 'persons.action.delete'|trans({}, 'persons') }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ 'persons.action.undo'|trans({}, 'persons') }}"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <p class="mg-data-value">{{ 'persons.action.delete_confirm'|trans({'{name}': person.fullName}, 'persons') }}</p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="mg-btn mg-btn-secondary" data-bs-dismiss="modal">
+                            {{ 'persons.action.undo'|trans({}, 'persons') }}
+                        </button>
+                        <form method="post" action="{{ deleteUrl }}">
+                            <input type="hidden" name="token" value="{{ csrf_token('ea-delete') }}">
+                            <button type="submit" class="mg-btn mg-btn-danger">
+                                <i class="fa-solid fa-trash"></i> {{ 'persons.action.delete'|trans({}, 'persons') }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

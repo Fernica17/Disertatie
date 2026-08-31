@@ -23,6 +23,10 @@ class CitiesFixtures extends Fixture implements FixtureGroupInterface, Dependent
 
     public function load(ObjectManager $manager): void
     {
+        if ($manager->getRepository(Cities::class)->count([]) > 0) {
+            return;
+        }
+
         $jsonPath = __DIR__ . '/data/cities.json';
         $cities = json_decode(file_get_contents($jsonPath), true);
 
